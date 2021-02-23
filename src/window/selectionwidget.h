@@ -45,7 +45,6 @@ namespace pixpaint
     };
 
     SelectionWidget(QWidget* parent, QMenu* rightClickMenu);
-    void updateSelection();
 
     void setMode(ESelectionMode mode);
 
@@ -62,6 +61,7 @@ namespace pixpaint
   private:
     friend class ZoomableScrollArea;
 
+    void updateSelection();
     void updateSelection(IntRect selectionRect);
     void updateSelectionUsingTemp();
 

@@ -33,7 +33,6 @@ namespace pixpaint
 
   public:
     explicit DummySelectionWidget(QWidget* parent);
-    void updateSelection();
 
     void setPosition(int x, int y);
 
@@ -45,7 +44,10 @@ namespace pixpaint
     const QTimer& getDashTimer() const noexcept;
 
   private:
+    friend class ZoomableScrollArea;
+
     void updateDash();
+    void updateSelection();
 
     QTimer  m_dashTimer;
     int     m_dashOffset;

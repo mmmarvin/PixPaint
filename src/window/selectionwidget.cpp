@@ -54,17 +54,6 @@ namespace pixpaint
   {
   }
 
-  void SelectionWidget::updateSelection()
-  {
-    const auto& selection_manager = getSelectionManager();
-    const auto& text_selection_manager = getTextSelectionManager();
-    if(selection_manager.selectionExists()) {
-      updateSelection(selection_manager.getSelectionRect());
-    } else if(text_selection_manager.selectionExists()) {
-      updateSelection(text_selection_manager.getSelectionRect());
-    }
-  }
-
   void SelectionWidget::setMode(ESelectionMode mode)
   {
     m_mode = mode;
@@ -344,7 +333,21 @@ namespace pixpaint
       painter.drawRect(0, 0, SELECTION_HANDLE_WIDTH, SELECTION_HANDLE_HEIGHT);
       painter.drawRect(width + SELECTION_HANDLE_WIDTH, 0, SELECTION_HANDLE_WIDTH, SELECTION_HANDLE_HEIGHT);
       painter.drawRect(0, height + SELECTION_HANDLE_HEIGHT, SELECTION_HANDLE_WIDTH, SELECTION_HANDLE_HEIGHT);
-      painter.drawRect(width + SELECTION_HANDLE_WIDTH, height + SELECTION_HANDLE_HEIGHT, SELECTION_HANDLE_WIDTH, SELECTION_HANDLE_HEIGHT);
+      painter.drawRect(width + SELECTION_HANDLE_WIDTH,
+                       height + SELECTION_HANDLE_HEIGHT,
+                       SELECTION_HANDLE_WIDTH,
+                       SELECTION_HANDLE_HEIGHT);
+    }
+  }
+
+  void SelectionWidget::updateSelection()
+  {
+    const auto& selection_manager = getSelectionManager();
+    const auto& text_selection_manager = getTextSelectionManager();
+    if(selection_manager.selectionExists()) {
+      updateSelection(selection_manager.getSelectionRect());
+    } else if(text_selection_manager.selectionExists()) {
+      updateSelection(text_selection_manager.getSelectionRect());
     }
   }
 

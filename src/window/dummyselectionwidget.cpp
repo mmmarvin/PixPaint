@@ -36,25 +36,6 @@ namespace pixpaint
     QObject::connect(&m_dashTimer, &QTimer::timeout, this, &DummySelectionWidget::updateDash);
   }
 
-  void DummySelectionWidget::updateSelection()
-  {
-    auto& img_env = getImageEnvironment();
-    auto& dummy_selection_manager = getDummySelectionManager();
-
-    auto selection_rect = dummy_selection_manager.getSelectionRect();
-    auto pixel_size = img_env.getView().getPixelSize();
-    selection_rect.x = double(selection_rect.x) * pixel_size;
-    selection_rect.y = double(selection_rect.y) * pixel_size;
-    selection_rect.width = double(selection_rect.width) * pixel_size;
-    selection_rect.height = double(selection_rect.height) * pixel_size;
-    this->resize(selection_rect.width + (SELECTION_HANDLE_WIDTH * 2),
-                 selection_rect.height + (SELECTION_HANDLE_HEIGHT * 2));
-
-    auto adj_offset = img_env.getScrollArea().frameWidth() + img_env.getScrollArea().lineWidth();
-    this->setPosition(img_env.getView().frameGeometry().x() + selection_rect.x + adj_offset,
-                      img_env.getView().frameGeometry().y() + selection_rect.y + adj_offset);
-  }
-
   void DummySelectionWidget::setPosition(int x, int y)
   {
     auto g = this->geometry();
@@ -103,5 +84,24 @@ namespace pixpaint
       m_dashOffset = (m_dashOffset + 1) % 10;
       this->repaint();
     }
+  }
+
+  void DummySelectionWidget::updateSelection()
+  {
+    auto& img_env = getImageEnvironment();
+    auto& dummy_selection_manager = getDummySelectionManager();
+
+    auto selection_rect = dummy_selection_manager.getSelectionRect();
+    auto pixel_size = img_env.getView().getPixelSize();
+    selection_rect.x = double(selection_rect.x) * pixel_size;
+    selection_rect.y = double(selection_rect.y) * pixel_size;
+    selection_rect.width = double(selection_rect.width) * pixel_size;
+    selection_rect.height = double(selection_rect.height) * pixel_size;
+    this->resize(selection_rect.width + (SELECTION_HANDLE_WIDTH * 2),
+                 selection_rect.height + (SELECTION_HANDLE_HEIGHT * 2));
+
+    auto adj_offset = img_env.getScrollArea().frameWidth() + img_env.getScrollArea().lineWidth();
+    this->setPosition(img_env.getView().frameGeometry().x() + selection_rect.x + adj_offset,
+                      img_env.getView().frameGeometry().y() + selection_rect.y + adj_offset);
   }
 }
