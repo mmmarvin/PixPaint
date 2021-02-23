@@ -80,6 +80,7 @@ namespace
   }
 }
   // Bresenham's line algorithm
+  // https://en.wikipedia.org/wiki/Bresenham's_line_algorithm
   void drawLine(const PixelData& brush, MaskablePixelData& layer, const Point& p1, const Point& p2, bool hard)
   {
     position_t hw = brush.getWidth() / 2;
