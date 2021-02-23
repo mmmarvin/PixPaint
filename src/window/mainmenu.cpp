@@ -373,8 +373,11 @@ namespace
         if(image_env.isViewSet() && getHistoryManager().canUndo()) {
           auto res = getHistoryManager().undo();
 
-          if(res & HistoryAction::EAR_REFRESH_FRAME_LIST) {
-            emitEvent(gui_events::HistoryRefreshFrameEvent());
+          if(res & HistoryAction::EAR_RECREATE_FRAME_LIST) {
+            emitEvent(gui_events::HistoryRecreateFrameEvent());
+          }
+          if(res & HistoryAction::EAR_RECREATE_LAYER_LIST) {
+            emitEvent(gui_events::HistoryRecreateLayerEvent());
           }
           if(res & HistoryAction::EAR_REFRESH_LAYER_LIST) {
             emitEvent(gui_events::HistoryRefreshLayerEvent());
@@ -397,8 +400,11 @@ namespace
         if(image_env.isViewSet() && getHistoryManager().canRedo()) {
           auto res = getHistoryManager().redo();
 
-          if(res & HistoryAction::EAR_REFRESH_FRAME_LIST) {
-            emitEvent(gui_events::HistoryRefreshFrameEvent());
+          if(res & HistoryAction::EAR_RECREATE_FRAME_LIST) {
+            emitEvent(gui_events::HistoryRecreateFrameEvent());
+          }
+          if(res & HistoryAction::EAR_RECREATE_LAYER_LIST) {
+            emitEvent(gui_events::HistoryRecreateLayerEvent());
           }
           if(res & HistoryAction::EAR_REFRESH_LAYER_LIST) {
             emitEvent(gui_events::HistoryRefreshLayerEvent());

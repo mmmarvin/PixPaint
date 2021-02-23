@@ -40,7 +40,7 @@ namespace pixpaint
     m_layer = std::make_unique<MaskablePixelData>(std::move(l));
     image.removeLayer(m_index);
 
-    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_REFRESH_LAYER_LIST);
+    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_RECREATE_LAYER_LIST);
   }
 
   AddLayerAction::EActionResult AddLayerAction::redo()
@@ -53,6 +53,6 @@ namespace pixpaint
     image.getLayer(m_index) = std::move(*m_layer.get());
     image.setCurrentLayerIndex(m_index);
 
-    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_REFRESH_LAYER_LIST);
+    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_RECREATE_LAYER_LIST);
   }
 }

@@ -192,13 +192,14 @@ namespace pixpaint
     emitEvent(gui_events::FrameChangeEvent { previous_frame_index, frame_index });
   }
 
-  void FrameToolbox::onEmit(const gui_events::HistoryRefreshFrameEvent&)
+  void FrameToolbox::onEmit(const gui_events::HistoryRecreateFrameEvent&)
   {
     clearItems();
     createItems();
 
     auto frame_index = getDocumentManager().getDocument().getAnimation().getCurrentFrameIndex();
     slotClicked(static_cast<FrameToolboxItem*>(m_itemHolderLayout->itemAt(frame_index)->widget()), frame_index);
+    m_scrollArea->repaint();
   }
 
   FrameToolboxItem* FrameToolbox::createItem(std::size_t index, bool addAtIndex)

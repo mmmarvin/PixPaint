@@ -121,7 +121,8 @@ namespace pixpaint
     getDummySelectionManager().clear();
 
     auto& selection_manager = getSelectionManager();
-    if(m_finalStartPoint.x != m_finalEndPoint.x &&
+    if(m_startPoint != m_endPoint &&
+       m_finalStartPoint.x != m_finalEndPoint.x &&
        m_finalStartPoint.y != m_finalEndPoint.y &&
        !selection_manager.selectionExists() &&
        !selection_manager.layerExists()) {

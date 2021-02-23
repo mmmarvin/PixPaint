@@ -41,6 +41,7 @@ namespace gui_events
   struct ImageFlattenEvent;
   struct ImageClearEvent;
   struct HistoryLayerChangeEvent;
+  struct HistoryRecreateLayerEvent;
   struct HistoryRefreshLayerEvent;
 }
   class LayerWidget : public QWidget,
@@ -49,6 +50,7 @@ namespace gui_events
                       EventListener<gui_events::ImageFlattenEvent>,
                       EventListener<gui_events::ImageClearEvent>,
                       EventListener<gui_events::HistoryLayerChangeEvent>,
+                      EventListener<gui_events::HistoryRecreateLayerEvent>,
                       EventListener<gui_events::HistoryRefreshLayerEvent>
   {
     static constexpr auto ITEM_HEIGHT = 100;
@@ -68,6 +70,7 @@ namespace gui_events
     void onEmit(const gui_events::ImageFlattenEvent& event) override;
     void onEmit(const gui_events::ImageClearEvent& event) override;
     void onEmit(const gui_events::HistoryLayerChangeEvent& event) override;
+    void onEmit(const gui_events::HistoryRecreateLayerEvent& event) override;
     void onEmit(const gui_events::HistoryRefreshLayerEvent& event) override;
 
     LayerWidgetItem* createItem(std::size_t index, bool addAtIndex = false);

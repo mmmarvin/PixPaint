@@ -25,7 +25,10 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
+#include "../history/showlayeraction.h"
+#include "../history/hidelayeraction.h"
 #include "../image/image.h"
+#include "../manager/historymanager.h"
 #include "../manager/imagemanager.h"
 #include "../manager/previewmanager.h"
 #include "layerpreviewview.h"
@@ -53,12 +56,12 @@ namespace pixpaint
     layout->addWidget(m_label, 8);
 
     m_checkbox = new QCheckBox(this);
-    m_checkbox->setChecked(true);
-    QObject::connect(m_checkbox, &QCheckBox::clicked, [this](bool toggled) {
+    m_checkbox->setChecked(imageManager.getImage().isVisible(layerIndex));
+    QObject::connect(m_checkbox, &QCheckBox::clicked, [this, layerIndex](bool toggled) {
       if(toggled) {
-        // HISTORY FIX: Show Layer
+        emitHistoryAction(ShowLayerAction(layerIndex));
       } else {
-        // HISTORY FIX: Hide Layer
+        emitHistoryAction(HideLayerAction(layerIndex));
       }
       LayerWidgetItem::toggled(toggled);
     });

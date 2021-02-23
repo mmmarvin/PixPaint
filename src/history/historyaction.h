@@ -32,8 +32,10 @@ namespace pixpaint
     {
       EAR_REFRESH_IMAGE = 1 << 0,
       EAR_REFRESH_IMAGE_SIZE = 1 << 1,
-      EAR_REFRESH_LAYER_LIST = 1 << 2,
-      EAR_REFRESH_FRAME_LIST = 1 << 3
+      EAR_RECREATE_LAYER_LIST = 1 << 2,
+      EAR_RECREATE_FRAME_LIST = 1 << 3,
+      EAR_REFRESH_LAYER_LIST = 1 << 4
+//      EAR_REFRESH_FRAME_LIST = 1 << 5
     };
 
     explicit HistoryAction(std::string name = "");
