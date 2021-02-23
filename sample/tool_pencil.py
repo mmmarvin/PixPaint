@@ -47,4 +47,5 @@ class ExampleBrushTool(pixpaint.PaintTool):
   def getDescription(self):
     return "Example Brush Tool"
     
-pixpaint.getPaintToolRegistrar().registerTool("Example Brush Tool", "", ExampleBrushTool())
+# Values must be: Tool name, tool icon filename, tool id (must be unique), shortcut key, class of new tool to register
+pixpaint.getPaintToolRegistrar().registerTool("Example Brush Tool", "", "exmp_brush", "", ExampleBrushTool())
