@@ -33,20 +33,25 @@
 #include "../image/point.h"
 #include "../image/rect.h"
 #include "../manager/colormanager.h"
+#include "../manager/consolemanager.h"
 #include "../manager/documentmanager.h"
 #include "../manager/drawermanager.h"
+#include "../manager/dummyselectionmanager.h"
 #include "../manager/imagemanager.h"
+#include "../manager/selectionmanager.h"
 #include "../registrar/animationfiletyperegistrar.h"
 #include "../registrar/imagefiletyperegistrar.h"
 #include "../registrar/painttoolregistrar.h"
 #include "../tool/painttoolbase.h"
+#include "../utility/geometry_utility.h"
 #include "../document.h"
 #include "../os_specific_headers.h"
 #include "animationfiletypewrapper.h"
 #include "effectwrapper.h"
+#include "headerstream.h"
 #include "imagefiletypewrapper.h"
 #include "painttoolwrapper.h"
-#include "headerstream.h"
+#include "script_errors.h"
 
 #define IMPORT_RECT(type, rectName) \
   bp::class_<Rect<type>>(rectName, bp::init<>()) \
@@ -241,12 +246,34 @@ BOOST_PYTHON_MODULE(pixpaint)
     .def("refresh", static_cast<void(ImageManager::*)(const IntRect&)>(&ImageManager::refresh))
     .def("getImage", static_cast<Image&(ImageManager::*)()>(&ImageManager::getImage), bp::return_value_policy<bp::reference_existing_object>());
 
-  bp::class_<DocumentManager, boost::noncopyable>("DocumentManager", bp::no_init)
-    .def("getDocument", static_cast<Document&(DocumentManager::*)()>(&DocumentManager::getDocument), bp::return_value_policy<bp::reference_existing_object>());
-
   bp::class_<ColorManager, boost::noncopyable>("ColorManager", bp::no_init)
     .def("getForegroundColor", &ColorManager::getForegroundColor, bp::return_value_policy<bp::return_by_value>())
     .def("getBackgroundColor", &ColorManager::getBackgroundColor, bp::return_value_policy<bp::return_by_value>());
+
+  bp::class_<ConsoleManager, boost::noncopyable>("ConsoleManager", bp::no_init)
+    .def("writeMessage",&ConsoleManager::writeMessage);
+
+  bp::class_<DocumentManager, boost::noncopyable>("DocumentManager", bp::no_init)
+    .def("getDocument", static_cast<Document&(DocumentManager::*)()>(&DocumentManager::getDocument), bp::return_value_policy<bp::reference_existing_object>());
+
+  bp::class_<SelectionManager, boost::noncopyable>("SelectionManager", bp::no_init)
+    .def("setSelectionRect", static_cast<void(SelectionManager::*)(position_t, position_t, position_t, position_t, bool, bool)>(&SelectionManager::setSelectionRect))
+    .def("setSelectionRectCenter", static_cast<void(SelectionManager::*)(position_t, position_t, position_t, position_t, bool, bool)>(&SelectionManager::setSelectionRectCenter))
+    .def("setSelectionLayer", static_cast<void(SelectionManager::*)(const MaskablePixelData&)>(&SelectionManager::setSelectionLayer))
+    .def("setSelectionLayerWithMask", static_cast<void(SelectionManager::*)(const MaskablePixelData&, const PixelData&)>(&SelectionManager::setSelectionLayer))
+    .def("selectionExists", &SelectionManager::selectionExists)
+    .def("layerExists", &SelectionManager::layerExists)
+    .def("layerMaskExists", &SelectionManager::layerMaskExists)
+    .def("getSelectionRect", static_cast<const IntRect&(SelectionManager::*)() const>(&SelectionManager::getSelectionRect), bp::return_value_policy<bp::reference_existing_object>())
+    .def("getSelectionLayer", static_cast<MaskablePixelData&(SelectionManager::*)()>(&SelectionManager::getSelectionLayer), bp::return_value_policy<bp::reference_existing_object>())
+    .def("getSelectionPreviewLayer", static_cast<ModifyablePixelData&(SelectionManager::*)()>(&SelectionManager::getSelectionPreviewLayer), bp::return_value_policy<bp::reference_existing_object>())
+    .def("getSelectionLayerMask", static_cast<PixelData&(SelectionManager::*)()>(&SelectionManager::getSelectionLayerMask), bp::return_value_policy<bp::reference_existing_object>());
+
+  bp::class_<DummySelectionManager, boost::noncopyable>("DummySelectionManager", bp::no_init)
+      .def("setSelectionRect", static_cast<void(DummySelectionManager::*)(position_t, position_t, position_t, position_t)>(&DummySelectionManager::setSelectionRect))
+      .def("clear", &DummySelectionManager::clear)
+      .def("selectionExists", &DummySelectionManager::selectionExists)
+      .def("getSelectionRect", &DummySelectionManager::getSelectionRect, bp::return_value_policy<bp::reference_existing_object>());
 
   /// Registrars
   bp::class_<PaintToolRegistrar, boost::noncopyable>("PaintToolRegistrar", bp::no_init)
@@ -258,22 +285,30 @@ BOOST_PYTHON_MODULE(pixpaint)
 
   /// Getters
   bp::def("getImageManager", &getImageManager, bp::return_value_policy<bp::reference_existing_object>());
-  bp::def("getDocumentManager", &getDocumentManager, bp::return_value_policy<bp::reference_existing_object>());
   bp::def("getColorManager", &getColorManager, bp::return_value_policy<bp::reference_existing_object>());
+  bp::def("getConsoleManager", &getConsoleManager, bp::return_value_policy<bp::reference_existing_object>());
+  bp::def("getDocumentManager", &getDocumentManager, bp::return_value_policy<bp::reference_existing_object>());
 
   bp::def("getLayerDrawer", &getLayerDrawer, bp::return_value_policy<bp::reference_existing_object>());
   bp::def("getPreviewDrawer", &getPreviewDrawer, bp::return_value_policy<bp::reference_existing_object>());
 
+  bp::def("getSelectionManager", &getSelectionManager, bp::return_value_policy<bp::reference_existing_object>());
+  bp::def("getDummySelectionManager", &getDummySelectionManager, bp::return_value_policy<bp::reference_existing_object>());
+
   bp::def("getPaintToolRegistrar", &getPaintToolRegistrar, bp::return_value_policy<bp::reference_existing_object>());
   bp::def("getImageFileTypeRegistrar", &getImageFileTypeRegistrar, bp::return_value_policy<bp::reference_existing_object>());
   bp::def("getAnimationFileTypeRegistrar", &getAnimationFileTypeRegistrar, bp::return_value_policy<bp::reference_existing_object>());
+}
+BOOST_PYTHON_MODULE(pixpaint_utils)
+{
+  bp::def("drawLine", &geometry_utils::drawLine);
 }
 
 namespace pixpaint
 {
 namespace
 {
-  void loadScriptsImpl(const os_specific::filesystem::path& location, bp::object& mainNamespace)
+  void load_scripts_impl(const os_specific::filesystem::path& location, bp::object& mainNamespace)
   {
     if(os_specific::filesystem::exists(location)) {
       for(const auto& tool_script_file : os_specific::filesystem::directory_iterator(location)) {
@@ -284,54 +319,56 @@ namespace
     }
   }
 
-  void loadToolScripts(bp::object& mainNamespace)
+  void load_tool_scripts(bp::object& mainNamespace)
   {
     auto location = os_specific::filesystem::current_path() /
                     os_specific::filesystem::path("scripts") /
                     os_specific::filesystem::path("tools");
-    loadScriptsImpl(location, mainNamespace);
+    load_scripts_impl(location, mainNamespace);
   }
 
-  void loadImageFileTypeScripts(bp::object& mainNamespace)
+  void load_image_file_type_scripts(bp::object& mainNamespace)
   {
     auto location = os_specific::filesystem::current_path() /
                     os_specific::filesystem::path("scripts") /
                     os_specific::filesystem::path("image_filetypes");
-    loadScriptsImpl(location, mainNamespace);
+    load_scripts_impl(location, mainNamespace);
   }
 
-  void loadAnimationFileTypeScripts(bp::object& mainNamespace)
+  void load_animation_file_type_scripts(bp::object& mainNamespace)
   {
     auto location = os_specific::filesystem::current_path() /
                     os_specific::filesystem::path("scripts") /
                     os_specific::filesystem::path("animation_filetypes");
-    loadScriptsImpl(location, mainNamespace);
+    load_scripts_impl(location, mainNamespace);
   }
 
-  void loadEffectScripts(bp::object& mainNamespace)
+  void load_effect_scripts(bp::object& mainNamespace)
   {
     auto location = os_specific::filesystem::current_path() /
         os_specific::filesystem::path("scripts") /
         os_specific::filesystem::path("effects");
-    loadScriptsImpl(location, mainNamespace);
+    load_scripts_impl(location, mainNamespace);
   }
 }
   bool initPythonExports()
   {
     try {
       PyImport_AppendInittab((char*)"pixpaint", PyInit_pixpaint);
+      PyImport_AppendInittab((char*)"pixpaint_utilities", PyInit_pixpaint_utils);
       Py_Initialize();
 
       bp::object main_module = bp::import("__main__");
       bp::object main_namespace = main_module.attr("__dict__");
       bp::import("pixpaint");
 
-      loadToolScripts(main_namespace);
-      loadImageFileTypeScripts(main_namespace);
-      loadAnimationFileTypeScripts(main_namespace);
-      loadEffectScripts(main_namespace);
+      load_tool_scripts(main_namespace);
+      load_image_file_type_scripts(main_namespace);
+      load_animation_file_type_scripts(main_namespace);
+      load_effect_scripts(main_namespace);
     } catch(const bp::error_already_set&) {
-      PyErr_Print();
+      printScriptError();
+      getConsoleManager().writeMessage("Failed to initialize the python environment.");
       if(Py_IsInitialized()) {
         Py_Finalize();
       }

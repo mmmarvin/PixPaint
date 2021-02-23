@@ -19,6 +19,7 @@
  **********/
 #include "qt_utility.h"
 
+#include <QBitmap>
 #include <QKeySequence>
 #include "../image/pixeldata.h"
 
@@ -39,6 +40,35 @@ namespace qt_utils_detail
   QImage createQImage(const PixelData& layer)
   {
     return QImage(layer.getData(), layer.getWidth(), layer.getHeight(), QImage::Format_RGBA8888);
+  }
+
+  QImage convertToQTImage(const PixelData& layer)
+  {
+    QImage ret(layer.getWidth(), layer.getHeight(), QImage::Format_RGBA8888);
+    for(position_t y = 0, ysize = layer.getHeight(); y < ysize; ++y) {
+      for(position_t x = 0, xsize = layer.getWidth(); x < xsize; ++x) {
+        ret.setPixelColor(x, y, convertToQTColor(layer.getPixel(x, y)));
+      }
+    }
+
+    return ret;
+  }
+
+  PixelData convertToPixelData(const QImage& image)
+  {
+    PixelData ret(image.width(), image.height());
+    for(position_t y = 0, ysize = image.height(); y < ysize; ++y) {
+      for(position_t x = 0, xsize = image.width(); x < xsize; ++x) {
+        ret.setPixel(x, y, convertToColor(image.pixelColor(x, y)));
+      }
+    }
+
+    return ret;
+  }
+
+  QPixmap convertToQTPixmap(const PixelData& layer)
+  {
+    return QPixmap::fromImage(QImage(layer.getData(), layer.getWidth(), layer.getHeight(), QImage::Format_RGBA8888));
   }
 
   QColor convertToQTColor(const Color& color)

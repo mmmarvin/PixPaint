@@ -19,20 +19,60 @@
  **********/
 #include "registrarbase.h"
 
+#include "../manager/consolemanager.h"
+
 namespace pixpaint
 {
   template<class T>
   template<class... Args>
-  void RegistrarBase<T>::registerBuiltIn(Args&&... args)
+  bool RegistrarBase<T>::registerBuiltIn(std::string id, Args&&... args)
   {
+    if(id.size() > registerbase_detail::ID_SIZE_LIMIT) {
+      getConsoleManager().writeMessage("Cannot register id \"" +
+                                       id +
+                                       "\" because it exceed maximum limit for size (>" +
+                                       std::to_string(registerbase_detail::ID_SIZE_LIMIT) +
+                                       " characters long)");
+      return false;
+    }
+
+    if(m_ids.find(id) != m_ids.end()) {
+      getConsoleManager().writeMessage("Cannot register id \"" +
+                                       id +
+                                       "\" because it is alread taken!");
+      return false;
+    }
+
     m_items.emplace_back(std::forward<Args>(args)...);
+    m_ids.emplace(std::move(id));
+
+    return true;
   }
 
   template<class T>
   template<class... Args>
-  void RegistrarBase<T>::registerCustom(Args&&... args)
+  bool RegistrarBase<T>::registerCustom(std::string id, Args&&... args)
   {
+    if(id.size() > registerbase_detail::ID_SIZE_LIMIT) {
+      getConsoleManager().writeMessage("Cannot register id \"" +
+                                       id +
+                                       "\" because it exceed maximum limit for size (>" +
+                                       std::to_string(registerbase_detail::ID_SIZE_LIMIT) +
+                                       " characters long)");
+      return false;
+    }
+
+    if(m_ids.find(id) != m_ids.end()) {
+      getConsoleManager().writeMessage("Cannot register id \"" +
+                                       id +
+                                       "\" because it is alread taken!");
+      return false;
+    }
+
     m_items.emplace_back(std::forward<Args>(args)...);
+    m_ids.emplace(std::move(id));
+
+    return true;
   }
 
   template<class T>

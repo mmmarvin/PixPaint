@@ -19,6 +19,7 @@
  **********/
 #include "maskablepixeldata.h"
 
+#include <cstring>
 #include "../assert.h"
 #include "mask.h"
 
@@ -49,10 +50,25 @@ namespace pixpaint
 
   void MaskablePixelData::combine(const MaskablePixelData& pixelData, position_t x, position_t y, bool hard)
   {
-    PixelData::combine(pixelData, x, y, hard);
-//    if(isMaskSet()) {
-//      detail::applyMask(*this, *getMask());
-//    }
+    PixelData::combine(pixelData, x, y, hard,
+    [mask = &m_mask](unsigned char* dst_ptr, const unsigned char* src_ptr, position_t i, position_t j) {
+      if(mask->get()) {
+        if(mask->get()->contains(i, j)) {
+          std::memcpy(dst_ptr, src_ptr, 4);
+        }
+      } else {
+        std::memcpy(dst_ptr, src_ptr, 4);
+      }
+    },
+    [mask = &m_mask](unsigned char* dst_ptr, const unsigned char* src_ptr, position_t i, position_t j) {
+      if(mask->get()) {
+        if(mask->get()->contains(i, j)) {
+          color_detail::alphaBlend(dst_ptr, src_ptr);
+        }
+      } else {
+        color_detail::alphaBlend(dst_ptr, src_ptr);
+      }
+    });
   }
 
   void MaskablePixelData::setMask(std::shared_ptr<Mask> mask)

@@ -44,13 +44,13 @@ namespace pixpaint
                      ControlState controlState,
                      ModifyablePixelData& previewLayer,
                      MaskablePixelData& currentLayer) override;
-    bool onMouseRelease(const Point& currentPoint,
-                        const Point& previousPoint,
-                        const Point& globalPoint,
-                        const Color& color,
-                        ControlState controlState,
-                        ModifyablePixelData& previewLayer,
-                        MaskablePixelData& currentLayer) override;
+    int onMouseRelease(const Point& currentPoint,
+                       const Point& previousPoint,
+                       const Point& globalPoint,
+                       const Color& color,
+                       ControlState controlState,
+                       ModifyablePixelData& previewLayer,
+                       MaskablePixelData& currentLayer) override;
 
     int onToolChange(ModifyablePixelData&, MaskablePixelData&) override;
     int onOptionChange(ModifyablePixelData&, MaskablePixelData&) override;
@@ -59,11 +59,10 @@ namespace pixpaint
     std::string getDescription() const override;
 
   private:
-    mutable Point m_currentMin;
-    mutable Point m_currentMax;
-
-    int     m_size;
-    bool    m_antialiasing;
+    PixelData m_brush;
+    Point     m_min;
+    Point     m_max;
+    int       m_size;
   };
 }
 

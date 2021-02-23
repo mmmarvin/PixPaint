@@ -23,10 +23,18 @@ namespace pixpaint
 {
   void EffectRegistrar::registerEffect(std::string name,
                                        std::string category,
+                                       std::string id,
                                        std::unique_ptr<EffectBase> effect,
                                        bool showPreview)
   {
-    RegistrarBase::registerBuiltIn(EffectInformation(std::move(name),
+    id = "id_effect_" + id;
+    if(name.size() > 64 || category.size() > 64) {
+      // TODO: write error to console here
+      return;
+    }
+
+    RegistrarBase::registerBuiltIn(std::move(id),
+                                   EffectInformation(std::move(name),
                                                      std::move(category),
                                                      std::make_unique<BuiltInEffectHandler>(std::move(effect)),
                                                      showPreview));
@@ -34,10 +42,18 @@ namespace pixpaint
 
   void EffectRegistrar::registerEffect(std::string name,
                                        std::string category,
+                                       std::string id,
                                        boost::python::object effectObject,
                                        bool showPreview)
   {
-    RegistrarBase::registerCustom(EffectInformation(std::move(name),
+    id = "id_effect_" + id;
+    if(name.size() > 64 || category.size() > 64) {
+      // TODO: write error to console here
+      return;
+    }
+
+    RegistrarBase::registerCustom(std::move(id),
+                                  EffectInformation(std::move(name),
                                                     std::move(category),
                                                     std::make_unique<CustomEffectHandler>(std::move(effectObject)),
                                                     showPreview));

@@ -23,6 +23,7 @@
 #include <QPainter>
 #include "../env/imageenvironment.h"
 #include "../history/selectionmoveaction.h"
+#include "../history/selectionresize.h"
 #include "../image/image.h"
 #include "../tool/painttoolbase.h"
 #include "../utility/general_utility.h"
@@ -43,8 +44,7 @@
 namespace pixpaint
 {
   SelectionWidget::SelectionWidget(QWidget* parent, QMenu* rightClickMenu) :
-    CustomCursorWidget<QWidget>(parent),
-    m_timer(this),
+    CustomCursorWidget<DummySelectionWidget>(parent),
     m_rightClickMenu(rightClickMenu),
     m_moveStart(false),
     m_selectionManagerTLSelect(false),
@@ -52,9 +52,6 @@ namespace pixpaint
     m_selectionManagerBLSelect(false),
     m_selectionManagerBRSelect(false)
   {
-//    m_timer.setInterval(100);
-//    m_timer.start();
-//    QObject::connect(&m_timer, &QTimer::timeout, this, &SelectionWidget::updateDash);
   }
 
   void SelectionWidget::updateSelection()
@@ -66,12 +63,6 @@ namespace pixpaint
     } else if(text_selection_manager.selectionExists()) {
       updateSelection(text_selection_manager.getSelectionRect());
     }
-  }
-
-  void SelectionWidget::setPosition(int x, int y)
-  {
-    auto g = this->geometry();
-    this->setGeometry(x - SELECTION_HANDLE_WIDTH, y - SELECTION_HANDLE_WIDTH, g.width(), g.height());
   }
 
   void SelectionWidget::setMode(ESelectionMode mode)
@@ -264,12 +255,22 @@ namespace pixpaint
       if(oldRect.x != m_temporarySelectionRect.x || oldRect.y != m_temporarySelectionRect.y ||
          oldRect.width != m_temporarySelectionRect.width || oldRect.height != m_temporarySelectionRect.height) {
         if(selection_manager.selectionExists()) {
+          if(selection_manager.layerMaskExists()) {
+            emitHistoryAction(SelectionResize(selection_manager.getSelectionRect(),
+                                              selection_manager.getSelectionLayer(),
+                                              selection_manager.getSelectionLayerMask()));
+          } else {
+            emitHistoryAction(SelectionResize(selection_manager.getSelectionRect(), selection_manager.getSelectionLayer()));
+          }
+
           selection_manager.moveSelectionRect(m_temporarySelectionRect.x, m_temporarySelectionRect.y, false, false);
           selection_manager.resizeSelectionRect(m_temporarySelectionRect.width, m_temporarySelectionRect.height, Color::TRANSPARENT, false);
+
           this->updateSelection();
         } else {
           text_selection_manager.moveSelectionRect(m_temporarySelectionRect.x, m_temporarySelectionRect.y, false, false);
           text_selection_manager.resizeSelectionRect(m_temporarySelectionRect.width, m_temporarySelectionRect.height, Color::TRANSPARENT, false);
+
           this->updateSelection();
         }
 
@@ -328,21 +329,14 @@ namespace pixpaint
     }
   }
 
-  void SelectionWidget::paintEvent(QPaintEvent*)
+  void SelectionWidget::paintEvent(QPaintEvent* event)
   {
+    DummySelectionWidget::paintEvent(event);
+
     QPainter painter(this);
-
-    QPen dashed_line(QColor(10, 10, 10, 255), 2);
-    dashed_line.setStyle(Qt::CustomDashLine);
-    dashed_line.setDashOffset(m_dashOffset);
-    dashed_line.setDashPattern({ 5.0, 5.0 });
-
-    painter.setPen(dashed_line);
-    painter.setBrush(QBrush(QColor(0, 0, 0, 0)));
 
     auto width = this->geometry().width() - ((SELECTION_HANDLE_WIDTH * 2) + 1);
     auto height = this->geometry().height() - ((SELECTION_HANDLE_HEIGHT * 2) + 1);
-    painter.drawRect(SELECTION_HANDLE_WIDTH, SELECTION_HANDLE_HEIGHT, width, height);
 
     if(m_mode == ESelectionMode::RESIZE) {
       painter.setPen(QPen(QColor(0, 0, 0, 255), 1, Qt::SolidLine));
@@ -373,14 +367,6 @@ namespace pixpaint
   void SelectionWidget::updateSelectionUsingTemp()
   {
     updateSelection(m_temporarySelectionRect);
-  }
-
-  void SelectionWidget::updateDash()
-  {
-    if(this->isVisible()) {
-      m_dashOffset = (m_dashOffset + 1) % 10;
-      this->repaint();
-    }
   }
 
   bool SelectionWidget::isResizeHandleSelected(int mx, int my)

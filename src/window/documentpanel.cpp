@@ -85,7 +85,7 @@ namespace pixpaint
         if(current_tool.getCursor()) {
           view->setCursor(current_tool.getCursor().value());
         } else {
-          view->setCursor(Cursor(QCursor(Qt::ArrowCursor)));
+          view->setCursor(Cursor(Cursor::ECT_ARROW));
         }
 
         emitEvent(gui_events::TabChangeEvent { m_currentIndex, index });

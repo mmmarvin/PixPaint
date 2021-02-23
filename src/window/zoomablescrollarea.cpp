@@ -22,9 +22,11 @@
 #include <QPainter>
 #include <QWheelEvent>
 #include "../debug_log.h"
+#include "../manager/dummyselectionmanager.h"
 #include "../manager/imagemanager.h"
 #include "../manager/selectionmanager.h"
 #include "../manager/textselectionmanager.h"
+#include "dummyselectionwidget.h"
 #include "imageeditorview.h"
 #include "horizontalresizehandle.h"
 #include "hvresizehandle.h"
@@ -59,6 +61,18 @@ namespace pixpaint
       }
     } else {
       m_selectionWidget->setVisible(false);
+    }
+  }
+
+  void ZoomableScrollArea::updateDummySelectionWidget()
+  {
+    if(getDummySelectionManager().selectionExists()) {
+      m_dummySelectionWidget->updateSelection();
+      if(!m_dummySelectionWidget->isVisible()) {
+        m_dummySelectionWidget->setVisible(true);
+      }
+    } else {
+      m_dummySelectionWidget->setVisible(false);
     }
   }
 
@@ -175,6 +189,11 @@ namespace pixpaint
     m_selectionWidget->resize(100, 100);
     m_selectionWidget->setPosition(3, 3);
     m_selectionWidget->setVisible(false);
+
+    m_dummySelectionWidget = new DummySelectionWidget(this);
+    m_dummySelectionWidget->resize(100, 100);
+    m_dummySelectionWidget->setPosition(3, 3);
+    m_dummySelectionWidget->setVisible(false);
   }
 
   void ZoomableScrollArea::createResizeHandles()

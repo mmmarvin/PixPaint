@@ -23,26 +23,39 @@
 
 namespace pixpaint
 {
-  void ImageFileTypeRegistrar::registerFileType(std::string fileExtension,
-                                                std::string fileTypeDescription,
+  void ImageFileTypeRegistrar::registerFileType(std::string extension,
+                                                std::string typeDescription,
+                                                std::string id,
                                                 std::unique_ptr<ImageFileTypeBase> fileType)
   {
-//    if(!fileExtension.empty()) {
-      RegistrarBase::registerBuiltIn(FileInformation<ImageFileTypeHandlerBase>(std::move(fileExtension),
-                                                                               std::move(fileTypeDescription),
-                                                                               std::make_unique<BuiltInImageFileTypeHandler>(std::move(fileType))));
+    id = "id_img_" + id;
+    if(extension.size() > 12 || typeDescription.size() > 255) {
+      // TODO: write error to console here
+      return;
+    }
+
+    RegistrarBase::registerBuiltIn(std::move(id),
+                                   FileInformation<ImageFileTypeHandlerBase>(std::move(extension),
+                                                                             std::move(typeDescription),
+                                                                             std::make_unique<BuiltInImageFileTypeHandler>(std::move(fileType))));
 //    }
   }
 
-  void ImageFileTypeRegistrar::registerCustomFileType(std::string fileExtension,
-                                                      std::string fileTypeDescription,
+  void ImageFileTypeRegistrar::registerCustomFileType(std::string extension,
+                                                      std::string typeDescription,
+                                                      std::string id,
                                                       boost::python::object fileType)
   {
-//    if(!fileExtension.empty()) {
-      RegistrarBase::registerCustom(FileInformation<ImageFileTypeHandlerBase>(std::move(fileExtension),
-                                                                              std::move(fileTypeDescription),
-                                                                              std::make_unique<CustomImageFileTypeHandler>(fileType)));
-//    }
+    id = "id_img_" + id;
+    if(extension.size() > 12 || typeDescription.size() > 255) {
+      // TODO: write error to console here
+      return;
+    }
+
+    RegistrarBase::registerCustom(std::move(id),
+                                  FileInformation<ImageFileTypeHandlerBase>(std::move(extension),
+                                                                            std::move(typeDescription),
+                                                                            std::make_unique<CustomImageFileTypeHandler>(fileType)));
   }
 
   PIXPAINT_SINGLETON_FUNC_DEF(ImageFileTypeRegistrar)

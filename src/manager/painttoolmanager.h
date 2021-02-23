@@ -41,6 +41,7 @@ namespace pixpaint
 
   private:
     PIXPAINT_SINGLETON_FUNC_FRIEND(PaintToolManager)
+    friend class GlobalKeyReader;
     friend class LeftToolbox;
 
     void setCurrentTool(PaintToolHandlerBase& currentTool) noexcept;

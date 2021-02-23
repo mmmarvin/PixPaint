@@ -25,30 +25,49 @@ namespace pixpaint
 {
   PaintToolInformation::PaintToolInformation(std::string name,
                                              std::string iconFilename,
+                                             std::string id,
+                                             std::string shortcut,
                                              std::unique_ptr<PaintToolHandlerBase> paintToolHandler) :
     m_name(std::move(name)),
     m_iconFilename(std::move(iconFilename)),
+    m_id(std::move(id)),
+    m_shortcut(std::move(shortcut)),
     m_paintToolHandler(std::move(paintToolHandler))
   {
     PIXPAINT_ASSERT(m_paintToolHandler.get(), "Empty effect");
   }
 
-  const std::string& PaintToolInformation::getName() const
+  void PaintToolInformation::setShortcut(std::string shortcut)
+  {
+    m_shortcut = std::move(shortcut);
+  }
+
+  const std::string& PaintToolInformation::getName() const noexcept
   {
     return m_name;
   }
 
-  const std::string& PaintToolInformation::getIconFilename() const
+  const std::string& PaintToolInformation::getIconFilename() const noexcept
   {
     return m_iconFilename;
   }
 
-  PaintToolHandlerBase& PaintToolInformation::getTool()
+  const std::string& PaintToolInformation::getID() const noexcept
+  {
+    return m_id;
+  }
+
+  const std::string& PaintToolInformation::getShortcut() const noexcept
+  {
+    return m_shortcut;
+  }
+
+  PaintToolHandlerBase& PaintToolInformation::getTool() noexcept
   {
     return *m_paintToolHandler.get();
   }
 
-  const PaintToolHandlerBase& PaintToolInformation::getTool() const
+  const PaintToolHandlerBase& PaintToolInformation::getTool() const noexcept
   {
     return *m_paintToolHandler.get();
   }

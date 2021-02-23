@@ -31,9 +31,6 @@ namespace pixpaint
   static constexpr auto DEFAULT_IMAGE_WIDTH = 64;
   static constexpr auto DEFAULT_IMAGE_HEIGHT = 64;
 
-  static constexpr auto DEFAULT_TOOL_ANTIALIASING = false;
-  static constexpr auto DEFAULT_TEXT_ANTIALIASING = false;
-
   static constexpr auto MAX_CONSOLE_LINES = 100;
 }
 

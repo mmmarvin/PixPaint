@@ -75,7 +75,7 @@ namespace filetype_utils
     }
 
     auto new_filename = os_specific::filesystem::path(filename).replace_extension(os_specific::filesystem::path(extension));
-    return new_filename.filename().string();
+    return new_filename.string();
   }
 }
 namespace projectfiletype_utils

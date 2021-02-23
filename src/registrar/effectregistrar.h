@@ -37,10 +37,12 @@ namespace pixpaint
   public:
     void registerEffect(std::string name,
                         std::string category,
+                        std::string id,
                         std::unique_ptr<EffectBase> effect,
                         bool showPreview = false);
     void registerEffect(std::string name,
                         std::string category,
+                        std::string id,
                         boost::python::object effectObject,
                         bool showPreview = false);
   };

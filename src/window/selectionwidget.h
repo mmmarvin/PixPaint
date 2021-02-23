@@ -26,6 +26,7 @@
 #include "../env/imageenvironment.h"
 #include "../image/point.h"
 #include "../image/rect.h"
+#include "dummyselectionwidget.h"
 #include "customcursorwidget.h"
 
 namespace pixpaint
@@ -33,11 +34,8 @@ namespace pixpaint
   class ImageEditorView;
   class ZoomableScrollArea;
 
-  class SelectionWidget : public CustomCursorWidget<QWidget>
+  class SelectionWidget : public CustomCursorWidget<DummySelectionWidget>
   {
-    static constexpr auto SELECTION_HANDLE_WIDTH = 15;
-    static constexpr auto SELECTION_HANDLE_HEIGHT = 15;
-
   public:
     enum class ESelectionMode : unsigned char
     {
@@ -49,7 +47,6 @@ namespace pixpaint
     SelectionWidget(QWidget* parent, QMenu* rightClickMenu);
     void updateSelection();
 
-    void setPosition(int x, int y);
     void setMode(ESelectionMode mode);
 
     Point getPosition() const;
@@ -67,7 +64,6 @@ namespace pixpaint
 
     void updateSelection(IntRect selectionRect);
     void updateSelectionUsingTemp();
-    void updateDash();
 
     bool isResizeHandleSelected(int mx, int my);
     bool isTopLeftResizeHandleSelected(const IntRect& geometryRect, const Point& mousePosition) const;
@@ -77,7 +73,6 @@ namespace pixpaint
     Point getMousePositionInView(position_t mx, position_t my) const;
     IntRect getSelectionRect() const;
 
-    QTimer            m_timer;
     QMenu*            m_rightClickMenu;
 
     IntRect           m_temporarySelectionRect;
@@ -85,8 +80,6 @@ namespace pixpaint
     Point             m_selectionManagerSelectDimension;
     Point             m_movePoint;
     Point             m_moveStartPoint;
-
-    int               m_dashOffset;
 
     ESelectionMode    m_mode;
     bool              m_moveStart;

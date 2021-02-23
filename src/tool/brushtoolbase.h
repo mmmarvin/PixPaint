@@ -26,10 +26,6 @@
 
 namespace pixpaint
 {
-namespace brushtoolbase_detail
-{
-  QPixmap generateBrushCursor(const Color& color = Color::BLACK);
-}
   class BrushToolBase : public CursorToolBase
   {
   public:
@@ -49,13 +45,13 @@ namespace brushtoolbase_detail
                      ControlState controlState,
                      ModifyablePixelData& previewLayer,
                      MaskablePixelData& currentLayer) override;
-    bool onMouseRelease(const Point& currentPoint,
-                        const Point& previousPoint,
-                        const Point& globalPoint,
-                        const Color& color,
-                        ControlState controlState,
-                        ModifyablePixelData& previewLayer,
-                        MaskablePixelData& currentLayer) override;
+    int onMouseRelease(const Point& currentPoint,
+                       const Point& previousPoint,
+                       const Point& globalPoint,
+                       const Color& color,
+                       ControlState controlState,
+                       ModifyablePixelData& previewLayer,
+                       MaskablePixelData& currentLayer) override;
 
     int onToolChange(ModifyablePixelData& previewLayer, MaskablePixelData& currentLayer) override;
     int onColorChange(ModifyablePixelData& previewLayer, MaskablePixelData& currentLayer) override;
@@ -64,10 +60,10 @@ namespace brushtoolbase_detail
     IntRect getDrawRect() const override;
 
   protected:
-    Point m_min;
-    Point m_max;
-    int   m_size;
-    bool  m_antialiased;
+    PixelData m_brush;
+    Point     m_min;
+    Point     m_max;
+    int       m_size;
   };
 }
 

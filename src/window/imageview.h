@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include "../image/rect.h"
+#include "../image/size.h"
 
 namespace pixpaint
 {
@@ -35,6 +36,10 @@ namespace pixpaint
 
     void showGrid(bool show);
     bool isGridShown() const noexcept;
+
+    void showBoxGrid(bool show, dimension_t width, dimension_t height);
+    bool isBoxGridShown() const noexcept;
+    const Size& getBoxGridSize() const noexcept;
 
     void setPixelSize(double pixelSize);
     double getPixelSize() const noexcept;
@@ -54,11 +59,16 @@ namespace pixpaint
   protected:
     void paintBackground(QPainter& painter);
     virtual void paintImage(QPainter& painter);
-    void paintGrid(QPainter& painter);
+    void paintGrid();
+    void paintBoxGrid();
 
   private:
     Image*      m_image;
     double      m_pixelSize;
+
+    Size        m_boxGridDimension;
+
+    bool        m_showBoxGrid;
     bool        m_showGrid;
   };
 }

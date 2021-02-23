@@ -39,6 +39,20 @@
 
 namespace pixpaint
 {
+  class PaintToolPushButton : public QPushButton, public PaintToolButton
+  {
+  public:
+    explicit PaintToolPushButton(QWidget* parent) :
+      QPushButton(parent)
+    {
+    }
+
+    void click() override
+    {
+      QPushButton::setChecked(true);
+    }
+  };
+
   LeftToolbox::LeftToolbox(QWidget* parent) :
     QWidget(parent)
   {
@@ -93,9 +107,12 @@ namespace pixpaint
     layout->setAlignment(Qt::AlignTop);
 
     for(auto& paintToolInformation : paintToolRegistrar) {
-      auto* toolBtn = new QPushButton(widget);
-      toolBtn->setToolTip(paintToolInformation.getName().c_str());
-      paintToolInformation.getTool().m_buttonPair = toolBtn;
+      auto* toolBtn = new PaintToolPushButton(widget);
+      toolBtn->setToolTip((paintToolInformation.getName() +
+                           std::string(" (") +
+                           paintToolInformation.getShortcut() +
+                           std::string(")")).c_str());
+      paintToolInformation.getTool().m_button = toolBtn;
       QObject::connect(toolBtn, &QPushButton::clicked,
       [&paintToolManager, &paintToolInformation]() {
         auto& paintTool = paintToolInformation.getTool();

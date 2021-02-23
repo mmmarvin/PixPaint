@@ -45,14 +45,6 @@
 
 namespace pixpaint
 {
-namespace
-{
-  Cursor& getLoadingCursor()
-  {
-    static Cursor loading_cursor(QCursor(QPixmap("res/cursor/hourglass_cursor.png")), false);
-    return loading_cursor;
-  }
-}
   ImageEditorView::ImageEditorView(ZoomableScrollArea* parent,
                                    QMenu* rightClickMenu,
                                    Image& image,
@@ -187,12 +179,12 @@ namespace
 
       m_globalDrawPoint = Point(g_px, g_py);
       if(event->button() == Qt::MouseButton::LeftButton) {
-        tool_helpers::setViewToolCursor(getLoadingCursor());
+        tool_helpers::setViewToolCursor(Cursor(Cursor::ECursorType::ECT_BUSY));
         paintStartEvent(px, py, getColorManager().getForegroundColor(), shift_down, control_down);
         tool_helpers::updateViewToolCursor();
       } else if(event->button() == Qt::MouseButton::RightButton) {
         if(getPaintToolManager().getCurrentTool().hasRightClick()) {
-          tool_helpers::setViewToolCursor(getLoadingCursor());
+          tool_helpers::setViewToolCursor(Cursor(Cursor::ECursorType::ECT_BUSY));
           paintStartEvent(px, py, getColorManager().getBackgroundColor(), shift_down, control_down);
           tool_helpers::updateViewToolCursor();
         } else {
@@ -424,16 +416,17 @@ namespace
     auto t = getTargetLayer(px, py);
     auto& target_layer = std::get<0>(t);
     auto& target_preview_layer = std::get<1>(t);
-    if(paint_helpers::paintEndEvent(px,
-                                    py,
-                                    color,
-                                    ControlState { shiftDown, controlDown },
-                                    m_currentDrawPoint,
-                                    m_previousDrawPoint,
-                                    m_globalDrawPoint,
-                                    target_preview_layer,
-                                    target_layer)) {
 
+    auto res = paint_helpers::paintEndEvent(px,
+                                            py,
+                                            color,
+                                            ControlState { shiftDown, controlDown },
+                                            m_currentDrawPoint,
+                                            m_previousDrawPoint,
+                                            m_globalDrawPoint,
+                                            target_preview_layer,
+                                            target_layer);
+    if(res & PaintToolBase::EChangeResult::ECCR_UPDATEIMAGE) {
       auto& current_tool = getPaintToolManager().getCurrentTool();
       auto old_rect = current_tool.getOldDrawRect();
       if(old_rect) {
@@ -450,6 +443,9 @@ namespace
       this->repaint(qt_utils::convertToQTRect(castTo<position_t>(refresh_rect)));
 
       getPreviewManager().refreshAll();
+    }
+    if(res & PaintToolBase::EChangeResult::ECCR_UPDATECURSOR) {
+      tool_helpers::updateViewToolCursor();
     }
 
     paintFinalizePreview();

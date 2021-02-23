@@ -74,6 +74,7 @@ namespace pixpaint
       QAction*              frameToolbar;
       QAction*              consoleToolbar;
       QAction*              showGridAction;
+      QAction*              boxGridAction;
       QAction*              zoomInAction;
       QAction*              zoomOutAction;
     };

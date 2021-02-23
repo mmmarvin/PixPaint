@@ -30,7 +30,7 @@ namespace type_determine_utils
 {
 namespace
 {
-  bool isIntegerImpl(const std::string& str)
+  bool is_integer_impl(const std::string& str)
   {
     bool neg = false;
     for(auto c : str) {
@@ -48,7 +48,7 @@ namespace
     return true;
   }
 
-  bool isFloatingPointImpl(const std::string& str)
+  bool is_floating_point_impl(const std::string& str)
   {
     bool neg = false, point = false;
     for(auto c : str) {
@@ -84,9 +84,9 @@ namespace
 
     if(std::find(str.begin(), str.end(), '-') != str.end() &&
        str.size() <= MIN_INTEGER_STR.size()) {
-      return isIntegerImpl(str);
+      return is_integer_impl(str);
     } else  if(str.size() <= MAX_INTEGER_STR.size()) {
-      return isIntegerImpl(str);
+      return is_integer_impl(str);
     }
 
     return false;
@@ -95,19 +95,19 @@ namespace
   bool isFloatingPoint(const std::string& str)
   {
     if(str.size() <= 7) {
-      return isFloatingPointImpl(str);
+      return is_floating_point_impl(str);
     }
 
     if(str.size() == 8 &&
        (std::find(str.begin(), str.end(), '-') != str.end() ||
         std::find(str.begin(), str.end(), '.') != str.end())) {
-      return isFloatingPointImpl(str);
+      return is_floating_point_impl(str);
     }
 
     if(str.size() == 9 &&
        std::find(str.begin(), str.end(), '-') != str.end() &&
         std::find(str.begin(), str.end(), '.') != str.end()) {
-      return isFloatingPointImpl(str);
+      return is_floating_point_impl(str);
     }
 
     return false;

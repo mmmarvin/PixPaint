@@ -35,16 +35,14 @@ namespace pixpaint
   static Drawer* currentDrawer = nullptr;
 
   RectTool::RectTool() :
-    CursorToolBase(Qt::CrossCursor),
+    CursorToolBase(Cursor::ECT_CROSS),
     m_min(-1, -1),
     m_max(1, 1),
     m_size(1),
-    m_antialiased(DEFAULT_TOOL_ANTIALIASING),
     m_fill(true)
   {
     this->addIntegerValueOption(&m_size, "Size", 1, 100);
     this->addFlagOption(&m_fill, "Fill Color");
-    this->addFlagOption(&m_antialiased, "Anti-Aliased");
   }
 
   bool RectTool::onMousePress(const Point& currentPoint,
@@ -71,7 +69,7 @@ namespace pixpaint
                             m_min,
                             m_max,
                             m_fill,
-                            DrawParam{ m_antialiased, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
+                            DrawParam{ false, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
 
     return true;
   }
@@ -97,18 +95,18 @@ namespace pixpaint
                             m_min,
                             m_max,
                             m_fill,
-                            DrawParam{ m_antialiased, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
+                            DrawParam{ false, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
 
     return true;
   }
 
-  bool RectTool::onMouseRelease(const Point&,
-                                const Point&,
-                                const Point&,
-                                const Color&,
-                                ControlState controlState,
-                                ModifyablePixelData& previewLayer,
-                                MaskablePixelData&)
+  int RectTool::onMouseRelease(const Point&,
+                               const Point&,
+                               const Point&,
+                               const Color&,
+                               ControlState controlState,
+                               ModifyablePixelData& previewLayer,
+                               MaskablePixelData&)
   {
     previewLayer.clear(Color::TRANSPARENT);
     tool_helpers::drawShape(&getLayerDrawer(),
@@ -121,16 +119,14 @@ namespace pixpaint
                             m_min,
                             m_max,
                             m_fill,
-                            DrawParam{ m_antialiased, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
+                            DrawParam{ false, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
 
     getImageManager().getImage().setModified(true);
-    return true;
+    return EChangeResult::ECCR_UPDATEIMAGE;
   }
 
   IntRect RectTool::getDrawRect() const
   {
-    // FIXME: Redraw rect doesn't work when shift is held down, and
-    // the rect is created on the 1st quadrant (top-left quadrant)
     auto min = m_min;
     auto max = m_max;
 

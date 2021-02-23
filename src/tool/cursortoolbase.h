@@ -20,7 +20,6 @@
 #ifndef CURSORTOOLBASE_H
 #define CURSORTOOLBASE_H
 
-#include <QPixmap>
 #include "painttoolbase.h"
 
 namespace pixpaint
@@ -28,11 +27,10 @@ namespace pixpaint
   class CursorToolBase : public PaintToolBase
   {
   public:
-    explicit CursorToolBase(Qt::CursorShape cursorShape);
+    explicit CursorToolBase(Cursor::ECursorType cursorShape);
     explicit CursorToolBase(const std::string& cursorLocation, bool autoScale = true);
     CursorToolBase(const std::string& cursorLocation, int scaleX, int scaleY, bool autoScale = true);
-    explicit CursorToolBase(const QPixmap& cursor, bool autoScale = true);
-    CursorToolBase(const QPixmap& cursor, int scaleX, int scaleY, bool autoScale = true);
+    explicit CursorToolBase(const PixelData& cursor, bool autoScale = true);
 
     optional<const Cursor&> getCursor() const override;
 

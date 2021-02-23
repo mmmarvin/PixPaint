@@ -35,12 +35,10 @@ namespace pixpaint
   static Drawer* currentDrawer = nullptr;
 
   LineTool::LineTool() :
-    CursorToolBase(Qt::CrossCursor),
-    m_size(1),
-    m_antialiased(DEFAULT_TOOL_ANTIALIASING)
+    CursorToolBase(Cursor::ECursorType::ECT_CROSS),
+    m_size(1)
   {
     this->addIntegerValueOption(&m_size, "Size", 1, 100);
-    this->addFlagOption(&m_antialiased, "Anti-Aliased");
   }
 
   bool LineTool::onMousePress(const Point& currentPoint,
@@ -62,7 +60,7 @@ namespace pixpaint
     currentDrawer->drawLineBlend(m_startPoint,
                                  m_endPoint,
                                  color,
-                                 DrawParam{ m_antialiased, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
+                                 DrawParam{ false, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
 
     return true;
   }
@@ -135,7 +133,7 @@ namespace pixpaint
     currentDrawer->drawLineBlend(m_lineStartPoint,
                                  m_lineEndPoint,
                                  color,
-                                 DrawParam{ m_antialiased, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
+                                 DrawParam{ false, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
 
     m_min.x = general_utils::minelement(std::initializer_list<position_t>{ m_lineStartPoint.x, m_lineEndPoint.x, m_min.x });
     m_min.y = general_utils::minelement(std::initializer_list<position_t>{ m_lineStartPoint.y, m_lineEndPoint.y, m_min.y });
@@ -144,22 +142,22 @@ namespace pixpaint
     return true;
   }
 
-  bool LineTool::onMouseRelease(const Point&,
-                                const Point&,
-                                const Point&,
-                                const Color& color,
-                                ControlState,
-                                ModifyablePixelData& previewLayer,
-                                MaskablePixelData&)
+  int LineTool::onMouseRelease(const Point&,
+                               const Point&,
+                               const Point&,
+                               const Color& color,
+                               ControlState,
+                               ModifyablePixelData& previewLayer,
+                               MaskablePixelData&)
   {
     previewLayer.clear(Color::TRANSPARENT);
     getLayerDrawer().drawLineBlend(m_lineStartPoint,
                                    m_lineEndPoint,
                                    color,
-                                   DrawParam{ m_antialiased, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
+                                   DrawParam{ false, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
 
     getImageManager().getImage().setModified(true);
-    return true;
+    return EChangeResult::ECCR_UPDATEIMAGE;
   }
 
   bool LineTool::hasRightClick() const

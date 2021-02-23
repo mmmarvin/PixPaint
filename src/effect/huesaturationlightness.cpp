@@ -26,7 +26,7 @@ namespace pixpaint
 {
 namespace
 {
-  void applyHSL(int hue, int saturation, int lightness, QColor& color)
+  void apply_hsl(int hue, int saturation, int lightness, QColor& color)
   {
     if(color.alpha() > 0) {
       auto h = color.hslHue();
@@ -39,22 +39,22 @@ namespace
     }
   }
 
-  bool isColorInChannel(int mainChannel, int subChannel1, int subChannel2)
+  bool is_color_in_channel(int mainChannel, int subChannel1, int subChannel2)
   {
     return mainChannel > subChannel1 &&
            mainChannel > subChannel2 &&
            std::abs(subChannel1 - subChannel2) <= 10;
   }
 
-  static const auto determineEffect = [](const std::string& channel) -> std::function<QColor(QColor, int, int, int)>
+  static const auto determine_effect = [](const std::string& channel) -> std::function<QColor(QColor, int, int, int)>
   {
     static const auto applyEffectRed = [](QColor color, int hue, int saturation, int lightness)
     {
       auto r = color.red();
       auto g = color.green();
       auto b = color.blue();
-      if(isColorInChannel(r, g, b)) {
-        applyHSL(hue, saturation, lightness, color);
+      if(is_color_in_channel(r, g, b)) {
+        apply_hsl(hue, saturation, lightness, color);
       }
 
       return color;
@@ -65,8 +65,8 @@ namespace
       auto r = color.red();
       auto g = color.green();
       auto b = color.blue();
-      if(isColorInChannel(g, r, b)) {
-        applyHSL(hue, saturation, lightness, color);
+      if(is_color_in_channel(g, r, b)) {
+        apply_hsl(hue, saturation, lightness, color);
       }
 
       return color;
@@ -77,8 +77,8 @@ namespace
       auto r = color.red();
       auto g = color.green();
       auto b = color.blue();
-      if(isColorInChannel(b, r, g)) {
-        applyHSL(hue, saturation, lightness, color);
+      if(is_color_in_channel(b, r, g)) {
+        apply_hsl(hue, saturation, lightness, color);
       }
 
       return color;
@@ -86,7 +86,7 @@ namespace
 
     static const auto applyEffectAll = [](QColor color, int hue, int saturation, int lightness)
     {
-      applyHSL(hue, saturation, lightness, color);
+      apply_hsl(hue, saturation, lightness, color);
       return color;
     };
 
@@ -117,7 +117,7 @@ namespace
 
   void HueSaturationLightness::applyLayerEffect(const IntRect&, MaskablePixelData& layer)
   {
-    auto applyEffect = determineEffect(m_channel);
+    auto applyEffect = determine_effect(m_channel);
 
     for(int y = 0, ysize = layer.getHeight(); y < ysize; ++y) {
       for(int x = 0, xsize = layer.getWidth(); x < xsize; ++x) {
@@ -132,7 +132,7 @@ namespace
 
   void HueSaturationLightness::applySelectionEffect(const IntRect&, MaskablePixelData& selectionLayer)
   {
-    auto applyEffect = determineEffect(m_channel);
+    auto applyEffect = determine_effect(m_channel);
 
     for(int y = 0, ysize = selectionLayer.getHeight(); y < ysize; ++y) {
       for(int x = 0, xsize = selectionLayer.getWidth(); x < xsize; ++x) {

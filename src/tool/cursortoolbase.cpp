@@ -19,31 +19,73 @@
  **********/
 #include "cursortoolbase.h"
 
+#include "../3rdparty/stbi/stb_image.h"
+#include "../filetype/stbiimageholder.h"
+#include "../image/image.h"
+#include "../debug_log.h"
+
 namespace pixpaint
 {
-  CursorToolBase::CursorToolBase(Qt::CursorShape cursorShape) :
-    m_cursor(QCursor(cursorShape), false)
+namespace
+{
+  PixelData try_scale_cursor(PixelData cursor, int scaleX, int scaleY)
+  {
+    if(scaleX > 0 && scaleY > 0) {
+      cursor.resize(scaleX, scaleY, Color::TRANSPARENT, PixelData::EResizeMode::SCALE);
+    }
+
+    return cursor;
+  }
+
+  PixelData import_image(const std::string& filename, int scaleX, int scaleY)
+  {
+    int width, height, n;
+    STBIImageDataHolder data(stbi_load(filename.c_str(),
+                                       &width,
+                                       &height,
+                                       &n,
+                                       0));
+    if(!data.getData()) {
+      return PixelData(0, 0, Color::TRANSPARENT);
+    }
+
+    PixelData ret(width, height);
+
+    auto* src_ptr = data.getData();
+    auto* dst_ptr = ret.getData();
+    for(int y = 0; y < height; ++y) {
+      for(int x = 0; x < width; ++x) {
+        std::memcpy(dst_ptr, src_ptr, n);
+        dst_ptr += 4;
+        src_ptr += n;
+      }
+    }
+
+    return try_scale_cursor(ret, scaleX, scaleY);
+  }
+}
+  CursorToolBase::CursorToolBase(Cursor::ECursorType cursorShape) :
+    m_cursor(cursorShape)
   {
   }
 
   CursorToolBase::CursorToolBase(const std::string& cursorLocation, bool autoScale) :
-    m_cursor(QCursor(QPixmap(cursorLocation.c_str())), autoScale)
+    CursorToolBase(import_image(cursorLocation, -1, -1), autoScale)
   {
   }
 
   CursorToolBase::CursorToolBase(const std::string& cursorLocation, int scaleX, int scaleY, bool autoScale) :
-    m_cursor(QCursor(QPixmap(cursorLocation.c_str()).scaled(scaleX, scaleY)), autoScale)
+    CursorToolBase(import_image(cursorLocation, scaleX, scaleY), autoScale)
   {
   }
 
-  CursorToolBase::CursorToolBase(const QPixmap& cursor, bool autoScale) :
-    m_cursor(QCursor(cursor), autoScale)
+  CursorToolBase::CursorToolBase(const PixelData& cursor, bool autoScale) :
+    m_cursor(cursor, autoScale)
   {
-  }
-
-  CursorToolBase::CursorToolBase(const QPixmap& cursor, int scaleX, int scaleY, bool autoScale) :
-    m_cursor(QCursor(cursor.scaled(scaleX, scaleY)), autoScale)
-  {
+    if(!m_cursor.getCursor().getWidth() ||
+       !m_cursor.getCursor().getHeight()) {
+      m_cursor = Cursor(Cursor::ECursorType::ECT_ARROW);
+    }
   }
 
   optional<const Cursor&> CursorToolBase::getCursor() const

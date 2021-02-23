@@ -30,12 +30,12 @@ namespace pixpaint
 {
 namespace
 {
-  void setPixel(position_t x, position_t y, PixelData& layer, const Color& color)
+  void set_pixel(position_t x, position_t y, PixelData& layer, const Color& color)
   {
     std::memcpy(layer.getData() + (y * 4 * layer.getWidth()) + (x * 4), &color, sizeof(Color));
   }
 
-  Color getPixel(position_t x, position_t y, const PixelData& layer)
+  Color get_pixel(position_t x, position_t y, const PixelData& layer)
   {
     return *reinterpret_cast<const Color*>(layer.getData() +
                                            (y * 4 * layer.getWidth()) +
@@ -87,9 +87,9 @@ namespace
 
       auto nx = tx - 1;
       if(nx >= 0 &&
-         getPixel(nx, ty, currentLayer) == oc &&
-         getPixel(nx, ty, color_map) == Color::TRANSPARENT) {
-        setPixel(nx, ty, color_map, Color::BLACK);
+         get_pixel(nx, ty, currentLayer) == oc &&
+         get_pixel(nx, ty, color_map) == Color::TRANSPARENT) {
+        set_pixel(nx, ty, color_map, Color::BLACK);
         points.push_back(Point(nx, ty));
         stack.push_back(Point(nx, ty));
 
@@ -99,9 +99,9 @@ namespace
       }
       nx = tx + 1;
       if(nx < w &&
-         getPixel(nx, ty, currentLayer) == oc &&
-         getPixel(nx, ty, color_map) == Color::TRANSPARENT) {
-        setPixel(nx, ty, color_map, Color::BLACK);
+         get_pixel(nx, ty, currentLayer) == oc &&
+         get_pixel(nx, ty, color_map) == Color::TRANSPARENT) {
+        set_pixel(nx, ty, color_map, Color::BLACK);
         points.push_back(Point(nx, ty));
         stack.push_back(Point(nx, ty));
 
@@ -112,9 +112,9 @@ namespace
 
       auto ny = ty - 1;
       if(ny >= 0 &&
-         getPixel(tx, ny, currentLayer) == oc &&
-         getPixel(tx, ny, color_map) == Color::TRANSPARENT) {
-        setPixel(tx, ny, color_map, Color::BLACK);
+         get_pixel(tx, ny, currentLayer) == oc &&
+         get_pixel(tx, ny, color_map) == Color::TRANSPARENT) {
+        set_pixel(tx, ny, color_map, Color::BLACK);
         points.push_back(Point(tx, ny));
         stack.push_back(Point(tx, ny));
 
@@ -124,9 +124,9 @@ namespace
       }
       ny = ty + 1;
       if(ny < h &&
-         getPixel(tx, ny, currentLayer) == oc &&
-         getPixel(tx, ny, color_map) == Color::TRANSPARENT) {
-        setPixel(tx, ny, color_map, Color::BLACK);
+         get_pixel(tx, ny, currentLayer) == oc &&
+         get_pixel(tx, ny, color_map) == Color::TRANSPARENT) {
+        set_pixel(tx, ny, color_map, Color::BLACK);
         points.push_back(Point(tx, ny));
         stack.push_back(Point(tx, ny));
 

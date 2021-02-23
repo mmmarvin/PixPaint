@@ -30,16 +30,16 @@
 
 namespace pixpaint
 {
-namespace
+namespace pixeldata_detail
 {
-  bool calculateOffset(position_t& x,
-                       position_t& y,
-                       position_t& xoff,
-                       position_t& yoff,
-                       std::make_signed_t<dimension_t>& w,
-                       std::make_signed_t<dimension_t>& h,
-                       std::make_signed_t<dimension_t> layer_width,
-                       std::make_signed_t<dimension_t> layer_height)
+  bool calculate_offset(position_t& x,
+                        position_t& y,
+                        position_t& xoff,
+                        position_t& yoff,
+                        std::make_signed_t<dimension_t>& w,
+                        std::make_signed_t<dimension_t>& h,
+                        std::make_signed_t<dimension_t> layer_width,
+                        std::make_signed_t<dimension_t> layer_height)
   {
     if(x + w > layer_width) {
       w = layer_width - x;
@@ -69,12 +69,12 @@ namespace
     return true;
   }
 
-  bool calculateOffset(position_t& x,
-                       position_t& y,
-                       std::make_signed_t<dimension_t>& w,
-                       std::make_signed_t<dimension_t>& h,
-                       std::make_signed_t<dimension_t> layer_width,
-                       std::make_signed_t<dimension_t> layer_height)
+  bool calculate_offset(position_t& x,
+                        position_t& y,
+                        std::make_signed_t<dimension_t>& w,
+                        std::make_signed_t<dimension_t>& h,
+                        std::make_signed_t<dimension_t> layer_width,
+                        std::make_signed_t<dimension_t> layer_height)
   {
     if(x + w > layer_width) {
       w = layer_width - x;
@@ -101,8 +101,10 @@ namespace
 
     return true;
   }
-
-  PIX getPix(PixelData& layer)
+}
+namespace
+{
+  PIX get_pix(PixelData& layer)
   {
     PIX p;
     p.w = layer.getWidth();
@@ -122,13 +124,13 @@ namespace
     return p;
   }
 
-  PixelData fastScale(const PixelData& layer, dimension_t width, dimension_t height)
+  PixelData fast_scale(const PixelData& layer, dimension_t width, dimension_t height)
   {
     PixelData ret(width, height);
 
     if(width && height) {
-      auto layer_width = layer.getWidth();
-      auto layer_height = layer.getHeight();
+      position_t layer_width = layer.getWidth();
+      position_t layer_height = layer.getHeight();
       auto mult_x = float(layer_width) / float(width);
       auto mult_y = float(layer_height) / float(height);
       auto* dst = ret.getData();
@@ -155,12 +157,12 @@ namespace
     return ret;
   }
 
-  PixelData smoothScale(PixelData& layer, dimension_t width, dimension_t height)
+  PixelData smooth_scale(PixelData& layer, dimension_t width, dimension_t height)
   {
     PixelData ret(width, height);
 
     if(width && height) {
-      auto p = getPix(layer);
+      auto p = get_pix(layer);
       auto* np = pixScale(&p, float(width) / layer.getWidth(), float(height) / layer.getHeight());
       std::memcpy(ret.getData(), np->data, width * height * 4);
       pixDestroy(&np);
@@ -169,7 +171,7 @@ namespace
     return ret;
   }
 
-  PixelData fastRotate(PixelData& layer, float degree, ERotationDirection direction)
+  PixelData fast_rotate(PixelData& layer, float degree, ERotationDirection direction)
   {
     // rotation formula from https://homepages.inf.ed.ac.uk/rbf/HIPR2/rotate.html
     // x2 = cos(angle) * (x1 - x0) - sin(angle) * (y1 - y0) + x0
@@ -312,7 +314,7 @@ namespace
     if(x < layer_width && y < layer_height) {
       std::make_signed_t<dimension_t> w = width;
       std::make_signed_t<dimension_t> h = height;
-      if(!calculateOffset(x, y, w, h, layer_width, layer_height)) {
+      if(!pixeldata_detail::calculate_offset(x, y, w, h, layer_width, layer_height)) {
         return;
       }
 
@@ -348,13 +350,13 @@ namespace
       break;
     case EResizeMode::SCALE:
     {
-      PixelData temp = fastScale(*this, width, height);
+      PixelData temp = fast_scale(*this, width, height);
       std::swap(temp, *this);
     }
       break;
     case EResizeMode::SMOOTH_SCALE:
     {
-      PixelData temp = smoothScale(*this, width, height);
+      PixelData temp = smooth_scale(*this, width, height);
       std::swap(temp, *this);
     }
       break;
@@ -394,53 +396,13 @@ namespace
 
   void PixelData::combine(const PixelData& pixelData, position_t x, position_t y, bool hard)
   {
-    auto layer_width = static_cast<std::make_signed_t<dimension_t>>(getWidth());
-    auto layer_height = static_cast<std::make_signed_t<dimension_t>>(getHeight());
-    if(x < layer_width && y < layer_height) {
-      if(hard) {
-        std::make_signed_t<dimension_t> w = pixelData.getWidth();
-        std::make_signed_t<dimension_t> h = pixelData.getHeight();
-        position_t srcXOff = 0, srcYOff = 0;
-        if(!calculateOffset(x, y, srcXOff, srcYOff, w, h, layer_width, layer_height)) {
-          return;
-        }
-
-        auto* src = pixelData.getData() + (srcYOff * 4 * pixelData.getWidth()) + (srcXOff * 4);
-        auto* dst = getData() + (y * 4 * layer_width) + (x * 4);
-        dimension_t src_width = pixelData.getWidth() * 4;
-        dimension_t dst_width = layer_width * 4;
-        auto size = w * 4;
-        for(std::size_t j = 0; j < h; ++j) {
-          std::memcpy(dst, src, size);
-          src += src_width;
-          dst += dst_width;
-        }
-      } else {
-        std::make_signed_t<dimension_t> w = pixelData.getWidth();
-        std::make_signed_t<dimension_t> h = pixelData.getHeight();
-        position_t srcXOff = 0, srcYOff = 0;
-        if(!calculateOffset(x, y, srcXOff, srcYOff, w, h, layer_width, layer_height)) {
-          return;
-        }
-
-        auto* src = pixelData.getData() + (srcYOff * 4 * pixelData.getWidth()) + (srcXOff * 4);
-        auto* dst = getData() + (y * 4 * layer_width) + (x * 4);
-        dimension_t src_width = pixelData.getWidth() * 4;
-        dimension_t dst_width = layer_width * 4;
-        for(std::size_t j = 0; j < h; ++j) {
-          auto* src_ptr = src;
-          auto* dst_ptr = dst;
-          for(std::size_t i = 0; i < w; ++i) {
-            detail::alphaBlend(dst_ptr, src_ptr);
-            src_ptr += 4;
-            dst_ptr += 4;
-          }
-
-          src += src_width;
-          dst += dst_width;
-        }
-      }
-    }
+    combine(pixelData, x, y, hard,
+    [](unsigned char* dst_ptr, const unsigned char* src_ptr, position_t, position_t) {
+      std::memcpy(dst_ptr, src_ptr, 4);
+    },
+    [](unsigned char* dst_ptr, const unsigned char* src_ptr, position_t, position_t) {
+      color_detail::alphaBlend(dst_ptr, src_ptr);
+    });
   }
 
   PixelData PixelData::copy(position_t x, position_t y, dimension_t width, dimension_t height) const
@@ -453,7 +415,7 @@ namespace
       std::make_signed_t<dimension_t> w = width;
       std::make_signed_t<dimension_t> h = height;
       position_t dstXOff = 0, dstYOff = 0;
-      if(!calculateOffset(x, y, dstXOff, dstYOff, w, h, layer_width, layer_height)) {
+      if(!pixeldata_detail::calculate_offset(x, y, dstXOff, dstYOff, w, h, layer_width, layer_height)) {
         return ret;
       }
 
@@ -482,7 +444,7 @@ namespace
       std::make_signed_t<dimension_t> w = width;
       std::make_signed_t<dimension_t> h = height;
       position_t dstXOff = 0, dstYOff = 0;
-      if(!calculateOffset(x, y, dstXOff, dstYOff, w, h, layer_width, layer_height)) {
+      if(!pixeldata_detail::calculate_offset(x, y, dstXOff, dstYOff, w, h, layer_width, layer_height)) {
         return ret;
       }
 
@@ -519,7 +481,7 @@ namespace
     }
 
     auto* data = getData() + (y * 4 * getWidth()) + (x * 4);
-    detail::alphaBlend(data, reinterpret_cast<const unsigned char*>(&color));
+    color_detail::alphaBlend(data, reinterpret_cast<const unsigned char*>(&color));
   }
 
   void PixelData::setPixel(position_t x, position_t y, const Color& color)
@@ -558,7 +520,7 @@ namespace
   {
     auto* data = getData() + (row * 4 * getWidth()) + (index * 4);
     for(std::size_t i = 0; i < size; ++i) {
-      detail::alphaBlend(data, reinterpret_cast<const unsigned char*>(&color[i]));
+      color_detail::alphaBlend(data, reinterpret_cast<const unsigned char*>(&color[i]));
       data += 4;
     }
   }
@@ -586,7 +548,7 @@ namespace
     }
     degree = fmod(degree, 360.f);
 
-    PixelData temp = fastRotate(*this, degree, direction);
+    PixelData temp = fast_rotate(*this, degree, direction);
     std::swap(temp, *this);
   }
 

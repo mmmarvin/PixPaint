@@ -1,18 +1,18 @@
 1 VERSIONINFO
-FILEVERSION	1,0,0,0
-PRODUCTVERSION	1,0,0,0
+FILEVERSION	1,0,1,0
+PRODUCTVERSION	1,0,1,0
 BEGIN
 	BLOCK "StringFileInfo"
 	BEGIN
 		BLOCK "040904E4"
 		BEGIN
 			VALUE "FileDescription", "Pixel art editor"
-			VALUE "FileVersion", "1.0"
+			VALUE "FileVersion", "1.01"
 			VALUE "InternalName", "PixPaint"
-			VALUE "LegalCopyright", "Marvin Manese"
+			VALUE "LegalCopyright", "2020-2021 Marvin Manese"
 			VALUE "OriginalFilename", "PixPaint.exe"
 			VALUE "ProductName", "PixPaint"
-			VALUE "ProductVersion", "1.0"
+			VALUE "ProductVersion", "1.01"
 		END
 	END
 	BLOCK "VarFileInfo"

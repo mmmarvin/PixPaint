@@ -21,20 +21,32 @@
 #define REGISTRARBASE_H
 
 #include <memory>
+#include <unordered_set>
 #include <vector>
 
 namespace pixpaint
 {
+namespace registerbase_detail
+{
+  static constexpr auto NAME_SIZE_LIMIT = 64;
+  static constexpr auto ID_SIZE_LIMIT = 32;
+  static constexpr auto CATEGORY_SIZE_LIMIT = 64;
+  static constexpr auto SHORTCUT_SIZE_LIMIT = 16;
+
+  static constexpr auto FILE_EXTENSION_SIZE_LIMIT = 12;
+  static constexpr auto FILE_DESCRIPTION_SIZE_LIMIT = 255;
+}
   template<class T>
   class RegistrarBase
   {
+    using id_container_type = std::unordered_set<std::string>;
     using container_type = std::vector<T>;
 
   public:
     RegistrarBase() {}
 
-    template<class... Args> void registerBuiltIn(Args&&... args);
-    template<class... Args> void registerCustom(Args&&... args);
+    template<class... Args> bool registerBuiltIn(std::string id, Args&&... args);
+    template<class... Args> bool registerCustom(std::string id, Args&&... args);
 
     typename container_type::iterator begin();
     typename container_type::const_iterator begin() const;
@@ -47,7 +59,8 @@ namespace pixpaint
     typename container_type::reverse_iterator rend();
 
   private:
-    container_type m_items;
+    id_container_type m_ids;
+    container_type    m_items;
   };
 }
 

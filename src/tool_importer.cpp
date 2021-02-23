@@ -23,6 +23,7 @@
 #include "tool/brushtool.h"
 #include "tool/circletool.h"
 #include "tool/colorpickertool.h"
+#include "tool/custombrushtool.h"
 #include "tool/ditherfilltool.h"
 #include "tool/erasertool.h"
 #include "tool/filltool.h"
@@ -42,39 +43,68 @@ namespace pixpaint
     // is used as the default selection tool
     paintToolRegistry.registerTool("Rectangle Selection Tool",
                                    "res/icons/rectselection_tool.png",
+                                   "rsel",
+                                   "S",
                                    std::make_unique<RectSelectionTool>());
     paintToolRegistry.registerTool("Pencil Tool",
                                    "res/icons/pencil_tool.png",
+                                   "penc",
+                                   "P",
                                    std::make_unique<PencilTool>());
     paintToolRegistry.registerTool("Eraser Tool",
                                    "res/icons/eraser_tool.png",
+                                   "eras",
+                                   "E",
                                    std::make_unique<EraserTool>());
     paintToolRegistry.registerTool("Brush Tool",
                                    "res/icons/brush_tool.png",
+                                   "brus",
+                                   "B",
                                    std::make_unique<BrushTool>());
     paintToolRegistry.registerTool("Magic Wand Tool",
                                    "res/icons/magic_wand_tool.png",
+                                   "wand",
+                                   "W",
                                    std::make_unique<MagicWandTool>());
+    paintToolRegistry.registerTool("Custom Brush Tool",
+                                   "res/icons/custom_brush_tool.png",
+                                   "cbru",
+                                   "U",
+                                   std::make_unique<CustomBrushTool>());
     paintToolRegistry.registerTool("Text Tool",
                                    "res/icons/text_selection_tool.png",
+                                   "text",
+                                   "T",
                                    std::make_unique<TextSelectionTool>());
     paintToolRegistry.registerTool("Color Picker Tool",
                                    "res/icons/color_picker_tool.png",
+                                   "pick",
+                                   "K",
                                    std::make_unique<ColorPickerTool>());
     paintToolRegistry.registerTool("Fill Tool",
                                    "res/icons/fill_tool.png",
+                                   "fill",
+                                   "F",
                                    std::make_unique<FillTool>());
     paintToolRegistry.registerTool("Dither Fill Tool",
                                    "res/icons/dither_fill_tool.png",
+                                   "dith",
+                                   "D",
                                    std::make_unique<DitherFillTool>());
     paintToolRegistry.registerTool("Line Tool",
                                    "res/icons/line_tool.png",
+                                   "line",
+                                   "L",
                                    std::make_unique<LineTool>());
     paintToolRegistry.registerTool("Rectangle Tool",
                                    "res/icons/rect_tool.png",
+                                   "rect",
+                                   "R",
                                    std::make_unique<RectTool>());
     paintToolRegistry.registerTool("Circle Tool",
                                    "res/icons/circle_tool.png",
+                                   "circ",
+                                   "O",
                                    std::make_unique<CircleTool>());
   }
 }

@@ -52,6 +52,7 @@ namespace pixpaint
   public:
     enum EChangeResult
     {
+      ECCR_NONE = 0,
       ECCR_UPDATECURSOR = 1 << 0,
       ECCR_UPDATEIMAGE = 1 << 1
     };
@@ -59,16 +60,16 @@ namespace pixpaint
     PaintToolBase() {}
     virtual ~PaintToolBase() {}
 
-    virtual bool onKeyPress(EKey key,
-                            const Color& color,
-                            ControlState controlState,
-                            ModifyablePixelData& previewLayer,
-                            MaskablePixelData& currentLayer);
-    virtual bool onKeyRelease(EKey key,
-                              const Color& color,
-                              ControlState controlState,
-                              ModifyablePixelData& previewLayer,
-                              MaskablePixelData& currentLayer);
+    virtual int onKeyPress(EKey key,
+                           const Color& color,
+                           ControlState controlState,
+                           ModifyablePixelData& previewLayer,
+                           MaskablePixelData& currentLayer);
+    virtual int onKeyRelease(EKey key,
+                             const Color& color,
+                             ControlState controlState,
+                             ModifyablePixelData& previewLayer,
+                             MaskablePixelData& currentLayer);
     virtual void onPreMousePress();
     virtual bool onMousePress(const Point& currentPoint,
                               const Point& previousPoint,
@@ -84,13 +85,13 @@ namespace pixpaint
                              ControlState controlState,
                              ModifyablePixelData& previewLayer,
                              MaskablePixelData& currentLayer);
-    virtual bool onMouseRelease(const Point& currentPoint,
-                                const Point& previousPoint,
-                                const Point& globalPoint,
-                                const Color& color,
-                                ControlState controlState,
-                                ModifyablePixelData& previewLayer,
-                                MaskablePixelData& currentLayer);
+    virtual int onMouseRelease(const Point& currentPoint,
+                               const Point& previousPoint,
+                               const Point& globalPoint,
+                               const Color& color,
+                               ControlState controlState,
+                               ModifyablePixelData& previewLayer,
+                               MaskablePixelData& currentLayer);
 
     virtual bool onFinalize(ModifyablePixelData& previewLayer,
                             MaskablePixelData& currentLayer);
@@ -115,22 +116,28 @@ namespace pixpaint
     virtual optional<const Cursor&> getCursor() const;
   };
 
+  class PaintToolButton
+  {
+  public:
+    virtual void click() = 0;
+  };
+
   class PaintToolHandlerBase
   {
   public:
     PaintToolHandlerBase() {}
     virtual ~PaintToolHandlerBase() {}
 
-    bool onKeyPress(EKey key,
-                    const Color& color,
-                    ControlState controlState,
-                    ModifyablePixelData& previewLayer,
-                    MaskablePixelData& currentLayer);
-    bool onKeyRelease(EKey key,
-                      const Color& color,
-                      ControlState controlState,
-                      ModifyablePixelData& previewLayer,
-                      MaskablePixelData& currentLayer);
+    int onKeyPress(EKey key,
+                   const Color& color,
+                   ControlState controlState,
+                   ModifyablePixelData& previewLayer,
+                   MaskablePixelData& currentLayer);
+    int onKeyRelease(EKey key,
+                     const Color& color,
+                     ControlState controlState,
+                     ModifyablePixelData& previewLayer,
+                     MaskablePixelData& currentLayer);
     void onPreMousePress();
     bool onMousePress(const Point& currentPoint,
                       const Point& previousPoint,
@@ -146,13 +153,13 @@ namespace pixpaint
                      ControlState controlState,
                      ModifyablePixelData& previewLayer,
                      MaskablePixelData& currentLayer);
-    bool onMouseRelease(const Point& currentPoint,
-                        const Point& previousPoint,
-                        const Point& globalPoint,
-                        const Color& color,
-                        ControlState controlState,
-                        ModifyablePixelData& previewLayer,
-                        MaskablePixelData& currentLayer);
+    int onMouseRelease(const Point& currentPoint,
+                       const Point& previousPoint,
+                       const Point& globalPoint,
+                       const Color& color,
+                       ControlState controlState,
+                       ModifyablePixelData& previewLayer,
+                       MaskablePixelData& currentLayer);
 
     bool onFinalize(ModifyablePixelData& previewLayer,
                     MaskablePixelData& currentLayer);
@@ -185,8 +192,8 @@ namespace pixpaint
     friend class LeftToolbox;
     friend class PaintToolManager;
 
-    PaintToolBase*  m_paintToolBase;
-    QPushButton*    m_buttonPair;
+    PaintToolBase*    m_paintToolBase;
+    PaintToolButton*  m_button;
   };
 
   class BuiltInPaintToolHandler : public PaintToolHandlerBase

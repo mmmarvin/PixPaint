@@ -34,6 +34,8 @@ namespace pixpaint
     QWidget(parent),
     m_image(&image),
     m_pixelSize(pixelSize),
+    m_boxGridDimension(64, 64),
+    m_showBoxGrid(false),
     m_showGrid(true)
   {
   }
@@ -47,6 +49,25 @@ namespace pixpaint
   bool ImageView::isGridShown() const noexcept
   {
     return m_showGrid;
+  }
+
+  void ImageView::showBoxGrid(bool show, dimension_t width, dimension_t height)
+  {
+    m_showBoxGrid = show;
+    if(show) {
+      m_boxGridDimension.width = width;
+      m_boxGridDimension.height = height;
+    }
+  }
+
+  bool ImageView::isBoxGridShown() const noexcept
+  {
+    return m_showBoxGrid;
+  }
+
+  const Size& ImageView::getBoxGridSize() const noexcept
+  {
+    return m_boxGridDimension;
   }
 
   void ImageView::setPixelSize(double pixelSize)
@@ -88,9 +109,12 @@ namespace pixpaint
     paintBackground(painter);
     this->paintImage(painter);
     if(m_showGrid && m_pixelSize >= 3) {
-      paintGrid(painter);
+      paintGrid();
     }
 
+    if(m_showBoxGrid) {
+      paintBoxGrid();
+    }
 //    PIXPAINT_PROFILER_END_TIME("ImageView paintEvent", general_utils::pointerToInt(this));
   }
 
@@ -129,9 +153,8 @@ namespace pixpaint
     }
   }
 
-  void ImageView::paintGrid(QPainter&)
+  void ImageView::paintGrid()
   {
-    // TODO: find more efficient way of drawing grid?
     QPainter painter(this);
 
     QPen pen(QColor(128, 128, 128, 255));
@@ -145,6 +168,27 @@ namespace pixpaint
       painter.drawLine(QPoint(0, y), QPoint(adjusted_image_width, y));
     }
     for(position_t x = 0; x <= adjusted_image_width; x += m_pixelSize) {
+      painter.drawLine(QPoint(x, 0), QPoint(x, adjusted_image_height));
+    }
+  }
+
+  void ImageView::paintBoxGrid()
+  {
+    QPainter painter(this);
+
+    QPen pen(QColor(64, 64, 64, 255));
+    pen.setWidth(3);
+    painter.setPen(pen);
+
+    auto adjusted_image_width = m_image->getWidth() * m_pixelSize;
+    auto adjusted_image_height = m_image->getHeight() * m_pixelSize;
+    auto w = m_boxGridDimension.width * m_pixelSize;
+    auto h = m_boxGridDimension.height * m_pixelSize;
+
+    for(position_t y = 0; y <= adjusted_image_height; y += h) {
+      painter.drawLine(QPoint(0, y), QPoint(adjusted_image_width, y));
+    }
+    for(position_t x = 0; x <= adjusted_image_width; x += w) {
       painter.drawLine(QPoint(x, 0), QPoint(x, adjusted_image_height));
     }
   }

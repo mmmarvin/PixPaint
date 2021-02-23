@@ -36,11 +36,13 @@ namespace pixpaint
     ImageFileTypeRegistrar() {}
 
   public:
-    void registerFileType(std::string fileExtension,
-                          std::string fileTypeDescription,
+    void registerFileType(std::string extension,
+                          std::string typeDescription,
+                          std::string id,
                           std::unique_ptr<ImageFileTypeBase> fileType);
-    void registerCustomFileType(std::string fileExtension,
-                                std::string fileTypeDescription,
+    void registerCustomFileType(std::string extension,
+                                std::string typeDescription,
+                                std::string id,
                                 boost::python::object fileType);
   };
 

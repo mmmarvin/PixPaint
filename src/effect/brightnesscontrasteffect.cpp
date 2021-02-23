@@ -26,21 +26,21 @@ namespace pixpaint
 {
 namespace
 {
-  std::uint8_t applyBrightness(std::uint8_t c, int brightness)
+  std::uint8_t apply_brightness(std::uint8_t c, int brightness)
   {
     return general_utils::clamp<int>(static_cast<int>(c) + brightness, 0, 255);
   }
 
   // Code based on:
   // https://www.dfstudios.co.uk/articles/programming/image-programming-algorithms/image-processing-algorithms-part-5-contrast-adjustment/
-  std::uint8_t applyContrast(std::uint8_t c, float contrastFactor)
+  std::uint8_t apply_contrast(std::uint8_t c, float contrastFactor)
   {
     return general_utils::clamp<float>((contrastFactor * (c - 128)) + 128, 0, 255);
   }
 
   // Code based on:
   // https://www.dfstudios.co.uk/articles/programming/image-programming-algorithms/image-processing-algorithms-part-5-contrast-adjustment/
-  float getContrastFactor(int contrast)
+  float get_contrast_factor(int contrast)
   {
     return static_cast<float>(259 * (contrast + 255)) / static_cast<float>(255 * (259 - contrast));
   }
@@ -61,13 +61,13 @@ namespace
 
   void BrightnessContrastEffect::applyLayerEffect(const IntRect&, MaskablePixelData& layer)
   {
-    auto contrast_factor = getContrastFactor(m_contrast);
+    auto contrast_factor = get_contrast_factor(m_contrast);
     if(m_channel == "Red") {
       for(int y = 0, ysize = layer.getHeight(); y < ysize; ++y) {
         for(int x = 0, xsize = layer.getWidth(); x < xsize; ++x) {
           auto c = layer.getPixel(x, y);
           if(c.a > 0) {
-            c.r = applyContrast(applyBrightness(c.r, m_brightness), contrast_factor);
+            c.r = apply_contrast(apply_brightness(c.r, m_brightness), contrast_factor);
             layer.setPixel(x, y, c);
           }
         }
@@ -77,7 +77,7 @@ namespace
         for(int x = 0, xsize = layer.getWidth(); x < xsize; ++x) {
           auto c = layer.getPixel(x, y);
           if(c.a > 0) {
-            c.g = applyContrast(applyBrightness(c.g, m_brightness), contrast_factor);
+            c.g = apply_contrast(apply_brightness(c.g, m_brightness), contrast_factor);
             layer.setPixel(x, y, c);
           }
         }
@@ -87,7 +87,7 @@ namespace
         for(int x = 0, xsize = layer.getWidth(); x < xsize; ++x) {
           auto c = layer.getPixel(x, y);
           if(c.a > 0) {
-            c.b = applyContrast(applyBrightness(c.b, m_brightness), contrast_factor);
+            c.b = apply_contrast(apply_brightness(c.b, m_brightness), contrast_factor);
             layer.setPixel(x, y, c);
           }
         }
@@ -97,9 +97,9 @@ namespace
         for(int x = 0, xsize = layer.getWidth(); x < xsize; ++x) {
           auto c = layer.getPixel(x, y);
           if(c.a > 0) {
-            c.r = applyContrast(applyBrightness(c.r, m_brightness), contrast_factor);
-            c.g = applyContrast(applyBrightness(c.g, m_brightness), contrast_factor);
-            c.b = applyContrast(applyBrightness(c.b, m_brightness), contrast_factor);
+            c.r = apply_contrast(apply_brightness(c.r, m_brightness), contrast_factor);
+            c.g = apply_contrast(apply_brightness(c.g, m_brightness), contrast_factor);
+            c.b = apply_contrast(apply_brightness(c.b, m_brightness), contrast_factor);
             layer.setPixel(x, y, c);
           }
         }
@@ -109,13 +109,13 @@ namespace
 
   void BrightnessContrastEffect::applySelectionEffect(const IntRect&, MaskablePixelData& selectionLayer)
   {
-    auto contrast_factor = getContrastFactor(m_contrast);
+    auto contrast_factor = get_contrast_factor(m_contrast);
     if(m_channel == "Red") {
       for(int y = 0, ysize = selectionLayer.getHeight(); y < ysize; ++y) {
         for(int x = 0, xsize = selectionLayer.getWidth(); x < xsize; ++x) {
           auto c = selectionLayer.getPixel(x, y);
           if(c.a > 0) {
-            c.r = applyContrast(applyBrightness(c.r, m_brightness), contrast_factor);
+            c.r = apply_contrast(apply_brightness(c.r, m_brightness), contrast_factor);
             selectionLayer.setPixel(x, y, c);
           }
         }
@@ -125,7 +125,7 @@ namespace
         for(int x = 0, xsize = selectionLayer.getWidth(); x < xsize; ++x) {
           auto c = selectionLayer.getPixel(x, y);
           if(c.a > 0) {
-            c.g = applyContrast(applyBrightness(c.g, m_brightness), contrast_factor);
+            c.g = apply_contrast(apply_brightness(c.g, m_brightness), contrast_factor);
             selectionLayer.setPixel(x, y, c);
           }
         }
@@ -135,7 +135,7 @@ namespace
         for(int x = 0, xsize = selectionLayer.getWidth(); x < xsize; ++x) {
           auto c = selectionLayer.getPixel(x, y);
           if(c.a > 0) {
-            c.b = applyContrast(applyBrightness(c.b, m_brightness), contrast_factor);
+            c.b = apply_contrast(apply_brightness(c.b, m_brightness), contrast_factor);
             selectionLayer.setPixel(x, y, c);
           }
         }
@@ -145,9 +145,9 @@ namespace
         for(int x = 0, xsize = selectionLayer.getWidth(); x < xsize; ++x) {
           auto c = selectionLayer.getPixel(x, y);
           if(c.a > 0) {
-            c.r = applyContrast(applyBrightness(c.r, m_brightness), contrast_factor);
-            c.g = applyContrast(applyBrightness(c.g, m_brightness), contrast_factor);
-            c.b = applyContrast(applyBrightness(c.b, m_brightness), contrast_factor);
+            c.r = apply_contrast(apply_brightness(c.r, m_brightness), contrast_factor);
+            c.g = apply_contrast(apply_brightness(c.g, m_brightness), contrast_factor);
+            c.b = apply_contrast(apply_brightness(c.b, m_brightness), contrast_factor);
             selectionLayer.setPixel(x, y, c);
           }
         }

@@ -46,13 +46,13 @@ namespace pixpaint
                      ControlState controlState,
                      ModifyablePixelData& previewLayer,
                      MaskablePixelData& currentLayer) override;
-    bool onMouseRelease(const Point& currentPoint,
-                        const Point& previousPoint,
-                        const Point& globalPoint,
-                        const Color& color,
-                        ControlState controlState,
-                        ModifyablePixelData& previewLayer,
-                        MaskablePixelData& currentLayer) override;
+    int onMouseRelease(const Point& currentPoint,
+                       const Point& previousPoint,
+                       const Point& globalPoint,
+                       const Color& color,
+                       ControlState controlState,
+                       ModifyablePixelData& previewLayer,
+                       MaskablePixelData& currentLayer) override;
 
     IntRect getDrawRect() const override;
     std::string getDescription() const override;

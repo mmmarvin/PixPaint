@@ -26,6 +26,7 @@
 #include "../dialog/aboutdialog.h"
 #include "../dialog/newimagedialog.h"
 #include "../dialog/rotateimagedialog.h"
+#include "../dialog/boxgriddialog.h"
 #include "../embed/script_utility.h"
 #include "../env/imageenvironment.h"
 #include "../env/guienvironment.h"
@@ -60,9 +61,9 @@ namespace pixpaint
 {
 namespace
 {
-  void applyImageEffectImpl(std::string effectName,
-                            std::function<void(const IntRect&, MaskablePixelData&)> layerEffect,
-                            std::function<void(const IntRect&, MaskablePixelData&)> selectionEffect)
+  void apply_image_effect_impl(std::string effectName,
+                               std::function<void(const IntRect&, MaskablePixelData&)> layerEffect,
+                               std::function<void(const IntRect&, MaskablePixelData&)> selectionEffect)
   {
     auto& image_env = getImageEnvironment();
     auto& image_manager = getImageManager();
@@ -76,9 +77,9 @@ namespace
     getPreviewManager().refreshResizeAll();
   }
 
-  void applyLayerEffectImpl(std::string effectName,
-                            std::function<void(const IntRect&, MaskablePixelData&)> layerEffect,
-                            std::function<void(const IntRect&, MaskablePixelData&)> selectionEffect)
+  void apply_layer_effect_impl(std::string effectName,
+                               std::function<void(const IntRect&, MaskablePixelData&)> layerEffect,
+                               std::function<void(const IntRect&, MaskablePixelData&)> selectionEffect)
   {
     auto& image_env = getImageEnvironment();
     auto& image_manager = getImageManager();
@@ -93,13 +94,13 @@ namespace
     getPreviewManager().refreshResizeAll();
   }
 
-  void applyImageEffect(std::string effectName,
-                        std::function<void(const IntRect&, MaskablePixelData&)> layerEffect,
-                        std::function<void(const IntRect&, MaskablePixelData&)> selectionEffect)
+  void apply_image_effect(std::string effectName,
+                          std::function<void(const IntRect&, MaskablePixelData&)> layerEffect,
+                          std::function<void(const IntRect&, MaskablePixelData&)> selectionEffect)
   {
     auto& image_env = getImageEnvironment();
     if(image_env.isViewSet()) {
-      applyImageEffectImpl(std::move(effectName), std::move(layerEffect), std::move(selectionEffect));
+      apply_image_effect_impl(std::move(effectName), std::move(layerEffect), std::move(selectionEffect));
     }
   }
 
@@ -113,11 +114,11 @@ namespace
 //    }
 //  }
 
-  void popResizeSubMenu(QMenu* mainMenu,
-                        QMenu** resizeMenu,
-                        QAction** resizeScaleAction,
-                        QAction** resizeSmoothScaleAction,
-                        QAction** resizeResizeAction)
+  void pop_resize_sub_menu(QMenu* mainMenu,
+                           QMenu** resizeMenu,
+                           QAction** resizeScaleAction,
+                           QAction** resizeSmoothScaleAction,
+                           QAction** resizeResizeAction)
   {
     *resizeMenu = mainMenu->addMenu(QObject::tr("Resize Mode"));
     *resizeScaleAction = (*resizeMenu)->addAction(QObject::tr("Scale"));
@@ -456,7 +457,8 @@ namespace
     viewMenu->frameToolbar = viewMenu->menu->addAction(QObject::tr("Frames Toolbar"));
     viewMenu->consoleToolbar = viewMenu->menu->addAction(QObject::tr("Console"));
     viewMenu->menu->addSeparator();
-    viewMenu->showGridAction = viewMenu->menu->addAction(QObject::tr("Show Grid"));
+    viewMenu->showGridAction = viewMenu->menu->addAction(QObject::tr("Show Pixel Grid"));
+    viewMenu->boxGridAction = viewMenu->menu->addAction(QObject::tr("Box Grid"));
     viewMenu->menu->addSeparator();
     viewMenu->zoomInAction = viewMenu->menu->addAction(QObject::tr("Zoom In"));
     viewMenu->zoomOutAction = viewMenu->menu->addAction(QObject::tr("Zoom Out"));
@@ -469,11 +471,13 @@ namespace
     QObject::connect(viewMenu->menu, &QMenu::aboutToShow, [viewMenu, parent]{
       if(getImageEnvironment().isViewSet()) {
         viewMenu->showGridAction->setEnabled(true);
+        viewMenu->boxGridAction->setEnabled(true);
         viewMenu->zoomInAction->setEnabled(true);
         viewMenu->zoomOutAction->setEnabled(true);
         viewMenu->showGridAction->setChecked(getImageEnvironment().getView().isGridShown());
       } else {
         viewMenu->showGridAction->setEnabled(false);
+        viewMenu->boxGridAction->setEnabled(false);
         viewMenu->zoomInAction->setEnabled(false);
         viewMenu->zoomOutAction->setEnabled(false);
       }
@@ -529,6 +533,22 @@ namespace
       if(image_env.isViewSet()) {
         image_env.getView().showGrid(!image_env.getView().isGridShown());
         image_manager.refresh();
+      }
+    });
+
+    QObject::connect(viewMenu->boxGridAction, &QAction::triggered, [parent](bool) {
+      BoxGridDialog dialog(parent);
+
+      auto res = dialog.exec();
+      if(res == QDialog::Accepted) {
+        auto& image_env = getImageEnvironment();
+        auto& view = image_env.getView();
+
+        if(dialog.showGrid()) {
+          view.showBoxGrid(true, dialog.getWidth(), dialog.getHeight());
+        } else {
+          view.showBoxGrid(false, view.getBoxGridSize().width, view.getBoxGridSize().height);
+        }
       }
     });
 
@@ -632,7 +652,7 @@ namespace
 
     QObject::connect(imageMenu->flipImageAction, &QAction::triggered, [parent](bool) {
       if(getImageEnvironment().isViewSet()) {
-        applyImageEffect("Flip Image",
+        apply_image_effect("Flip Image",
         [](const IntRect&, MaskablePixelData& layer)
         {
           layer = layer.flipVertically();
@@ -645,7 +665,7 @@ namespace
     });
     QObject::connect(imageMenu->mirrorImageAction, &QAction::triggered, [parent](bool) {
       if(getImageEnvironment().isViewSet()) {
-        applyImageEffect("Mirror Image",
+        apply_image_effect("Mirror Image",
         [](const IntRect&, MaskablePixelData& layer)
         {
           layer = layer.flipHorizontally();
@@ -666,7 +686,7 @@ namespace
           auto direction = rotateDialog.getRotationDirection();
           auto angle = rotateDialog.getRotation();
 
-          applyImageEffect("Rotate Image",
+          apply_image_effect("Rotate Image",
           [direction, angle](const IntRect& , MaskablePixelData& layer)
           {
             layer.rotate(angle, direction);
@@ -702,7 +722,7 @@ namespace
     });
 
     QObject::connect(imageMenu->invertImageAction, &QAction::triggered, [parent](bool) {
-      applyImageEffect("Invert Image",
+      apply_image_effect("Invert Image",
       [](const IntRect& , MaskablePixelData& layer)
       {
         layer.invert();
@@ -732,7 +752,7 @@ namespace
 
   void popSelectMenu(MainMenu::SelectMenu* selectMenu, QWidget*, bool menu)
   {
-    popResizeSubMenu(selectMenu->menu,
+    pop_resize_sub_menu(selectMenu->menu,
                      &selectMenu->resizeMenu,
                      &selectMenu->resizeScaleAction,
                      &selectMenu->resizeSmoothScaleAction,
@@ -925,7 +945,7 @@ namespace
               auto target = dialog.getTarget();
               if(target == EffectOptionDialog::EEffectTarget::IMAGE ||
                  target == EffectOptionDialog::EEffectTarget::SELECTION) {
-                applyImageEffectImpl(effect_information.getName(),
+                apply_image_effect_impl(effect_information.getName(),
                 [&effect_information](const IntRect& rect, MaskablePixelData& layer)
                 {
                   effect_information.getEffect().applyLayerEffect(rect, layer);
@@ -935,7 +955,7 @@ namespace
                   effect_information.getEffect().applySelectionEffect(rect, selectionLayer);
                 });
               } else if(target == EffectOptionDialog::EEffectTarget::LAYER) {
-                applyLayerEffectImpl(effect_information.getName(),
+                apply_layer_effect_impl(effect_information.getName(),
                 [&effect_information](const IntRect& rect, MaskablePixelData& layer)
                 {
                   effect_information.getEffect().applyLayerEffect(rect, layer);
@@ -949,7 +969,7 @@ namespace
           } else {
             auto& image = image_manager.getImage();
             for(std::size_t i = 0, isize = image.getLayerCount(); i < isize; ++i) {
-              applyImageEffectImpl(effect_information.getName(),
+              apply_image_effect_impl(effect_information.getName(),
               [&effect_information](const IntRect& rect, MaskablePixelData& layer)
               {
                 effect_information.getEffect().applyLayerEffect(rect, layer);

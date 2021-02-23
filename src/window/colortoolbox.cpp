@@ -41,7 +41,7 @@ namespace pixpaint
 {
 namespace
 {
-  void onColorClick()
+  void on_color_click()
   {
     auto& imageEnv = getImageEnvironment();
     if(imageEnv.isViewSet()) {
@@ -192,12 +192,12 @@ namespace
 
       connect(colorBtn, &ColorButton::clicked, [colorBtn] {
         getColorManager().setForegroundColor(colorBtn->getBackgroundColor());
-        onColorClick();
+        on_color_click();
       });
 
       connect(colorBtn, &ColorButton::customContextMenuRequested, [colorBtn] {
         getColorManager().setBackgroundColor(colorBtn->getBackgroundColor());
-        onColorClick();
+        on_color_click();
       });
 
       connect(colorBtn, &ColorButton::doubleClicked, [colorBtn]{

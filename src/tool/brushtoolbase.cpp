@@ -26,28 +26,17 @@
 #include "../manager/drawermanager.h"
 #include "../manager/imagemanager.h"
 #include "../utility/general_utility.h"
+#include "../utility/geometry_utility.h"
 #include "../utility/qt_utility.h"
 #include "../debug_log.h"
 #include "../define.h"
 
 namespace pixpaint
 {
-namespace brushtoolbase_detail
-{
-  QPixmap generateBrushCursor(const Color& color)
-  {
-    QImage ret(1, 1, QImage::Format_RGBA8888);
-    ret.setPixelColor(0, 0, qt_utils::convertToQTColor(color));
-
-    return QPixmap::fromImage(ret);
-  }
-}
-  static Drawer* currentDrawer = nullptr;
-
   BrushToolBase::BrushToolBase() :
-    CursorToolBase(brushtoolbase_detail::generateBrushCursor()),
-    m_size(1),
-    m_antialiased(DEFAULT_TOOL_ANTIALIASING)
+    CursorToolBase(PixelData(1, 1, Color::BLACK)),
+    m_brush(1, 1, Color::BLACK),
+    m_size(1)
   {
   }
 
@@ -57,116 +46,128 @@ namespace brushtoolbase_detail
                                    const Color& color,
                                    ControlState,
                                    ModifyablePixelData&,
-                                   MaskablePixelData&)
+                                   MaskablePixelData& currentLayer)
   {
     auto tx = general_utils::minmax(currentPoint.x, currentPoint.x);
     auto ty = general_utils::minmax(currentPoint.y, currentPoint.y);
-    auto startX = std::get<0>(tx);
-    auto endX = std::get<1>(tx);
-    auto startY = std::get<0>(ty);
-    auto endY = std::get<1>(ty);
+    auto start_x = std::get<0>(tx);
+    auto end_x = std::get<1>(tx);
+    auto start_y = std::get<0>(ty);
+    auto end_y = std::get<1>(ty);
 
-    startX -= m_size;
-    startY -= m_size;
-    endX += m_size;
-    endY += m_size;
+    start_x -= m_size;
+    start_y -= m_size;
+    end_x += m_size;
+    end_y += m_size;
 
-    currentDrawer = &getLayerDrawer();
-    currentDrawer->drawLineBlend(currentPoint, currentPoint, color, DrawParam{ m_antialiased, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
-    m_min = m_max = currentPoint;
+    m_brush = PixelData(m_size, m_size, color);
+
+    auto hs = m_size / 2;
+    getLayerDrawer().getDrawerCommander()->addCommand(start_x, start_y, end_x - start_x, end_y - start_y);
+    currentLayer.combine(m_brush, currentPoint.x - hs, currentPoint.y - hs);
+
+    auto sp = Point(m_size, m_size);
+    m_min = currentPoint - sp;
+    m_max = currentPoint + sp;
     return true;
   }
 
   bool BrushToolBase::onMouseMove(const Point& currentPoint,
                                   const Point& previousPoint,
                                   const Point&,
-                                  const Color& color,
+                                  const Color&,
                                   ControlState,
                                   ModifyablePixelData&,
-                                  MaskablePixelData&)
+                                  MaskablePixelData& currentLayer)
   {
     if(previousPoint.x != -1 &&
        previousPoint.y != -1) {
       auto tx = general_utils::minmax(previousPoint.x, currentPoint.x);
       auto ty = general_utils::minmax(previousPoint.y, currentPoint.y);
-      auto startX = std::get<0>(tx);
-      auto endX = std::get<1>(tx);
-      auto startY = std::get<0>(ty);
-      auto endY = std::get<1>(ty);
+      auto start_x = std::get<0>(tx);
+      auto end_x = std::get<1>(tx);
+      auto start_y = std::get<0>(ty);
+      auto end_y = std::get<1>(ty);
 
-      startX -= m_size;
-      startY -= m_size;
-      endX += m_size;
-      endY += m_size;
+      start_x -= m_size;
+      start_y -= m_size;
+      end_x += m_size;
+      end_y += m_size;
 
-      currentDrawer->drawLineBlend(previousPoint, currentPoint, color, DrawParam{ m_antialiased, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
+      getLayerDrawer().getDrawerCommander()->addCommand(start_x, start_y, end_x - start_x, end_y - start_y);
+      geometry_utils::drawLine(m_brush, currentLayer, currentPoint, previousPoint);
     } else {
       auto tx = general_utils::minmax(currentPoint.x, currentPoint.x);
       auto ty = general_utils::minmax(currentPoint.y, currentPoint.y);
-      auto startX = std::get<0>(tx);
-      auto endX = std::get<1>(tx);
-      auto startY = std::get<0>(ty);
-      auto endY = std::get<1>(ty);
+      auto start_x = std::get<0>(tx);
+      auto end_x = std::get<1>(tx);
+      auto start_y = std::get<0>(ty);
+      auto end_y = std::get<1>(ty);
 
-      startX -= m_size;
-      startY -= m_size;
-      endX += m_size;
-      endY += m_size;
+      start_x -= m_size;
+      start_y -= m_size;
+      end_x += m_size;
+      end_y += m_size;
 
-      currentDrawer->drawLineBlend(currentPoint, currentPoint, color, DrawParam{ m_antialiased, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
+      getLayerDrawer().getDrawerCommander()->addCommand(start_x, start_y, end_x - start_x, end_y - start_y);
+      geometry_utils::drawLine(m_brush, currentLayer, currentPoint, previousPoint);
     }
 
     auto tx = general_utils::minmax(currentPoint.x, previousPoint.x);
     auto ty = general_utils::minmax(currentPoint.y, previousPoint.y);
-    auto minX = std::get<0>(tx);
-    auto maxX = std::get<1>(tx);
-    auto minY = std::get<0>(ty);
-    auto maxY = std::get<1>(ty);
+    auto min_x = std::get<0>(tx);
+    auto max_x = std::get<1>(tx);
+    auto min_y = std::get<0>(ty);
+    auto max_y = std::get<1>(ty);
 
-    minX -= m_size;
-    maxX += m_size;
-    minY -= m_size;
-    maxY += m_size;
+    min_x -= m_size;
+    max_x += m_size;
+    min_y -= m_size;
+    max_y += m_size;
 
-    m_min.x = minX - 1;
-    m_min.y = minY - 1;
-    m_max.x = maxX + 1;
-    m_max.y = maxY + 1;
+    m_min.x = min_x - 1;
+    m_min.y = min_y - 1;
+    m_max.x = max_x + 1;
+    m_max.y = max_y + 1;
     return true;
   }
 
-  bool BrushToolBase::onMouseRelease(const Point&,
-                                     const Point&,
-                                     const Point&,
-                                     const Color&,
-                                     ControlState,
-                                     ModifyablePixelData&,
-                                     MaskablePixelData&)
+  int BrushToolBase::onMouseRelease(const Point&,
+                                    const Point&,
+                                    const Point&,
+                                    const Color&,
+                                    ControlState,
+                                    ModifyablePixelData&,
+                                    MaskablePixelData&)
   {
     getImageManager().getImage().setModified(true);
-    return true;
+    return EChangeResult::ECCR_NONE;
   }
 
   int BrushToolBase::onToolChange(ModifyablePixelData&, MaskablePixelData&)
   {
-    auto foregroundColor = getColorManager().getForegroundColor();
-    if(foregroundColor == Color::TRANSPARENT) {
-      foregroundColor = Color::WHITE;
+    auto foreground_color = getColorManager().getForegroundColor();
+    if(foreground_color == Color::TRANSPARENT) {
+      foreground_color = Color::WHITE;
     }
-    foregroundColor.a = 255;
-    this->setCursor(Cursor(QCursor(brushtoolbase_detail::generateBrushCursor(foregroundColor).scaled(m_size, m_size))));
+    foreground_color.a = 255;
+
+    m_brush = PixelData(m_size, m_size, foreground_color);
+    this->setCursor(Cursor(m_brush));
 
     return EChangeResult::ECCR_UPDATECURSOR;
   }
 
   int BrushToolBase::onColorChange(ModifyablePixelData&, MaskablePixelData&)
   {
-    auto foregroundColor = getColorManager().getForegroundColor();
-    if(foregroundColor == Color::TRANSPARENT) {
-      foregroundColor = Color::WHITE;
+    auto foreground_color = getColorManager().getForegroundColor();
+    if(foreground_color == Color::TRANSPARENT) {
+      foreground_color = Color::WHITE;
     }
-    foregroundColor.a = 255;
-    this->setCursor(Cursor(QCursor(brushtoolbase_detail::generateBrushCursor(foregroundColor).scaled(m_size, m_size))));
+    foreground_color.a = 255;
+
+    m_brush = PixelData(m_size, m_size, foreground_color);
+    this->setCursor(Cursor(m_brush));
 
     return EChangeResult::ECCR_UPDATECURSOR;
   }

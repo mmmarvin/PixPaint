@@ -71,7 +71,7 @@ namespace
 
   // Layer setPixel and getPixel have checkers that could cause slow-downs
   // when used in fill
-  void setPixel(int x, int y, const Color& color, MaskablePixelData& layer)
+  void set_pixel(int x, int y, const Color& color, MaskablePixelData& layer)
   {
     auto mask = layer.getMask();
     if(mask) {
@@ -85,7 +85,7 @@ namespace
     }
   }
 
-  Color getPixel(int x, int y, MaskablePixelData& layer)
+  Color get_pixel(int x, int y, MaskablePixelData& layer)
   {
     Color ret;
     std::memcpy(&ret, layer.getData() + (y * 4 * layer.getWidth()) + (x * 4), sizeof(Color));
@@ -116,7 +116,7 @@ namespace
     Color ov;	/* old pixel value */
     Segment stack[MAX], *sp = stack;	/* stack of filled segments */
 
-    ov = getPixel(x, y, layer);		/* read pv at seed point */
+    ov = get_pixel(x, y, layer);		/* read pv at seed point */
     if (ov == nv || x < dim.x0 || x > dim.x1 || y < dim.y0 || y > dim.y1) {
       return history;
     }
@@ -130,23 +130,23 @@ namespace
       * segment of scan line y-dy for x1<=x<=x2 was previously filled,
       * now explore adjacent pixels in scan line y
       */
-      for (x = x1; x >= dim.x0 && getPixel(x, y, layer) == ov; x--) {
+      for (x = x1; x >= dim.x0 && get_pixel(x, y, layer) == ov; x--) {
         history.push_back(std::make_pair(Point(x, y), ov));
-        setPixel(x, y, nv, layer);
+        set_pixel(x, y, nv, layer);
       }
       if (x >= x1) goto skip;
       l = x + 1;
       if (l < x1) PUSH(y, l, x1 - 1, -dy);		/* leak on left? */
       x = x1 + 1;
       do {
-        for (; x <= dim.x1 && getPixel(x, y, layer) == ov; x++) {
+        for (; x <= dim.x1 && get_pixel(x, y, layer) == ov; x++) {
           history.push_back(std::make_pair(Point(x, y), ov));
-          setPixel(x, y, nv, layer);
+          set_pixel(x, y, nv, layer);
         }
         PUSH(y, l, x - 1, dy);
         if (x > x2 + 1) PUSH(y, x2 + 1, x - 1, -dy);	/* leak on right? */
     skip:
-        for (x++; x <= x2 && getPixel(x, y, layer) != ov; x++);
+        for (x++; x <= x2 && get_pixel(x, y, layer) != ov; x++);
         l = x;
       } while (x <= x2);
     }

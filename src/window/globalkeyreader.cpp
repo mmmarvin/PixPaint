@@ -22,8 +22,11 @@
 #include <QKeyEvent>
 #include "../3rdparty/gengine/configuration.h"
 #include "../env/imageenvironment.h"
+#include "../helper/tool_helpers.h"
 #include "../manager/documentmanager.h"
 #include "../manager/imagemanager.h"
+#include "../manager/painttoolmanager.h"
+#include "../registrar/painttoolregistrar.h"
 #include "../utility/qt_utility.h"
 #include "../window/imageeditorview.h"
 #include "../define.h"
@@ -33,7 +36,7 @@ namespace pixpaint
 {
 namespace
 {
-  QKeySequence getKeySequence(QKeyEvent* event)
+  QKeySequence get_key_sequence(QKeyEvent* event)
   {
     auto m = event->modifiers();
     auto k = event->key();
@@ -55,7 +58,7 @@ namespace
   bool GlobalKeyReader::eventFilter(QObject* watched, QEvent* event)
   {
     auto eventType = event->type();
-    if(eventType == QEvent::KeyPress ) {
+    if(eventType == QEvent::KeyPress) {
       auto* keyEvent = static_cast<QKeyEvent*>(event);
       if(!keyEvent->isAutoRepeat()) {
         auto& configurationManager = gengine2d::getConfigurationManager();
@@ -64,7 +67,7 @@ namespace
 
         auto previousFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "previousframe")->c_str());
         auto nextFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "nextframe")->c_str());
-        auto keySequence = getKeySequence(keyEvent);
+        auto keySequence = get_key_sequence(keyEvent);
 
         if(previousFrameKeySequence == keySequence) {
           auto& animation = getDocumentManager().getDocument().getAnimation();
@@ -95,6 +98,18 @@ namespace
             event->accept();
             return true;
           }
+        } else {
+          for(auto& paint_tool_information : getPaintToolRegistrar()) {
+            if(!paint_tool_information.getShortcut().empty()) {
+              auto tool_key_sequence = QKeySequence(paint_tool_information.getShortcut().c_str());
+              if(keySequence == tool_key_sequence) {
+                auto& paint_tool = paint_tool_information.getTool();
+                getPaintToolManager().setCurrentTool(paint_tool);
+                tool_helpers::onToolChange(paint_tool, &PaintToolHandlerBase::onToolChange);
+                break;
+              }
+            }
+          }
         }
       }
     } else if(eventType == QEvent::KeyRelease) {
@@ -106,7 +121,7 @@ namespace
 
         const auto previousFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "previousframe")->c_str());
         const auto nextFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "nextframe")->c_str());
-        auto keySequence = getKeySequence(keyEvent);
+        auto keySequence = get_key_sequence(keyEvent);
 
         if(previousFrameKeySequence == keySequence ||
            nextFrameKeySequence == keySequence) {

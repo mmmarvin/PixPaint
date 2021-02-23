@@ -32,7 +32,7 @@ namespace script_utils
 {
 namespace
 {
-  EMessageBoxButtons QButtonToEMessageBoxButton(int qbutton)
+  EMessageBoxButtons qbutton_to_emessage_box_button(int qbutton)
   {
     switch(qbutton) {
     case QMessageBox::Yes:
@@ -69,7 +69,7 @@ namespace
       msg_btns |= QMessageBox::Cancel;
     }
     msg_box.setStandardButtons(static_cast<QMessageBox::StandardButton>(msg_btns));
-    return QButtonToEMessageBoxButton(msg_box.exec());
+    return qbutton_to_emessage_box_button(msg_box.exec());
   }
 
   std::vector<std::uint8_t> convertImageToData(const Image& image, bool includeAlpha)
@@ -95,8 +95,8 @@ namespace
   {
     std::vector<std::uint8_t> ret;
 
-    for(int y = 0; y < layer.getHeight(); ++y) {
-      for(int x = 0; x < layer.getWidth(); ++x) {
+    for(position_t y = 0; y < layer.getHeight(); ++y) {
+      for(position_t x = 0; x < layer.getWidth(); ++x) {
         auto c = layer.getPixel(x, y);
         ret.push_back(c.r);
         ret.push_back(c.g);
@@ -138,8 +138,8 @@ namespace
   {
     std::vector<std::uint32_t> ret;
 
-    for(int y = 0; y < layer.getHeight(); ++y) {
-      for(int x = 0; x < layer.getWidth(); ++x) {
+    for(position_t y = 0; y < layer.getHeight(); ++y) {
+      for(position_t x = 0; x < layer.getWidth(); ++x) {
         auto c = layer.getPixel(x, y);
 
         std::uint32_t color = 0;

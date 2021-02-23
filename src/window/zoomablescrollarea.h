@@ -32,6 +32,7 @@ namespace pixpaint
   class DocumentPanel;
   class ImageEditorView;
   class SelectionWidget;
+  class DummySelectionWidget;
 
   class HorizontalResizeHandle;
   class HVResizeHandle;
@@ -44,6 +45,7 @@ namespace pixpaint
     void setWidget(ImageEditorView* view);
 
     void updateSelectionWidget();
+    void updateDummySelectionWidget();
     void updateResizeHandles();
 
   protected:
@@ -59,6 +61,7 @@ namespace pixpaint
     friend class HorizontalResizeHandle;
     friend class HVResizeHandle;
     friend class ImageEnvironment;
+    friend class DummySelectionWidget;
     friend class SelectionWidget;
     friend class VerticalResizeHandle;
 
@@ -67,6 +70,7 @@ namespace pixpaint
 
     ImageEditorView*        m_view;
     SelectionWidget*        m_selectionWidget;
+    DummySelectionWidget*   m_dummySelectionWidget;
 
     VerticalResizeHandle*   m_vertResizeHandle;
     HorizontalResizeHandle* m_horResizeHandle;

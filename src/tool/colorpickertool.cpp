@@ -42,16 +42,16 @@ namespace pixpaint
     return true;
   }
 
-  bool ColorPickerTool::onMouseRelease(const Point&,
-                                       const Point&,
-                                       const Point&,
-                                       const Color&,
-                                       ControlState,
-                                       ModifyablePixelData&,
-                                       MaskablePixelData&)
+  int ColorPickerTool::onMouseRelease(const Point&,
+                                      const Point&,
+                                      const Point&,
+                                      const Color&,
+                                      ControlState,
+                                      ModifyablePixelData&,
+                                      MaskablePixelData&)
   {
     getPaintToolManager().setToPreviousTool();
-    return true;
+    return EChangeResult::ECCR_NONE;
   }
 
   bool ColorPickerTool::hasRightClick() const

@@ -30,8 +30,8 @@ namespace pixpaint
   void register_fixed_image_file_types()
   {
     auto& registry = getImageFileTypeRegistrar();
-    registry.registerFileType("jpg", "JPEG Image", std::make_unique<JPGImageFileType>());
-    registry.registerFileType("png", "PNG Image", std::make_unique<PNGImageFileType>());
-    registry.registerFileType("bmp", "Windows BMP Image", std::make_unique<BMPImageFileType>());
+    registry.registerFileType("jpg", "JPEG Image", "jpg", std::make_unique<JPGImageFileType>());
+    registry.registerFileType("png", "PNG Image", "png", std::make_unique<PNGImageFileType>());
+    registry.registerFileType("bmp", "Windows BMP Image", "bmp", std::make_unique<BMPImageFileType>());
   }
 }

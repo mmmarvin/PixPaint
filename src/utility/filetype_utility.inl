@@ -34,7 +34,7 @@ namespace filetype_utils
     }
 
     auto new_filename = os_specific::filesystem::path(filename).replace_extension(fileTypeInformation.getExtension());
-    return new_filename.filename().string();
+    return new_filename.string();
   }
 }
 }

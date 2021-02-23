@@ -40,7 +40,9 @@
 #include "../env/guienvironment.h"
 #include "../event/gui/tab_events.h"
 #include "../helper/selection_helpers.h"
+#include "../helper/tool_helpers.h"
 #include "../image/image.h"
+#include "../manager/consolemanager.h"
 #include "../manager/documentmanager.h"
 #include "../manager/imagemanager.h"
 #include "../manager/selectionmanager.h"
@@ -76,10 +78,10 @@ namespace pixpaint
 {
 namespace
 {
-  void doSave(MainWindow* parent,
-              const std::string& filter,
-              const std::string& dialogTitle,
-              std::function<void(const std::string&, const std::string&)> saveFunc)
+  void do_save(MainWindow* parent,
+               const std::string& filter,
+               const std::string& dialogTitle,
+               std::function<void(const std::string&, const std::string&)> saveFunc)
   {
     if(getImageEnvironment().isViewSet()) {
       QFileDialog dialog(parent, QObject::tr(dialogTitle.c_str()), QObject::tr(""), filter.c_str());
@@ -94,9 +96,7 @@ namespace
       }
     }
   }
-}
-namespace
-{
+
   struct ProjectRegistrarGetter
   {
     ProjectFileTypeRegistrar& operator()() { return getProjectFileTypeRegistrar(); }
@@ -193,22 +193,48 @@ namespace
       handle.onPreSave(document_manager.getDocument().getAnimation());
     }
   };
+
+  struct ModifySetter
+  {
+    void operator()(Animation& animation)
+    {
+      for(size_t i = 0, isize = animation.getFrameCount(); i < isize; ++i) {
+        animation.getFrame(i).setModified(false);
+      }
+    }
+  };
+
+  struct DummyModifySetter
+  {
+    void operator()(Animation&)
+    {
+    }
+  };
 }
   MainWindow::MainWindow(const RunParam& runParam) :
     QMainWindow(nullptr)
   {
+    auto app_name = (APP_TITLE +
+                     std::string(" v.") +
+                     std::to_string(APP_VERSION_MAJOR) +
+                     std::string(".") +
+                     std::to_string(APP_VERSION_MINOR) +
+                     std::to_string(APP_VERSION_PATCH) +
+                     std::string(" [") +
+                     APP_RELEASE_TYPE +
+                     std::string("]"));
+
     this->setMinimumSize(640, 480);
     this->setWindowState(Qt::WindowState::WindowMaximized);
-    this->setWindowTitle((APP_TITLE +
-                         std::string(" v.") +
-                         std::to_string(APP_VERSION_MAJOR) +
-                         std::string(".") +
-                         std::to_string(APP_VERSION_MINOR) +
-                         std::to_string(APP_VERSION_PATCH) +
-                         std::string(" [") +
-                         APP_RELEASE_TYPE +
-                         std::string("]")).c_str());
+    this->setWindowTitle(app_name.c_str());
     this->setWindowIcon(QIcon("res/pixpaint.png"));
+
+    createConsoleWidget();
+    getConsoleManager().writeMessageSystem(app_name + std::string(" Console"));
+    getConsoleManager().writeMessageSystem("=================================");
+
+    // initialize built-in config values
+    initializeConfigValues();
 
     // register the paint tools
     register_fixed_tool();
@@ -222,22 +248,26 @@ namespace
       initPythonExports();
     }
 
-    createStatusBar();
+    // load the config values
+    loadConfigValues();
 
+    // create widgets
+    createStatusBar();
     createMainWidget();
     createDocks();
     createMenus();
     createActions();
     createActionShortcuts();
 
+    // create recent files
     createRecentFiles();
     checkRecentFiles();
     updateRecentActions();
 
     auto& configurationManager = gengine2d::getConfigurationManager();
-    m_lastImageWidth = *configurationManager.getInteger(pixpaint::CONFIG_SECTION_SETTINGS,
+    m_lastImageWidth = *configurationManager.getInteger(CONFIG_SECTION_SETTINGS,
                                                        "image_width");
-    m_lastImageHeight = *configurationManager.getInteger(pixpaint::CONFIG_SECTION_SETTINGS,
+    m_lastImageHeight = *configurationManager.getInteger(CONFIG_SECTION_SETTINGS,
                                                        "image_height");
     m_lastImageWidth = m_lastImageWidth <= 0 ? DEFAULT_IMAGE_WIDTH : m_lastImageWidth ;
     m_lastImageHeight = m_lastImageHeight <= 0 ? DEFAULT_IMAGE_HEIGHT : m_lastImageHeight;
@@ -295,14 +325,19 @@ namespace
         } else {
           const bool shift_down = (event->modifiers() & Qt::ShiftModifier) != 0;
           const bool ctrl_down = (event->modifiers() & Qt::ControlModifier) != 0;
-          if(currentPaintTool.onKeyPress(static_cast<EKey>(event->key()),
-                                         getColorManager().getForegroundColor(),
-                                         ControlState { shift_down, ctrl_down },
-                                         view.getPreviewLayer(),
-                                         imageManager.getImage().getCurrentLayer())) {
+          auto res = currentPaintTool.onKeyPress(static_cast<EKey>(event->key()),
+                                                 getColorManager().getForegroundColor(),
+                                                 ControlState { shift_down, ctrl_down },
+                                                 view.getPreviewLayer(),
+                                                 imageManager.getImage().getCurrentLayer());
+
+          if(res & PaintToolBase::EChangeResult::ECCR_UPDATEIMAGE) {
             auto pixelSize = view.getPixelSize();
             auto refreshRect = view.getSmallestDrawableRegion(castTo<double>(currentPaintTool.getDrawRect()) * pixelSize);
             view.repaint(qt_utils::convertToQTRect(castTo<position_t>(refreshRect)));
+          }
+          if(res & PaintToolBase::EChangeResult::ECCR_UPDATECURSOR) {
+            tool_helpers::updateViewToolCursor();
           }
         }
       }
@@ -320,14 +355,19 @@ namespace
 
         const bool shift_down = (event->modifiers() & Qt::ShiftModifier) != 0;
         const bool ctrl_down = (event->modifiers() & Qt::ControlModifier) != 0;
-        if(currentPaintTool.onKeyRelease(static_cast<EKey>(event->key()),
-                                         getColorManager().getForegroundColor(),
-                                         ControlState { shift_down, ctrl_down },
-                                         view.getPreviewLayer(),
-                                         imageManager.getImage().getCurrentLayer())) {
+        auto res = currentPaintTool.onKeyRelease(static_cast<EKey>(event->key()),
+                                                 getColorManager().getForegroundColor(),
+                                                 ControlState { shift_down, ctrl_down },
+                                                 view.getPreviewLayer(),
+                                                 imageManager.getImage().getCurrentLayer());
+
+        if(res & PaintToolBase::EChangeResult::ECCR_UPDATEIMAGE) {
           auto pixelSize = view.getPixelSize();
           auto refreshRect = view.getSmallestDrawableRegion(castTo<double>(currentPaintTool.getDrawRect()) * pixelSize);
           view.repaint(qt_utils::convertToQTRect(castTo<position_t>(refreshRect)));
+        }
+        if(res & PaintToolBase::EChangeResult::ECCR_UPDATECURSOR) {
+          tool_helpers::updateViewToolCursor();
         }
       }
     }
@@ -409,6 +449,19 @@ namespace
     return QMainWindow::eventFilter(w, e);
   }
 
+  void MainWindow::createConsoleWidget()
+  {
+    auto& gui_env = getGUIEnvironment();
+
+    gui_env.m_consoleToolboxDock = new QDockWidget(tr("Console"), this);
+    gui_env.m_consoleToolbox = new ConsoleToolbox(gui_env.m_consoleToolboxDock);
+    gui_env.m_consoleToolboxDock->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    gui_env.m_consoleToolboxDock->setAllowedAreas(Qt::LeftDockWidgetArea);
+    gui_env.m_consoleToolboxDock->setWidget(gui_env.m_consoleToolbox);
+    this->addDockWidget(Qt::LeftDockWidgetArea, gui_env.m_consoleToolboxDock);
+    gui_env.m_consoleToolboxDock->hide();
+  }
+
   void MainWindow::createMainWidget()
   {
     m_documentPanel = new DocumentPanel(this);
@@ -450,14 +503,6 @@ namespace
     gui_env.m_frameToolboxDock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     gui_env.m_frameToolboxDock->setWidget(gui_env.m_frameToolbox);
     this->addDockWidget(Qt::TopDockWidgetArea, gui_env.m_frameToolboxDock);
-
-    gui_env.m_consoleToolboxDock = new QDockWidget(tr("Console"), this);
-    gui_env.m_consoleToolbox = new ConsoleToolbox(gui_env.m_consoleToolboxDock);
-    gui_env.m_consoleToolboxDock->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    gui_env.m_consoleToolboxDock->setAllowedAreas(Qt::LeftDockWidgetArea);
-    gui_env.m_consoleToolboxDock->setWidget(gui_env.m_consoleToolbox);
-    this->addDockWidget(Qt::LeftDockWidgetArea, gui_env.m_consoleToolboxDock);
-    gui_env.m_consoleToolboxDock->hide();
   }
 
   void MainWindow::createMenus()
@@ -590,7 +635,7 @@ namespace
 
   void MainWindow::slotSaveAsFile(bool)
   {
-    doSave(this,
+    do_save(this,
            projectfiletype_utils::getFilterList(),
            "Save Project...",
     [this](const std::string& filename, const std::string& mimeType){
@@ -621,7 +666,7 @@ namespace
 
   void MainWindow::slotExportAnimationFile(bool)
   {
-    doSave(this,
+    do_save(this,
            animationtype_utils::getFilterList(),
            "Export Animation...",
     [this](const std::string& filename, const std::string& mimeType){
@@ -652,7 +697,7 @@ namespace
 
   void MainWindow::slotExportImageFile(bool)
   {
-    doSave(this,
+    do_save(this,
            imagefiletype_utils::getFilterList(),
            "Export Image...",
     [this](const std::string& filename, const std::string& mimeType) {
@@ -697,7 +742,8 @@ namespace
     saveImpl<ProjectRegistrarGetter,
              ProjectSaver,
              ProjectFileTypeSetter,
-             AnimationPreSaver>(std::move(filename), std::move(mimeType), true, true, true);
+             AnimationPreSaver,
+             ModifySetter>(std::move(filename), std::move(mimeType), true, true, true);
   }
 
   void MainWindow::saveImage(std::string filename, std::string mimeType)
@@ -705,7 +751,8 @@ namespace
     saveImpl<ImageRegistrarGetter,
              ImageSaver,
              ImageFiletypeSetter,
-             ImagePreSaver>(std::move(filename), std::move(mimeType), false, false, false);
+             ImagePreSaver,
+             DummyModifySetter>(std::move(filename), std::move(mimeType), false, false, false);
   }
 
   void MainWindow::saveAnimation(std::string filename, std::string mimeType)
@@ -713,7 +760,8 @@ namespace
     saveImpl<AnimationRegistrarGetter,
              AnimationSaver,
              AnimationFiletypeSetter,
-             AnimationPreSaver>(std::move(filename), std::move(mimeType), false, false, false);
+             AnimationPreSaver,
+             DummyModifySetter>(std::move(filename), std::move(mimeType), false, false, false);
   }
 
   void MainWindow::addToRecent(std::string filename)

@@ -20,21 +20,44 @@
 #ifndef CURSOR_H
 #define CURSOR_H
 
-#include <QCursor>
+#include "image/pixeldata.h"
 
 namespace pixpaint
 {
   class Cursor
   {
   public:
-    Cursor(const QCursor& cursor = QCursor(), bool autoScale = true);
+    enum ECursorType
+    {
+      ECT_IMAGE,
+      ECT_ARROW,
+      ECT_CROSS,
+      ECT_WAIT,
+      ECT_IBEAM,
+      ECT_RESIZE_VER,
+      ECT_RESIZE_HOR,
+      ECT_RESIZE_BDIAG,
+      ECT_RESIZE_FDIAG,
+      ECT_BUSY,
+      ECT_OPEN_HAND,
+      ECT_CLOSED_HAND,
+      ECT_DRAG_COPY,
+      ECT_DRAG_MOVE
+    };
+
+    Cursor();
+    explicit Cursor(ECursorType cursorType);
+    explicit Cursor(const PixelData& cursor, bool autoscale = true);
 
     bool isAutoScale() const noexcept;
-    const QCursor& getCursor() const noexcept;
+
+    const PixelData& getCursor() const noexcept;
+    ECursorType getCursorType() const noexcept;
 
   private:
-    QCursor m_cursor;
-    bool    m_autoScale;
+    PixelData   m_cursor;
+    ECursorType m_cursorType;
+    bool        m_autoScale;
   };
 }
 

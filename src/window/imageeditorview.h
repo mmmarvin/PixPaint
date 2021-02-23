@@ -66,6 +66,7 @@ namespace pixpaint
     void wheelEvent(QWheelEvent* event) override;
 
   private:
+    friend class DummySelectionWidget;
     friend class SelectionWidget;
     friend class ZoomableScrollArea;
 

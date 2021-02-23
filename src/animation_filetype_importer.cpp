@@ -28,7 +28,7 @@ namespace pixpaint
   void register_fixed_animation_file_types()
   {
     auto& registrar = getAnimationFileTypeRegistrar();
-    registrar.registerFileType("gif", "GIF Image", std::make_unique<GIFAnimationFileType>());
-    registrar.registerFileType("", "Sprite Sheet Image", std::make_unique<SpriteSheetAnimationFileType>());
+    registrar.registerFileType("gif", "GIF Image", "gif", std::make_unique<GIFAnimationFileType>());
+    registrar.registerFileType("", "Sprite Sheet Image", "spr", std::make_unique<SpriteSheetAnimationFileType>());
   }
 }

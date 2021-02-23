@@ -43,7 +43,7 @@ namespace pixpaint
   {
     if(m_previousTool) {
       m_currentTool = m_previousTool;
-      m_currentTool->m_buttonPair->setChecked(true);
+      m_currentTool->m_button->click();
       m_previousTool = nullptr;
 
       selection_helpers::tryFinalizeTextSelection(true);
@@ -84,7 +84,7 @@ namespace pixpaint
       m_previousTool = m_currentTool;
     }
     m_currentTool = &currentTool;
-    m_currentTool->m_buttonPair->setChecked(true);
+    m_currentTool->m_button->click();
 
     selection_helpers::tryFinalizeTextSelection(true);
     tool_helpers::updateViewToolCursor();

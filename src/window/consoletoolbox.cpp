@@ -37,17 +37,19 @@ namespace pixpaint
 
   void ConsoleToolbox::writeMessage(std::string msg)
   {
-    if(m_messages.size() == MAX_CONSOLE_LINES) {
-      m_messages.erase(m_messages.begin());
-    }
-    m_messages.push_back(msg);
+    if(!msg.empty()) {
+      if(m_messages.size() == MAX_CONSOLE_LINES) {
+        m_messages.erase(m_messages.begin());
+      }
+      m_messages.push_back(msg);
 
-    std::string new_message;
-    for(const auto& msg : m_messages) {
-      new_message += msg + "\n";
-    }
+      std::string new_message;
+      for(const auto& msg : m_messages) {
+        new_message += msg + "\n";
+      }
 
-    m_text->setText(new_message.c_str());
+      m_text->setText(new_message.c_str());
+    }
   }
 
   void ConsoleToolbox::clearMessages()

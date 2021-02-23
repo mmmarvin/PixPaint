@@ -36,6 +36,12 @@ namespace qt_utils
 {
   QImage createQImage(PixelData& layer);
   QImage createQImage(const PixelData& layer);
+
+  QImage convertToQTImage(const PixelData& layer);
+  PixelData convertToPixelData(const QImage& image);
+
+  QPixmap convertToQTPixmap(const PixelData& layer);
+
   QColor convertToQTColor(const Color& color);
   Color convertToColor(const QColor& color);
 

@@ -30,10 +30,12 @@ namespace pixpaint
     auto& registrar = getEffectRegistrar();
     registrar.registerEffect("Brightness / Contrast",
                              "",
+                             "brgt",
                              std::make_unique<BrightnessContrastEffect>(),
                              true);
     registrar.registerEffect("Hue / Saturation",
                              "",
+                             "hues",
                              std::make_unique<HueSaturationLightness>(),
                              true);
   }

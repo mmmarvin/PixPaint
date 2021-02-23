@@ -30,16 +30,26 @@ namespace pixpaint
   public:
     PaintToolInformation(std::string name,
                          std::string iconFilename,
+                         std::string id,
+                         std::string shortcut,
                          std::unique_ptr<PaintToolHandlerBase> paintToolHandler);
 
-    const std::string& getName() const;
-    const std::string& getIconFilename() const;
-    PaintToolHandlerBase& getTool();
-    const PaintToolHandlerBase& getTool() const;
+    void setShortcut(std::string shortcut);
+
+    const std::string& getName() const noexcept;
+    const std::string& getIconFilename() const noexcept;
+
+    const std::string& getID() const noexcept;
+    const std::string& getShortcut() const noexcept;
+
+    PaintToolHandlerBase& getTool() noexcept;
+    const PaintToolHandlerBase& getTool() const noexcept;
 
   private:
     std::string                           m_name;
     std::string                           m_iconFilename;
+    std::string                           m_id;
+    std::string                           m_shortcut;
     std::unique_ptr<PaintToolHandlerBase> m_paintToolHandler;
   };
 }

@@ -26,27 +26,17 @@
 #include "../manager/colormanager.h"
 #include "../manager/drawermanager.h"
 #include "../manager/imagemanager.h"
+#include "../utility/geometry_utility.h"
 #include "../utility/qt_utility.h"
 
 namespace pixpaint
 {
-namespace
-{
-  QPixmap getEraserCursor()
-  {
-    QImage ret(1, 1, QImage::Format_RGBA8888);
-    ret.setPixelColor(0, 0, qt_utils::convertToQTColor(Color::WHITE));
-
-    return QPixmap::fromImage(ret);
-  }
-}
   EraserTool::EraserTool() :
-    CursorToolBase(getEraserCursor()),
-    m_size(1),
-    m_antialiasing(false)
+    CursorToolBase(PixelData(1, 1, Color::WHITE)),
+    m_brush(1, 1, Color::TRANSPARENT),
+    m_size(1)
   {
     this->addIntegerValueOption(&m_size, "Size", 1, 100);
-    this->addFlagOption(&m_antialiasing, "Anti-Aliased");
   }
 
   bool EraserTool::onMousePress(const Point& currentPoint,
@@ -55,26 +45,26 @@ namespace
                                 const Color&,
                                 ControlState,
                                 ModifyablePixelData&,
-                                MaskablePixelData&)
+                                MaskablePixelData& currentLayer)
   {
     auto tx = general_utils::minmax(currentPoint.x, currentPoint.x);
     auto ty = general_utils::minmax(currentPoint.y, currentPoint.y);
-    auto startX = std::get<0>(tx);
-    auto endX = std::get<1>(tx);
-    auto startY = std::get<0>(ty);
-    auto endY = std::get<1>(ty);
+    auto start_x = std::get<0>(tx);
+    auto end_x = std::get<1>(tx);
+    auto start_y = std::get<0>(ty);
+    auto end_y = std::get<1>(ty);
 
-    startX -= m_size;
-    startY -= m_size;
-    endX += m_size;
-    endY += m_size;
+    start_x -= m_size;
+    start_y -= m_size;
+    end_x += m_size;
+    end_y += m_size;
 
-    getLayerDrawer().drawLine(currentPoint,
-                              currentPoint,
-                              Color::TRANSPARENT,
-                              DrawParam{ m_antialiasing, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
-    m_currentMin = m_currentMax = currentPoint;
+    auto hs = m_size / 2;
+    currentLayer.combine(m_brush, currentPoint.x - hs, currentPoint.y - hs, true);
 
+    auto sp = Point(m_size, m_size);
+    m_min = currentPoint - sp;
+    m_max = currentPoint + sp;
     return true;
   }
 
@@ -84,60 +74,54 @@ namespace
                                const Color&,
                                ControlState,
                                ModifyablePixelData&,
-                               MaskablePixelData&)
+                               MaskablePixelData& currentLayer)
   {
     if(previousPoint.x != -1 &&
        previousPoint.y != -1) {
       auto tx = general_utils::minmax(previousPoint.x, currentPoint.x);
       auto ty = general_utils::minmax(previousPoint.y, currentPoint.y);
-      auto startX = std::get<0>(tx);
-      auto endX = std::get<1>(tx);
-      auto startY = std::get<0>(ty);
-      auto endY = std::get<1>(ty);
+      auto start_x = std::get<0>(tx);
+      auto end_x = std::get<1>(tx);
+      auto start_y = std::get<0>(ty);
+      auto end_y = std::get<1>(ty);
 
-      startX -= m_size;
-      startY -= m_size;
-      endX += m_size;
-      endY += m_size;
+      start_x -= m_size;
+      start_y -= m_size;
+      end_x += m_size;
+      end_y += m_size;
 
-      getLayerDrawer().drawLine(currentPoint,
-                                previousPoint,
-                                Color::TRANSPARENT,
-                                DrawParam{ m_antialiasing, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
+      geometry_utils::drawLine(m_brush, currentLayer, currentPoint, previousPoint, true);
     } else {
       auto tx = general_utils::minmax(previousPoint.x, currentPoint.x);
       auto ty = general_utils::minmax(previousPoint.y, currentPoint.y);
-      auto startX = std::get<0>(tx);
-      auto endX = std::get<1>(tx);
-      auto startY = std::get<0>(ty);
-      auto endY = std::get<1>(ty);
+      auto start_x = std::get<0>(tx);
+      auto end_x = std::get<1>(tx);
+      auto start_y = std::get<0>(ty);
+      auto end_y = std::get<1>(ty);
 
-      startX -= m_size;
-      startY -= m_size;
-      endX += m_size;
-      endY += m_size;
+      start_x -= m_size;
+      start_y -= m_size;
+      end_x += m_size;
+      end_y += m_size;
 
-      getLayerDrawer().drawLine(currentPoint,
-                                currentPoint,
-                                Color::TRANSPARENT,
-                                DrawParam{ m_antialiasing, LineStyle{ m_size, 0, false, LineStyle::ELineStyle::SolidLine } });
+      geometry_utils::drawLine(m_brush, currentLayer, currentPoint, previousPoint, true);
     }
 
     auto tx = general_utils::minmax(currentPoint.x, previousPoint.x);
     auto ty = general_utils::minmax(currentPoint.y, previousPoint.y);
-    auto minX = std::get<0>(tx);
-    auto maxX = std::get<1>(tx);
-    auto minY = std::get<0>(ty);
-    auto maxY = std::get<1>(ty);
+    auto min_x = std::get<0>(tx);
+    auto max_x = std::get<1>(tx);
+    auto min_y = std::get<0>(ty);
+    auto max_y = std::get<1>(ty);
 
-    m_currentMin.x = minX - 1;
-    m_currentMin.y = minY - 1;
-    m_currentMax.x = maxX + 1;
-    m_currentMax.y = maxY + 1;
+    m_min.x = min_x - 1;
+    m_min.y = min_y - 1;
+    m_max.x = max_x + 1;
+    m_max.y = max_y + 1;
     return true;
   }
 
-  bool EraserTool::onMouseRelease(const Point&,
+  int EraserTool::onMouseRelease(const Point&,
                                   const Point&,
                                   const Point&,
                                   const Color&,
@@ -146,27 +130,33 @@ namespace
                                   MaskablePixelData&)
   {
     getImageManager().getImage().setModified(true);
-    return false;
+    return EChangeResult::ECCR_NONE;
   }
 
   int EraserTool::onToolChange(ModifyablePixelData&, MaskablePixelData&)
   {
-    this->setCursor(Cursor(QCursor(getEraserCursor().scaled(m_size, m_size))));
+    m_brush = PixelData(m_size, m_size, Color::TRANSPARENT);
+    auto cursor = m_brush;
+    cursor.clear(Color::WHITE);
+    this->setCursor(Cursor(cursor));
 
     return EChangeResult::ECCR_UPDATECURSOR;
   }
 
   int EraserTool::onOptionChange(ModifyablePixelData&, MaskablePixelData&)
   {
-    this->setCursor(Cursor(QCursor(getEraserCursor().scaled(m_size, m_size))));
+    m_brush = PixelData(m_size, m_size, Color::TRANSPARENT);
+    auto cursor = m_brush;
+    cursor.clear(Color::WHITE);
+    this->setCursor(Cursor(cursor));
 
     return EChangeResult::ECCR_UPDATECURSOR;
   }
 
   IntRect EraserTool::getDrawRect() const
   {
-      auto min = m_currentMin;
-      auto max = m_currentMax;
+      auto min = m_min;
+      auto max = m_max;
 
       min.x -= m_size;
       min.y -= m_size;

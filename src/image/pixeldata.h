@@ -21,12 +21,30 @@
 #define PIXELDATA_H
 
 #include <cstddef>
+#include <type_traits>
 #include "../type.h"
 #include "color.h"
 #include "point.h"
 
 namespace pixpaint
 {
+namespace pixeldata_detail
+{
+  bool calculate_offset(position_t& x,
+                        position_t& y,
+                        position_t& xoff,
+                        position_t& yoff,
+                        std::make_signed_t<dimension_t>& w,
+                        std::make_signed_t<dimension_t>& h,
+                        std::make_signed_t<dimension_t> layer_width,
+                        std::make_signed_t<dimension_t> layer_height);
+  bool calculate_offset(position_t& x,
+                        position_t& y,
+                        std::make_signed_t<dimension_t>& w,
+                        std::make_signed_t<dimension_t>& h,
+                        std::make_signed_t<dimension_t> layer_width,
+                        std::make_signed_t<dimension_t> layer_height);
+}
   class PixelMap;
 
   enum class ERotationDirection : unsigned char
@@ -95,6 +113,10 @@ namespace pixpaint
     color_channel_t* getData() noexcept;
     const color_channel_t* getData() const noexcept;
 
+  protected:
+    template<class HardFunc, class Func>
+    void combine(const PixelData& pixelData, position_t x, position_t y, bool hard, HardFunc hardFunc, Func func);
+
   private:
     Color*        m_data;
     dimension_t   m_width;
@@ -103,5 +125,7 @@ namespace pixpaint
 
   Point center(const PixelData& layer);
 }
+
+#include "pixeldata.inl"
 
 #endif // PIXELDATA_H

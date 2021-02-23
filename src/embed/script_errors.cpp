@@ -20,8 +20,9 @@
 #include "script_errors.h"
 
 #include <boost/bind/bind.hpp>
+#include <boost/exception/all.hpp>
 #include <boost/python.hpp>
-#include "../env/guienvironment.h"
+#include "../manager/consolemanager.h"
 #include "../window/consoletoolbox.h"
 
 namespace bp = boost::python;
@@ -30,32 +31,41 @@ namespace pixpaint
 {
   std::string getScriptError()
   {
-    PyObject* type, * value, * traceback;
-    PyErr_Fetch(&type, &value, &traceback);
+    std::string error_msg;
 
-    bp::handle<> htraceback(traceback);
-    bp::object otraceback(htraceback);
-    bp::handle<> htype(type);
-    bp::object otype(htype);
+    try {
+      PyObject* type, * value, * traceback;
+      PyErr_Fetch(&type, &value, &traceback);
 
-    auto err_line_number = bp::extract<long>(otraceback.attr("tb_lineno"))();
-    auto err_filename = bp::extract<std::string>(otraceback.attr("tb_frame").attr("f_code").attr("co_filename"))();
-    auto err_funcname = bp::extract<std::string>(otraceback.attr("tb_frame").attr("f_code").attr("co_name"))();
-    auto err_type = bp::extract<std::string>(otype.attr("__name__"))();
-    auto err_msg = bp::extract<std::string>(value)();
+      bp::handle<> htraceback(traceback);
+      bp::object otraceback(htraceback);
+      bp::handle<> htype(type);
+      bp::object otype(htype);
 
-    // emulate pytohn error
-    auto error_msg = std::string("Traceback (most recent call last):\n") +
-                     std::string(" File \"") + err_filename + std::string("\", line ") +
-                     std::to_string(err_line_number) + std::string(", in ") + err_funcname + std::string("\n") +
-                     err_type + std::string(": ") + err_msg;
-    PyErr_Clear();
+      auto err_line_number = bp::extract<long>(otraceback.attr("tb_lineno"))();
+      auto err_filename = bp::extract<std::string>(otraceback.attr("tb_frame").attr("f_code").attr("co_filename"))();
+      auto err_funcname = bp::extract<std::string>(otraceback.attr("tb_frame").attr("f_code").attr("co_name"))();
+      auto err_type = bp::extract<std::string>(otype.attr("__name__"))();
+      auto err_msg = bp::extract<std::string>(value)();
+
+      // emulate pytohn error
+      error_msg = std::string("Traceback (most recent call last):\n") +
+                  std::string(" File \"") + err_filename + std::string("\", line ") +
+                  std::to_string(err_line_number) + std::string(", in ") + err_funcname + std::string("\n") +
+                  err_type + std::string(": ") + err_msg;
+
+      PyErr_Clear();
+    } catch(const boost::exception& e) {
+      error_msg = boost::diagnostic_information(e);
+    } catch(const boost::python::error_already_set&) {
+      error_msg = "There was a problem retrieving the python error";
+    }
 
     return error_msg;
   }
 
   void printScriptError()
   {
-    getGUIEnvironment().getConsoleToolbox().writeMessage(getScriptError());
+    getConsoleManager().writeMessage(getScriptError());
   }
 }

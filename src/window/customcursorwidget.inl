@@ -19,6 +19,8 @@
  **********/
 #include "customcursorwidget.h"
 
+#include "../utility/qt_utility.h"
+
 namespace pixpaint
 {
   template<class ParentWidgetT>
@@ -52,14 +54,59 @@ namespace pixpaint
   template<class ParentWidgetT>
   void CustomCursorWidget<ParentWidgetT>::setCursorImpl(const Cursor& cursor)
   {
-    const auto& c = cursor.getCursor();
-    if(c.shape() == Qt::BitmapCursor && cursor.isAutoScale()) {
-      auto cursorPixmap = c.pixmap();
-      customcursorwidget_detail::scaleCursorPixmap(cursorPixmap);
-
-      QWidget::setCursor(cursorPixmap);
+    const auto cursor_type = cursor.getCursorType();
+    if(cursor_type == Cursor::ECursorType::ECT_IMAGE) {
+      if(cursor.isAutoScale()) {
+        auto cursorPixmap = qt_utils::convertToQTPixmap(cursor.getCursor());
+        customcursorwidget_detail::scaleCursorPixmap(cursorPixmap);
+        QWidget::setCursor(cursorPixmap);
+      } else {
+        QWidget::setCursor(qt_utils::convertToQTPixmap(cursor.getCursor()));
+      }
     } else {
-      QWidget::setCursor(cursor.getCursor());
+      switch(cursor_type) {
+      case Cursor::ECursorType::ECT_ARROW:
+        QWidget::setCursor(QCursor(Qt::ArrowCursor));
+        break;
+      case Cursor::ECursorType::ECT_CROSS:
+        QWidget::setCursor(QCursor(Qt::CrossCursor));
+        break;
+      case Cursor::ECursorType::ECT_WAIT:
+        QWidget::setCursor(QCursor(Qt::WaitCursor));
+        break;
+      case Cursor::ECursorType::ECT_IBEAM:
+        QWidget::setCursor(QCursor(Qt::IBeamCursor));
+        break;
+      case Cursor::ECursorType::ECT_RESIZE_VER:
+        QWidget::setCursor(QCursor(Qt::SizeVerCursor));
+        break;
+      case Cursor::ECursorType::ECT_RESIZE_HOR:
+        QWidget::setCursor(QCursor(Qt::SizeHorCursor));
+        break;
+      case Cursor::ECursorType::ECT_RESIZE_BDIAG:
+        QWidget::setCursor(QCursor(Qt::SizeBDiagCursor));
+        break;
+      case Cursor::ECursorType::ECT_RESIZE_FDIAG:
+        QWidget::setCursor(QCursor(Qt::SizeFDiagCursor));
+        break;
+      case Cursor::ECursorType::ECT_BUSY:
+        QWidget::setCursor(QCursor(Qt::BusyCursor));
+        break;
+      case Cursor::ECursorType::ECT_OPEN_HAND:
+        QWidget::setCursor(QCursor(Qt::OpenHandCursor));
+        break;
+      case Cursor::ECursorType::ECT_CLOSED_HAND:
+        QWidget::setCursor(QCursor(Qt::ClosedHandCursor));
+        break;
+      case Cursor::ECursorType::ECT_DRAG_COPY:
+        QWidget::setCursor(QCursor(Qt::DragCopyCursor));
+        break;
+      case Cursor::ECursorType::ECT_DRAG_MOVE:
+        QWidget::setCursor(QCursor(Qt::DragMoveCursor));
+        break;
+      default:
+        break;
+      }
     }
   }
 }

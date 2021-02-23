@@ -36,16 +36,16 @@ namespace pixpaint
   public:
     PaintToolWrapper() {}
 
-    bool onKeyPress(EKey key,
-                    const Color& color,
-                    ControlState controlState,
-                    ModifyablePixelData& previewLayer,
-                    MaskablePixelData& currentLayer) override;
-    bool onKeyRelease(EKey key,
-                      const Color& color,
-                      ControlState controlState,
-                      ModifyablePixelData& previewLayer,
-                      MaskablePixelData& currentLayer) override;
+    int onKeyPress(EKey key,
+                   const Color& color,
+                   ControlState controlState,
+                   ModifyablePixelData& previewLayer,
+                   MaskablePixelData& currentLayer) override;
+    int onKeyRelease(EKey key,
+                     const Color& color,
+                     ControlState controlState,
+                     ModifyablePixelData& previewLayer,
+                     MaskablePixelData& currentLayer) override;
 
     void onPreMousePress() override;
 
@@ -63,13 +63,13 @@ namespace pixpaint
                      ControlState controlState,
                      ModifyablePixelData& previewLayer,
                      MaskablePixelData& currentLayer) override;
-    bool onMouseRelease(const Point& currentPoint,
-                        const Point& previousPoint,
-                        const Point& globalPoint,
-                        const Color& color,
-                        ControlState controlState,
-                        ModifyablePixelData& previewLayer,
-                        MaskablePixelData& currentLayer) override;
+    int onMouseRelease(const Point& currentPoint,
+                       const Point& previousPoint,
+                       const Point& globalPoint,
+                       const Color& color,
+                       ControlState controlState,
+                       ModifyablePixelData& previewLayer,
+                       MaskablePixelData& currentLayer) override;
 
     bool onFinalize(ModifyablePixelData& previewLayer,
                     MaskablePixelData& currentLayer) override;

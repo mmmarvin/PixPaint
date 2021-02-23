@@ -28,6 +28,16 @@ namespace pixpaint
   {
     PIXPAINT_SINGLETON_FUNC_FRIEND(ProjectFileTypeRegistrar)
     ProjectFileTypeRegistrar() {}
+
+  public:
+    void registerFileType(std::string extension,
+                          std::string typeDescription,
+                          std::string id,
+                          std::unique_ptr<AnimationFileTypeBase> exportType);
+    void registerCustomFileType(std::string extension,
+                                std::string typeDescription,
+                                std::string id,
+                                boost::python::object exportType);
   };
 
   PIXPAINT_SINGLETON_FUNC(ProjectFileTypeRegistrar)

@@ -49,7 +49,6 @@ namespace pixpaint
   private:
     std::string m_fontFamily;
     int         m_fontSize;
-    bool        m_antialiased;
   };
 }
 

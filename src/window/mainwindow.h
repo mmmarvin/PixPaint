@@ -60,6 +60,7 @@ namespace pixpaint
     bool eventFilter(QObject* watched, QEvent* event) override;
 
   private:
+    void createConsoleWidget();
     void createMainWidget();
     void createDocks();
     void createMenus();
@@ -68,6 +69,8 @@ namespace pixpaint
     void createStatusBar();
     void createRecentFiles();
     void checkRecentFiles();
+    void initializeConfigValues();
+    void loadConfigValues();
 
   private:
     friend void popFileMenu(MainMenu::FileMenu*, QWidget*, bool);
@@ -94,7 +97,7 @@ namespace pixpaint
                   bool shouldSetFilename,
                   bool shouldAddToRecent,
                   bool showError = true);
-    template<class RegistrarGetterT, class FileSaverT, class FileTypeSetterT, class FilePreSaverT>
+    template<class RegistrarGetterT, class FileSaverT, class FileTypeSetterT, class FilePreSaverT, class ModifySetterT>
     void saveImpl(std::string filename,
                   std::string mimeType,
                   bool shouldSetFilename,

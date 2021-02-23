@@ -35,13 +35,15 @@ namespace pixpaint
     PaintToolRegistrar() {}
 
   public:
-
-
     void registerTool(std::string name,
                       std::string iconFilename,
+                      std::string id,
+                      std::string shortcut,
                       std::unique_ptr<PaintToolBase> paintTool);
     void registerCustomTool(std::string name,
                             std::string iconFilename,
+                            std::string id,
+                            std::string shortcut,
                             boost::python::object paintToolObject);
   };
 

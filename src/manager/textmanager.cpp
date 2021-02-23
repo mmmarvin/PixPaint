@@ -33,7 +33,7 @@ namespace pixpaint
     m_text(""),
     m_cursorPosition(0),
     m_fontSize(11),
-    m_antialiased(DEFAULT_TEXT_ANTIALIASING)
+    m_antialiased(false)
   {
     auto font_family_list = script_utils::getFontList();
     if(!font_family_list.empty()) {
@@ -47,7 +47,8 @@ namespace pixpaint
     if(isalnum(c) || ispunct(c)) {
       if(key == Qt::Key_Control ||
          key == Qt::Key_Shift ||
-         key == Qt::Key_CapsLock) {
+         key == Qt::Key_CapsLock ||
+         key == Qt::Key_Alt) {
         return;
       }
 

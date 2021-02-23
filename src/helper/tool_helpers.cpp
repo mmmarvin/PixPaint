@@ -68,9 +68,9 @@ namespace tool_helpers
         const auto& cursor = paintToolCursor.value();
         setViewToolCursor(cursor);
       } else {
-        image_env.getView().setCursor(Cursor(QCursor(Qt::ArrowCursor)));
-        image_env.getScrollArea().setCursor(Cursor(QCursor(Qt::ArrowCursor)));
-        image_env.getSelection().setCursor(Cursor(QCursor(Qt::ArrowCursor)));
+        image_env.getView().setCursor(Cursor(Cursor::ECursorType::ECT_ARROW));
+        image_env.getScrollArea().setCursor(Cursor(Cursor::ECursorType::ECT_ARROW));
+        image_env.getSelection().setCursor(Cursor(Cursor::ECursorType::ECT_ARROW));
       }
     }
   }

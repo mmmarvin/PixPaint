@@ -81,15 +81,15 @@ namespace paint_helpers
                                                               currentLayer);
   }
 
-  bool paintEndEvent(position_t px,
-                     position_t py,
-                     const Color& color,
-                     ControlState controlState,
-                     Point& currentPoint,
-                     Point& previousPoint,
-                     const Point& globalPoint,
-                     ModifyablePixelData& previewLayer,
-                     MaskablePixelData& currentLayer)
+  int paintEndEvent(position_t px,
+                    position_t py,
+                    const Color& color,
+                    ControlState controlState,
+                    Point& currentPoint,
+                    Point& previousPoint,
+                    const Point& globalPoint,
+                    ModifyablePixelData& previewLayer,
+                    MaskablePixelData& currentLayer)
   {
     previousPoint = currentPoint;
     currentPoint = Point(px, py);

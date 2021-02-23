@@ -31,10 +31,9 @@
 namespace pixpaint
 {
   TextSelectionTool::TextSelectionTool() :
-    CursorToolBase(Qt::CrossCursor),
+    CursorToolBase(Cursor::ECursorType::ECT_CROSS),
     m_fontFamily(""),
-    m_fontSize(11),
-    m_antialiased(DEFAULT_TEXT_ANTIALIASING)
+    m_fontSize(11)
   {    
     auto font_family_list = script_utils::getFontList();
     if(!font_family_list.empty()) {
@@ -43,7 +42,6 @@ namespace pixpaint
 
     this->addStringChoice(&m_fontFamily, "Font Family", font_family_list);
     this->addIntegerValueOption(&m_fontSize, "Font Size", 1, 100);
-    this->addFlagOption(&m_antialiased, "Anti-Aliased");
   }
 
   void TextSelectionTool::onPreMousePress()
@@ -68,6 +66,9 @@ namespace pixpaint
                                             100,
                                             50);
       text_selection_manager.getTextLayer().clear(getColorManager().getBackgroundColor());
+      text_manager.setFontFamily(m_fontFamily);
+      text_manager.setFontSize(m_fontSize);
+      text_manager.setAntiAliasing(false);
       text_manager.tryUpdateText();
       return true;
     }
@@ -81,7 +82,7 @@ namespace pixpaint
     auto& text_manager = getTextManager();
     text_manager.setFontFamily(m_fontFamily);
     text_manager.setFontSize(m_fontSize);
-    text_manager.setAntiAliasing(m_antialiased);
+    text_manager.setAntiAliasing(false);
     text_manager.tryUpdateText();
 
     return EChangeResult::ECCR_UPDATEIMAGE;

@@ -1,0 +1,13 @@
+PixPaint Changelog:
+
+v.1.01:
+* Added the Custom Brush Tool
+* Added shortcut keys to tools
+* Added box grid
+* Tools now require an ID field (breaks compatibility to v.1.00 tool scripts)
+* Removed anti-aliasing options on all built-in tools
+* Fixed file export bug, where the files being exported are always saved in the program's directory
+* Fixed selection resizing not appearing in undo / redo history
+* Fixed brush tool / eraser tool that causes weird jagged line when using thick brushes
+* Fixed brush tool not rendering on single click draw when using thick brushes
+* Fixed a tool cursor bug, where zooming out causes the tool cursors to not render the correct size

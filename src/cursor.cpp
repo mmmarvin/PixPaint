@@ -21,8 +21,23 @@
 
 namespace pixpaint
 {
-  Cursor::Cursor(const QCursor& cursor, bool autoScale) :
+  Cursor::Cursor() :
+    m_cursor(0, 0),
+    m_cursorType(ECT_ARROW),
+    m_autoScale(false)
+  {
+  }
+
+  Cursor::Cursor(ECursorType cursorType) :
+    m_cursor(0, 0),
+    m_cursorType(cursorType),
+    m_autoScale(false)
+  {
+  }
+
+  Cursor::Cursor(const PixelData& cursor, bool autoScale) :
     m_cursor(cursor),
+    m_cursorType(ECursorType::ECT_IMAGE),
     m_autoScale(autoScale)
   {
   }
@@ -32,8 +47,13 @@ namespace pixpaint
     return m_autoScale;
   }
 
-  const QCursor& Cursor::getCursor() const noexcept
+  const PixelData& Cursor::getCursor() const noexcept
   {
     return m_cursor;
+  }
+
+  Cursor::ECursorType Cursor::getCursorType() const noexcept
+  {
+    return m_cursorType;
   }
 }

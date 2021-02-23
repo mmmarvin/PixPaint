@@ -28,7 +28,7 @@ namespace string_utils
 {
 namespace
 {
-  bool partialMatchSeekForward(const std::string& substr, const std::string& str)
+  bool partial_match_seek_forward(const std::string& substr, const std::string& str)
   {
     auto it1 = substr.begin();
     auto it1End = substr.end();
@@ -42,7 +42,7 @@ namespace
     return true;
   }
 
-  bool partialMatchSeekBackward(const std::string& substr, const std::string& str)
+  bool partial_match_seek_backward(const std::string& substr, const std::string& str)
   {
     auto it1 = substr.rbegin();
     auto it1End = substr.rend();
@@ -141,7 +141,7 @@ namespace
 
   std::string tryRemoveQuotations(std::string str)
   {
-    if(str.size() > 2 && str.front() == '\"' && str.back() == '\"') {
+    if(str.size() >= 2 && str.front() == '\"' && str.back() == '\"') {
       str.erase(str.begin());
       str.pop_back();
     }
@@ -153,9 +153,9 @@ namespace
   {
     if(substr.size() <= str.size()) {
       if(dir == ESeekDirection::SD_BEG) {
-        return partialMatchSeekForward(substr, str);
+        return partial_match_seek_forward(substr, str);
       } else if(dir == ESeekDirection::SD_END) {
-        return partialMatchSeekBackward(substr, str);
+        return partial_match_seek_backward(substr, str);
       }
     }
 

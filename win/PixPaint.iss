@@ -4,7 +4,7 @@
 
 [Setup]
 AppName = PixPaint
-AppVersion = 1.00
+AppVersion = 1.01
 WizardStyle = modern
 DefaultDirName = {autopf}\PixPaint
 DefaultGroupName = PixPaint

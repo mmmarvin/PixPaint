@@ -21,6 +21,19 @@
 
 namespace pixpaint
 {
+  GUIEnvironment::GUIEnvironment() :
+    m_colorToolbox(nullptr),
+    m_leftToolbox(nullptr),
+    m_leftToolboxDock(nullptr),
+    m_rightToolbox(nullptr),
+    m_rightToolboxDock(nullptr),
+    m_frameToolbox(nullptr),
+    m_frameToolboxDock(nullptr),
+    m_consoleToolbox(nullptr),
+    m_consoleToolboxDock(nullptr)
+  {
+  }
+
   MainMenu& GUIEnvironment::getMainMenu() noexcept
   {
     return m_mainMenu;

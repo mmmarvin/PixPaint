@@ -31,7 +31,7 @@ namespace pixpaint
 {
 namespace
 {
-  void tryAddTo(std::list<std::unique_ptr<HistoryAction>>& l, std::unique_ptr<HistoryAction> action)
+  void try_add_to(std::list<std::unique_ptr<HistoryAction>>& l, std::unique_ptr<HistoryAction> action)
   {
     if(l.size() == 10) {
       l.pop_front();
@@ -119,11 +119,11 @@ namespace
 
   void History::tryAddUndo(std::unique_ptr<HistoryAction> action)
   {
-    tryAddTo(m_undo, std::move(action));
+    try_add_to(m_undo, std::move(action));
   }
 
   void History::tryAddRedo(std::unique_ptr<HistoryAction> action)
   {
-    tryAddTo(m_redo, std::move(action));
+    try_add_to(m_redo, std::move(action));
   }
 }

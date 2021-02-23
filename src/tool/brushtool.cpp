@@ -26,17 +26,18 @@ namespace pixpaint
   BrushTool::BrushTool()
   {
     this->addIntegerValueOption(&m_size, "Size", 1, 100);
-    this->addFlagOption(&m_antialiased, "Anti-Aliased");
   }
 
   int BrushTool::onOptionChange(ModifyablePixelData&, MaskablePixelData&)
   {
-    auto foregroundColor = getColorManager().getForegroundColor();
-    if(foregroundColor == Color::TRANSPARENT) {
-      foregroundColor = Color::WHITE;
+    auto foreground_color = getColorManager().getForegroundColor();
+    if(foreground_color == Color::TRANSPARENT) {
+      foreground_color = Color::WHITE;
     }
-    foregroundColor.a = 255;
-    this->setCursor(Cursor(QCursor(brushtoolbase_detail::generateBrushCursor(foregroundColor).scaled(m_size, m_size))));
+    foreground_color.a = 255;
+
+    m_brush = PixelData(m_size, m_size, foreground_color);
+    this->setCursor(Cursor(m_brush));
 
     return EChangeResult::ECCR_UPDATECURSOR;
   }

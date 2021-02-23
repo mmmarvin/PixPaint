@@ -21,5 +21,29 @@
 
 namespace pixpaint
 {
+  void ProjectFileTypeRegistrar::registerFileType(std::string extension,
+                                                  std::string typeDescription,
+                                                  std::string id,
+                                                  std::unique_ptr<AnimationFileTypeBase> exportType)
+  {
+    id = "id_proj_" + id;
+    RegistrarBase::registerBuiltIn(std::move(id),
+                                   FileInformation<AnimationFileTypeHandlerBase>(std::move(extension),
+                                                                                 std::move(typeDescription),
+                                                                                 std::make_unique<BuiltInAnimationFileTypeHandlerBase>(std::move(exportType))));
+  }
+
+  void ProjectFileTypeRegistrar::registerCustomFileType(std::string extension,
+                                                        std::string typeDescription,
+                                                        std::string id,
+                                                        boost::python::object exportType)
+  {
+    id = "id_proj_" + id;
+    RegistrarBase::registerCustom(std::move(id),
+                                  FileInformation<AnimationFileTypeHandlerBase>(std::move(extension),
+                                                                                std::move(typeDescription),
+                                                                                std::make_unique<CustomAnimationFileTypeHandlerBase>(exportType)));
+  }
+
   PIXPAINT_SINGLETON_FUNC_DEF(ProjectFileTypeRegistrar)
 }

@@ -21,26 +21,38 @@
 
 namespace pixpaint
 {
-  void AnimationFileTypeRegistrar::registerFileType(std::string exportExtension,
-                                                    std::string exportTypeDescription,
+  void AnimationFileTypeRegistrar::registerFileType(std::string extension,
+                                                    std::string typeDescription,
+                                                    std::string id,
                                                     std::unique_ptr<AnimationFileTypeBase> exportType)
   {
-//    if(!exportExtension.empty()) {
-      RegistrarBase::registerBuiltIn(FileInformation<AnimationFileTypeHandlerBase>(std::move(exportExtension),
-                                                                                   std::move(exportTypeDescription),
-                                                                                   std::make_unique<BuiltInAnimationFileTypeHandlerBase>(std::move(exportType))));
-//    }
+    id = "id_anim_" + id;
+    if(extension.size() > 12 || typeDescription.size() > 255) {
+      // TODO: write error to console here
+      return;
+    }
+
+    RegistrarBase::registerBuiltIn(std::move(id),
+                                   FileInformation<AnimationFileTypeHandlerBase>(std::move(extension),
+                                                                                 std::move(typeDescription),
+                                                                                 std::make_unique<BuiltInAnimationFileTypeHandlerBase>(std::move(exportType))));
   }
 
-  void AnimationFileTypeRegistrar::registerCustomFileType(std::string exportExtension,
-                                                          std::string exportTypeDescription,
+  void AnimationFileTypeRegistrar::registerCustomFileType(std::string extension,
+                                                          std::string typeDescription,
+                                                          std::string id,
                                                           boost::python::object exportType)
   {
-//    if(!exportExtension.empty()) {
-      RegistrarBase::registerCustom(FileInformation<AnimationFileTypeHandlerBase>(std::move(exportExtension),
-                                                                                  std::move(exportTypeDescription),
-                                                                                  std::make_unique<CustomAnimationFileTypeHandlerBase>(exportType)));
-//    }
+    id = "id_anim_" + id;
+    if(extension.size() > 12 || typeDescription.size() > 255) {
+      // TODO: write error to console here
+      return;
+    }
+
+    RegistrarBase::registerCustom(std::move(id),
+                                  FileInformation<AnimationFileTypeHandlerBase>(std::move(extension),
+                                                                                std::move(typeDescription),
+                                                                                std::make_unique<CustomAnimationFileTypeHandlerBase>(exportType)));
   }
 
   PIXPAINT_SINGLETON_FUNC_DEF(AnimationFileTypeRegistrar)

@@ -35,7 +35,7 @@ namespace pixpaint
 
   class GUIEnvironment
   {
-    GUIEnvironment() {}
+    GUIEnvironment();
 
   public:
     MainMenu& getMainMenu() noexcept;

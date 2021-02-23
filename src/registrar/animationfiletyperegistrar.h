@@ -38,11 +38,13 @@ namespace pixpaint
     AnimationFileTypeRegistrar() {}
 
   public:
-    void registerFileType(std::string exportExtension,
-                          std::string exportTypeDescription,
+    void registerFileType(std::string extension,
+                          std::string typeDescription,
+                          std::string id,
                           std::unique_ptr<AnimationFileTypeBase> exportType);
-    void registerCustomFileType(std::string exportExtension,
-                                std::string exportTypeDescription,
+    void registerCustomFileType(std::string extension,
+                                std::string typeDescription,
+                                std::string id,
                                 boost::python::object exportType);
   };
 

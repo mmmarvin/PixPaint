@@ -23,7 +23,7 @@
 
 namespace pixpaint
 {
-namespace detail
+namespace color_detail
 {
   void alphaBlend(color_channel_t* dst, const color_channel_t* src)
   {
@@ -132,7 +132,7 @@ namespace detail
   Color alphaBlend(const Color& background, const Color& foreground)
   {
     Color ret = background;
-    detail::alphaBlend(reinterpret_cast<unsigned char*>(&ret), reinterpret_cast<const unsigned char*>(&foreground));
+    color_detail::alphaBlend(reinterpret_cast<unsigned char*>(&ret), reinterpret_cast<const unsigned char*>(&foreground));
 
     return ret;
   }

@@ -27,6 +27,6 @@ namespace pixpaint
   void register_fixed_project_file_types()
   {
     auto& registrar = getProjectFileTypeRegistrar();
-    registrar.registerFileType("ppf", "PixPaint Project File", std::make_unique<PixPaintProjectFileType>());
+    registrar.registerFileType("ppf", "PixPaint Project File", "ppf", std::make_unique<PixPaintProjectFileType>());
   }
 }

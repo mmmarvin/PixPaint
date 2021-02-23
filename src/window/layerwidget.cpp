@@ -386,8 +386,8 @@ namespace pixpaint
     QObject::connect(renameAction, &QAction::triggered, [this, layerItem](){
       bool ok;
       auto new_layer_name = QInputDialog::getText(this,
-                                                  QObject::tr("Enter new layer name"),
-                                                  QObject::tr("New layer name:"),
+                                                  tr("Enter new layer name"),
+                                                  tr("New layer name:"),
                                                   QLineEdit::Normal,
                                                   layerItem->getLayerName().c_str(),
                                                   &ok);

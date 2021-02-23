@@ -44,13 +44,13 @@ namespace pixpaint
                      ControlState controlState,
                      ModifyablePixelData& previewLayer,
                      MaskablePixelData& currentLayer) override;
-    bool onMouseRelease(const Point& currentPoint,
-                        const Point& previousPoint,
-                        const Point& globalPoint,
-                        const Color& color,
-                        ControlState controlState,
-                        ModifyablePixelData& previewLayer,
-                        MaskablePixelData& currentLayer) override;
+    int onMouseRelease(const Point& currentPoint,
+                       const Point& previousPoint,
+                       const Point& globalPoint,
+                       const Color& color,
+                       ControlState controlState,
+                       ModifyablePixelData& previewLayer,
+                       MaskablePixelData& currentLayer) override;
 
     IntRect getDrawRect() const override;
     optional<IntRect> getHistoryRect() const override;
@@ -66,7 +66,6 @@ namespace pixpaint
     Point m_max;
 
     int   m_size;
-    bool  m_antialiased;
     bool  m_fill;
   };
 }

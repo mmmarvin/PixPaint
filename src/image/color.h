@@ -24,7 +24,7 @@
 
 namespace pixpaint
 {
-namespace detail
+namespace color_detail
 {
   void alphaBlend(color_channel_t* dst, const color_channel_t* src);
 }

@@ -29,11 +29,11 @@
 
 namespace pixpaint
 {
-  bool PaintToolWrapper::onKeyPress(EKey key,
-                                    const Color& color,
-                                    ControlState controlState,
-                                    ModifyablePixelData& previewLayer,
-                                    MaskablePixelData& currentLayer)
+  int PaintToolWrapper::onKeyPress(EKey key,
+                                   const Color& color,
+                                   ControlState controlState,
+                                   ModifyablePixelData& previewLayer,
+                                   MaskablePixelData& currentLayer)
   {
     if(auto f = wrapper_base_type::get_override(("onKeyPress"))) {
       try {
@@ -50,11 +50,11 @@ namespace pixpaint
     return PaintToolBase::onKeyPress(key, color, controlState, previewLayer, currentLayer);
   }
 
-  bool PaintToolWrapper::onKeyRelease(EKey key,
-                                      const Color& color,
-                                      ControlState controlState,
-                                      ModifyablePixelData& previewLayer,
-                                      MaskablePixelData& currentLayer)
+  int PaintToolWrapper::onKeyRelease(EKey key,
+                                     const Color& color,
+                                     ControlState controlState,
+                                     ModifyablePixelData& previewLayer,
+                                     MaskablePixelData& currentLayer)
   {
     if(auto f = wrapper_base_type::get_override(("onKeyRelease"))) {
       try {
@@ -146,13 +146,13 @@ namespace pixpaint
                                       currentLayer);
   }
 
-  bool PaintToolWrapper::onMouseRelease(const Point& currentPoint,
-                                        const Point& previousPoint,
-                                        const Point& globalPoint,
-                                        const Color& color,
-                                        ControlState controlState,
-                                        ModifyablePixelData& previewLayer,
-                                        MaskablePixelData& currentLayer)
+  int PaintToolWrapper::onMouseRelease(const Point& currentPoint,
+                                       const Point& previousPoint,
+                                       const Point& globalPoint,
+                                       const Color& color,
+                                       ControlState controlState,
+                                       ModifyablePixelData& previewLayer,
+                                       MaskablePixelData& currentLayer)
   {
     if(auto f = wrapper_base_type::get_override("onMouseRelease")) {
       try {

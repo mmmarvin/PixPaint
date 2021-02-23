@@ -26,20 +26,20 @@ namespace pixpaint
   /**********
    * Paint Tool Base
    **********/
-  bool PaintToolBase::onKeyPress(EKey,
-                                 const Color&,
-                                 ControlState,
-                                 ModifyablePixelData&,
-                                 MaskablePixelData&)
+  int PaintToolBase::onKeyPress(EKey,
+                                const Color&,
+                                ControlState,
+                                ModifyablePixelData&,
+                                MaskablePixelData&)
   {
     return false;
   }
 
-  bool PaintToolBase::onKeyRelease(EKey,
-                                   const Color&,
-                                   ControlState,
-                                   ModifyablePixelData&,
-                                   MaskablePixelData&)
+  int PaintToolBase::onKeyRelease(EKey,
+                                  const Color&,
+                                  ControlState,
+                                  ModifyablePixelData&,
+                                  MaskablePixelData&)
   {
     return false;
   }
@@ -70,15 +70,15 @@ namespace pixpaint
     return false;
   }
 
-  bool PaintToolBase::onMouseRelease(const Point&,
-                                     const Point&,
-                                     const Point&,
-                                     const Color&,
-                                     ControlState,
-                                     ModifyablePixelData&,
-                                     MaskablePixelData&)
+  int PaintToolBase::onMouseRelease(const Point&,
+                                    const Point&,
+                                    const Point&,
+                                    const Color&,
+                                    ControlState,
+                                    ModifyablePixelData&,
+                                    MaskablePixelData&)
   {
-    return false;
+    return EChangeResult::ECCR_NONE;
   }
 
   bool PaintToolBase::onFinalize(ModifyablePixelData&,
@@ -143,20 +143,20 @@ namespace pixpaint
     return os_specific::nullopt;
   }
 
-  bool PaintToolHandlerBase::onKeyPress(EKey key,
-                                        const Color& color,
-                                        ControlState controlState,
-                                        ModifyablePixelData& previewLayer,
-                                        MaskablePixelData& currentLayer)
+  int PaintToolHandlerBase::onKeyPress(EKey key,
+                                       const Color& color,
+                                       ControlState controlState,
+                                       ModifyablePixelData& previewLayer,
+                                       MaskablePixelData& currentLayer)
   {
     return m_paintToolBase->onKeyPress(key, color, controlState, previewLayer, currentLayer);
   }
 
-  bool PaintToolHandlerBase::onKeyRelease(EKey key,
-                                          const Color& color,
-                                          ControlState controlState,
-                                          ModifyablePixelData& previewLayer,
-                                          MaskablePixelData& currentLayer)
+  int PaintToolHandlerBase::onKeyRelease(EKey key,
+                                         const Color& color,
+                                         ControlState controlState,
+                                         ModifyablePixelData& previewLayer,
+                                         MaskablePixelData& currentLayer)
   {
     return m_paintToolBase->onKeyRelease(key, color, controlState, previewLayer, currentLayer);
   }
@@ -200,13 +200,13 @@ namespace pixpaint
                                         currentLayer);
   }
 
-  bool PaintToolHandlerBase::onMouseRelease(const Point& currentPoint,
-                                            const Point& previousPoint,
-                                            const Point& globalPoint,
-                                            const Color& color,
-                                            ControlState controlState,
-                                            ModifyablePixelData& previewLayer,
-                                            MaskablePixelData& currentLayer)
+  int PaintToolHandlerBase::onMouseRelease(const Point& currentPoint,
+                                           const Point& previousPoint,
+                                           const Point& globalPoint,
+                                           const Color& color,
+                                           ControlState controlState,
+                                           ModifyablePixelData& previewLayer,
+                                           MaskablePixelData& currentLayer)
   {
     return m_paintToolBase->onMouseRelease(currentPoint,
                                            previousPoint,

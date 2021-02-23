@@ -125,7 +125,7 @@ namespace pixpaint
     return false;
   }
 
-  template<class RegistrarGetterT, class FileSaverT, class FileTypeSetterT, class FilePreSaverT>
+  template<class RegistrarGetterT, class FileSaverT, class FileTypeSetterT, class FilePreSaverT, class ModifySetterT>
   void MainWindow::saveImpl(std::string filename,
                             std::string mimeType,
                             bool shouldSetFilename,
@@ -200,10 +200,7 @@ namespace pixpaint
             addToRecent(filename);
           }
 
-          auto& animation = document_manager.getDocument().getAnimation();
-          for(size_t i = 0, isize = animation.getFrameCount(); i < isize; ++i) {
-            animation.getFrame(i).setModified(false);
-          }
+          ModifySetterT()(document_manager.getDocument().getAnimation());
           break;
         }
       }
