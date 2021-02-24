@@ -178,7 +178,8 @@ namespace pixpaint
             break;
           }
         } else {
-          auto res = FileSaverT()(filetype_utils::addExtension(filename, file_type_information),
+          auto filename_with_extension = filetype_utils::addExtension(filename, file_type_information);
+          auto res = FileSaverT()(filename_with_extension,
                                   file_type_obj,
                                   document_manager.getDocument());
           if(res == ImageFileTypeBase::EOR_ERROR) {
@@ -189,12 +190,12 @@ namespace pixpaint
           FileTypeSetterT()(document_manager, file_type_obj);
 
           if(shouldSetFilename) {
-            document_manager.getDocument().setFilename(filename);
+            document_manager.getDocument().setFilename(filename_with_extension);
           }
 
           if(shouldSetTabText) {
             m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(getDocumentManager().getDocument()),
-                                                  filename.c_str());
+                                                  filename_with_extension.c_str());
           }
           if(shouldAddToRecent) {
             addToRecent(filename);
