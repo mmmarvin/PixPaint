@@ -43,6 +43,7 @@ namespace pixpaint
 
     void addColor(const Color& color);
     void setColor(size_t index, const Color& color);
+    void removeColor(size_t index);
 
     iterator begin();
     const_iterator begin() const;

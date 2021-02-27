@@ -88,6 +88,12 @@ namespace pixpaint
     m_colors[index] = color;
   }
 
+  void ColorPalette::removeColor(size_t index)
+  {
+    PIXPAINT_ASSERT(index < m_colors.size(), "Index is out-of-bounds of colors");
+    m_colors.erase(m_colors.begin() + index);
+  }
+
   ColorPalette::iterator ColorPalette::begin()
   {
     return m_colors.begin();
