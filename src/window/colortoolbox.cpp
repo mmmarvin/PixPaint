@@ -173,8 +173,7 @@ namespace
     this->connect(save_btn, &QPushButton::clicked, [this]() {
       auto filename = QFileDialog::getSaveFileName(this,
                                                    tr("Save Palette..."),
-                                                   gengine2d::getConfigurationManager().getString(CONFIG_SECTION_SETTINGS,
-                                                                                                  "last_location")->c_str(),
+                                                   "./palette",
                                                    "PixPaint Palette (*.ppa)");
       if(filename.size()) {
         auto filename_s = std::string(filename.toUtf8().constData());
@@ -193,8 +192,7 @@ namespace
     this->connect(load_btn, &QPushButton::clicked, [this]() {
       auto filename = QFileDialog::getOpenFileName(this,
                                                    tr("Load Palette..."),
-                                                   gengine2d::getConfigurationManager().getString(CONFIG_SECTION_SETTINGS,
-                                                                                                  "last_location")->c_str(),
+                                                   "./palette",
                                                    "PixPaint Palette (*.ppa)");
       if(filename.size()) {
         if(!getColorPalette().load(filename.toUtf8().constData())) {
