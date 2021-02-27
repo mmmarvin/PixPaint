@@ -20,7 +20,10 @@
 #include "colortoolbox.h"
 
 #include <QColorDialog>
+#include <QFileDialog>
 #include <QHBoxLayout>
+#include <QMessageBox>
+#include "../3rdparty/gengine/configuration.h"
 #include "../env/imageenvironment.h"
 #include "../helper/tool_helpers.h"
 #include "../image/image.h"
@@ -32,7 +35,9 @@
 #include "../manager/textselectionmanager.h"
 #include "../tool/painttoolbase.h"
 #include "../utility/qt_utility.h"
+#include "../colorpalette.h"
 #include "../debug_log.h"
+#include "../define.h"
 #include "../gui_define.h"
 #include "colorbutton.h"
 #include "imageeditorview.h"
@@ -148,7 +153,7 @@ namespace
     QWidget::resizeEvent(event);
   }
 
-  ColorToolbox::ColorToolbox(QWidget* parent, const std::vector<Color>& colors) :
+  ColorToolbox::ColorToolbox(QWidget* parent) :
     QWidget(parent)
   {
     this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -159,7 +164,52 @@ namespace
 
     m_colorSelectionWidget = static_cast<ColorSelectionWidget*>(createColorSelectionWidget());
     layout->addWidget(m_colorSelectionWidget);
-    layout->addWidget(createColorGridWidget(colors));
+    layout->addWidget(createColorGridWidget());
+
+    auto* btn_layout = new QVBoxLayout(this);
+    auto* save_btn = new QPushButton("Save Palette", this);
+    auto* load_btn = new QPushButton("Load Palette", this);
+
+    this->connect(save_btn, &QPushButton::clicked, [this]() {
+      auto filename = QFileDialog::getSaveFileName(this,
+                                                   tr("Save Palette..."),
+                                                   gengine2d::getConfigurationManager().getString(CONFIG_SECTION_SETTINGS,
+                                                                                                  "last_location")->c_str(),
+                                                   "PixPaint Palette (*.ppa)");
+      if(filename.size()) {
+        auto filename_s = std::string(filename.toUtf8().constData());
+        auto filename_p = os_specific::filesystem::path(filename_s);
+        if(filename_p.extension().string().empty() ||
+           filename_p.extension().string() != "ppa") {
+          filename_s += ".ppa";
+        }
+
+        if(!getColorPalette().save(filename_s)) {
+          QMessageBox::critical(this, tr("Error"), tr("There was an error saving the color palette!"));
+        }
+      }
+    });
+
+    this->connect(load_btn, &QPushButton::clicked, [this]() {
+      auto filename = QFileDialog::getOpenFileName(this,
+                                                   tr("Load Palette..."),
+                                                   gengine2d::getConfigurationManager().getString(CONFIG_SECTION_SETTINGS,
+                                                                                                  "last_location")->c_str(),
+                                                   "PixPaint Palette (*.ppa)");
+      if(filename.size()) {
+        if(!getColorPalette().load(filename.toUtf8().constData())) {
+          QMessageBox::critical(this, tr("Error"), tr("There was an error saving the color palette!"));
+          return;
+        }
+
+        clearColorGrid();
+        updateColorGrid();
+      }
+    });
+
+    btn_layout->addWidget(save_btn);
+    btn_layout->addWidget(load_btn);
+    layout->addLayout(btn_layout);
 
     this->setLayout(layout);
   }
@@ -179,14 +229,31 @@ namespace
     return new ColorSelectionWidget(this);
   }
 
-  QWidget* ColorToolbox::createColorGridWidget(const std::vector<Color>& colors)
+  QWidget* ColorToolbox::createColorGridWidget()
   {
-    auto* surface = new QWidget(this);
-    auto* layout = new QGridLayout(surface);
+    m_colorGridSurface = new QWidget(this);
+    m_colorGrid = new QGridLayout(m_colorGridSurface);
 
+    updateColorGrid();
+
+    m_colorGridSurface->setLayout(m_colorGrid);
+    return m_colorGridSurface;
+  }
+
+  void ColorToolbox::clearColorGrid()
+  {
+    while(m_colorGrid->itemAt(0)) {
+      delete m_colorGrid->itemAt(0)->widget();
+    }
+  }
+
+  void ColorToolbox::updateColorGrid()
+  {
     int x = 0, y = 0;
-    for(const auto& color : colors) {
-      auto* colorBtn = new ColorButton(surface, color, true);
+    int i = 0;
+    int color_size = getColorPalette().size();
+    for(const auto& color : getColorPalette()) {
+      auto* colorBtn = new ColorButton(m_colorGridSurface, color, true);
       colorBtn->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
       colorBtn->setFixedSize(COLOR_BUTTON_WIDTH, COLOR_BUTTON_HEIGHT);
 
@@ -200,7 +267,7 @@ namespace
         on_color_click();
       });
 
-      connect(colorBtn, &ColorButton::doubleClicked, [colorBtn]{
+      connect(colorBtn, &ColorButton::doubleClicked, [colorBtn, i]{
         auto color = QColorDialog::getColor(qt_utils::convertToQTColor(colorBtn->getBackgroundColor()),
                                             nullptr,
                                             "Select Color",
@@ -208,18 +275,17 @@ namespace
                                             QColorDialog::DontUseNativeDialog);
         if(color.isValid()) {
           colorBtn->setBackgroundColor(qt_utils::convertToColor(color));
+          getColorPalette().setColor(i, qt_utils::convertToColor(color));
         }
       });
 
-      layout->addWidget(colorBtn, y, x, 1, 1);
-      if(x == (colors.size() / 2)) {
+      m_colorGrid->addWidget(colorBtn, y, x, 1, 1);
+      if(x == (color_size / 2)) {
         ++y; x = 0;
       } else {
         ++x;
       }
+      ++i;
     }
-
-    surface->setLayout(layout);
-    return surface;
   }
 }

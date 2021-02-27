@@ -20,6 +20,7 @@
 #ifndef COLORTOOLBOX_H
 #define COLORTOOLBOX_H
 
+#include <QGridLayout>
 #include <QWidget>
 #include "../image/color.h"
 
@@ -46,15 +47,20 @@ namespace pixpaint
     };
 
   public:
-    ColorToolbox(QWidget* parent, const std::vector<Color>& colors);
+    explicit ColorToolbox(QWidget* parent);
 
     void setSelectedForegroundColor(const Color& color);
     void setSelectedBackgroundColor(const Color& color);
 
   private:
     QWidget* createColorSelectionWidget();
-    QWidget* createColorGridWidget(const std::vector<Color>& colors);
+    QWidget* createColorGridWidget();
 
+    void clearColorGrid();
+    void updateColorGrid();
+
+    QWidget*              m_colorGridSurface;
+    QGridLayout*          m_colorGrid;
     ColorSelectionWidget* m_colorSelectionWidget;
   };
 }

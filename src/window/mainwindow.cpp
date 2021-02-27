@@ -100,7 +100,7 @@ namespace
     }
   }
 
-  void do_open(QMainWindow* parent,
+  void do_open(MainWindow* parent,
                const std::string& filter,
                const std::string& dialogTitle,
                std::function<void(const std::string&)> openFunc)
@@ -513,7 +513,7 @@ namespace
     this->addDockWidget(Qt::RightDockWidgetArea, gui_env.m_rightToolboxDock);
 
     auto* dock = new QDockWidget(tr("Colors Toolbar"), this);
-    gui_env.m_colorToolbox = new ColorToolbox(dock, getDefaultColor());
+    gui_env.m_colorToolbox = new ColorToolbox(dock);
     dock->setFeatures(static_cast<QDockWidget::DockWidgetFeature>(0));
     dock->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     dock->setAllowedAreas(Qt::BottomDockWidgetArea);
