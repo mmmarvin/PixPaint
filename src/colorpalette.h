@@ -41,6 +41,7 @@ namespace pixpaint
     bool save(const std::string& filename) const;
     bool load(const std::string& filename);
 
+    void addColor(const Color& color);
     void setColor(size_t index, const Color& color);
 
     iterator begin();

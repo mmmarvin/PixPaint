@@ -75,6 +75,13 @@ namespace pixpaint
     return false;
   }
 
+  void ColorPalette::addColor(const Color& color)
+  {
+    if(m_colors.size() < MAX_COLOR_COUNT) {
+      m_colors.push_back(color);
+    }
+  }
+
   void ColorPalette::setColor(size_t index, const Color& color)
   {
     PIXPAINT_ASSERT(index < m_colors.size(), "Index is out-of-bounds of colors");

@@ -249,43 +249,58 @@ namespace
 
   void ColorToolbox::updateColorGrid()
   {
-    int x = 0, y = 0;
-    int i = 0;
-    int color_size = getColorPalette().size();
+    int x = 0, y = 0, i = 0;
     for(const auto& color : getColorPalette()) {
-      auto* colorBtn = new ColorButton(m_colorGridSurface, color, true);
-      colorBtn->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
-      colorBtn->setFixedSize(COLOR_BUTTON_WIDTH, COLOR_BUTTON_HEIGHT);
+      auto* color_btn = new ColorButton(m_colorGridSurface, color, true);
+      color_btn->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
+      color_btn->setFixedSize(COLOR_BUTTON_WIDTH, COLOR_BUTTON_HEIGHT);
 
-      connect(colorBtn, &ColorButton::clicked, [colorBtn] {
-        getColorManager().setForegroundColor(colorBtn->getBackgroundColor());
+      this->connect(color_btn, &ColorButton::clicked, [color_btn] {
+        getColorManager().setForegroundColor(color_btn->getBackgroundColor());
         on_color_click();
       });
 
-      connect(colorBtn, &ColorButton::customContextMenuRequested, [colorBtn] {
-        getColorManager().setBackgroundColor(colorBtn->getBackgroundColor());
+      this->connect(color_btn, &ColorButton::customContextMenuRequested, [color_btn] {
+        getColorManager().setBackgroundColor(color_btn->getBackgroundColor());
         on_color_click();
       });
 
-      connect(colorBtn, &ColorButton::doubleClicked, [colorBtn, i]{
-        auto color = QColorDialog::getColor(qt_utils::convertToQTColor(colorBtn->getBackgroundColor()),
+      this->connect(color_btn, &ColorButton::doubleClicked, [color_btn, i]{
+        auto color = QColorDialog::getColor(qt_utils::convertToQTColor(color_btn->getBackgroundColor()),
                                             nullptr,
                                             "Select Color",
                                             QColorDialog::ShowAlphaChannel |
                                             QColorDialog::DontUseNativeDialog);
         if(color.isValid()) {
-          colorBtn->setBackgroundColor(qt_utils::convertToColor(color));
+          color_btn->setBackgroundColor(qt_utils::convertToColor(color));
           getColorPalette().setColor(i, qt_utils::convertToColor(color));
         }
       });
 
-      m_colorGrid->addWidget(colorBtn, y, x, 1, 1);
-      if(x == (color_size / 2)) {
-        ++y; x = 0;
+      m_colorGrid->addWidget(color_btn, y, x, 1, 1);
+      if(y == 1) {
+        y = 0; ++x;
       } else {
-        ++x;
+        ++y;
       }
       ++i;
     }
+
+    auto* add_btn = new QPushButton(tr("+"), this);
+    add_btn->setFixedSize(COLOR_BUTTON_WIDTH, COLOR_BUTTON_HEIGHT);
+    this->connect(add_btn, &QPushButton::clicked, [this]() {
+      getColorPalette().addColor(Color::BLACK);
+
+      clearColorGrid();
+      updateColorGrid();
+    });
+
+    if(getColorPalette().size() < ColorPalette::MAX_COLOR_COUNT - 1) {
+      add_btn->setEnabled(true);
+    } else {
+      add_btn->setEnabled(false);
+    }
+
+    m_colorGrid->addWidget(add_btn, y, x, 1, 1);
   }
 }
