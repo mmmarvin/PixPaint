@@ -423,17 +423,29 @@ namespace
     }
 
     QObject::connect(editMenu->copyEditAction, &QAction::triggered, [](bool){
-      selection_helpers::tryCopy();
+      if(getImageEnvironment().isViewSet()) {
+        selection_helpers::tryCopy();
+
+        getImageEnvironment().getView().setFocus();
+      }
     });
     QObject::connect(editMenu->cutEditAction, &QAction::triggered, [](bool){
-      selection_helpers::tryCut(true);
+      if(getImageEnvironment().isViewSet()) {
+        selection_helpers::tryCut(true);
+
+        getImageEnvironment().getView().setFocus();
+      }
     });
     QObject::connect(editMenu->pasteEditAction, &QAction::triggered, [](bool) {
-      selection_helpers::tryPaste(true);
+      if(getImageEnvironment().isViewSet()) {
+        selection_helpers::tryPaste(true);
+
+        getImageEnvironment().getView().setFocus();
+      }
     });
     QObject::connect(editMenu->deleteEditAction, &QAction::triggered, [](bool) {
       auto& selection_manager = getSelectionManager();
-      if(selection_manager.layerExists() && selection_manager.selectionExists()) {
+      if(getImageEnvironment().isViewSet() && selection_manager.layerExists() && selection_manager.selectionExists()) {
         auto selection_rect = selection_manager.getSelectionRect();
         auto selection_layer = selection_manager.getSelectionLayer();
 
@@ -452,6 +464,8 @@ namespace
         getPreviewManager().refreshAll();
         image_env.getScrollArea().updateSelectionWidget();
         image_env.getView().repaint();
+
+        getImageEnvironment().getView().setFocus();
       }
     });
   }
@@ -652,6 +666,8 @@ namespace
           image_env.getScrollArea().updateResizeHandles();
 
           getPreviewManager().refreshResizeAll();
+
+          getImageEnvironment().getView().setFocus();
         }
       }
     });
@@ -667,6 +683,8 @@ namespace
         {
           selectionLayer = selectionLayer.flipVertically();
         });
+
+        getImageEnvironment().getView().setFocus();
       }
     });
     QObject::connect(imageMenu->mirrorImageAction, &QAction::triggered, [parent](bool) {
@@ -680,6 +698,8 @@ namespace
         {
           selectionLayer = selectionLayer.flipHorizontally();
         });
+
+        getImageEnvironment().getView().setFocus();
       }
     });
 
@@ -710,6 +730,8 @@ namespace
                                                          false);
           });
         }
+
+        getImageEnvironment().getView().setFocus();
       }
     });
 
@@ -724,19 +746,25 @@ namespace
 
         emitEvent(gui_events::ImageFlattenEvent());
         getPreviewManager().refreshAll();
+
+        getImageEnvironment().getView().setFocus();
       }
     });
 
     QObject::connect(imageMenu->invertImageAction, &QAction::triggered, [parent](bool) {
-      apply_image_effect("Invert Image",
-      [](const IntRect& , MaskablePixelData& layer)
-      {
-        layer.invert();
-      },
-      [](const IntRect& , MaskablePixelData& selectionLayer)
-      {
-        selectionLayer.invert();
-      });
+      if(getImageEnvironment().isViewSet()) {
+        apply_image_effect("Invert Image",
+        [](const IntRect& , MaskablePixelData& layer)
+        {
+          layer.invert();
+        },
+        [](const IntRect& , MaskablePixelData& selectionLayer)
+        {
+          selectionLayer.invert();
+        });
+
+        getImageEnvironment().getView().setFocus();
+      }
     });
 
     QObject::connect(imageMenu->clearImageAction, &QAction::triggered, [](bool) {
@@ -752,6 +780,8 @@ namespace
 
         emitEvent(gui_events::ImageClearEvent());
         getPreviewManager().refreshAll();
+
+        getImageEnvironment().getView().setFocus();
       }
     });
   }
@@ -856,6 +886,8 @@ namespace
          (getSelectionManager().selectionExists() || getTextSelectionManager().selectionExists())) {
         getImageEnvironment().getSelection().setMode(SelectionWidget::ESelectionMode::NORMAL);
         getGUIEnvironment().getLeftToolbox().switchToDefaultSelectionTool();
+
+        getImageEnvironment().getView().setFocus();
       }
     });
 
@@ -864,6 +896,8 @@ namespace
          (getSelectionManager().selectionExists() || getTextSelectionManager().selectionExists())) {
         getImageEnvironment().getSelection().setMode(SelectionWidget::ESelectionMode::MOVE);
         getGUIEnvironment().getLeftToolbox().switchToDefaultSelectionTool();
+
+        getImageEnvironment().getView().setFocus();
       }
     });
 
@@ -872,6 +906,8 @@ namespace
          (getSelectionManager().selectionExists() || getTextSelectionManager().selectionExists())) {
         getImageEnvironment().getSelection().setMode(SelectionWidget::ESelectionMode::RESIZE);
         getGUIEnvironment().getLeftToolbox().switchToDefaultSelectionTool();
+
+        getImageEnvironment().getView().setFocus();
       }
     });
 
@@ -902,12 +938,18 @@ namespace
           getPreviewManager().refreshAll();
           image_env.getScrollArea().updateSelectionWidget();
           image_env.getView().repaint();
+
+          getImageEnvironment().getView().setFocus();
         }
       });
     }
 
     QObject::connect(selectMenu->deselectEditAction, &QAction::triggered, [](bool) {
-      selection_helpers::tryFinalizeAllSelections(true);
+      if(getImageEnvironment().isViewSet()) {
+        selection_helpers::tryFinalizeAllSelections(true);
+
+        getImageEnvironment().getView().setFocus();
+      }
     });
   }
 
@@ -986,6 +1028,8 @@ namespace
               });
             }
           }
+
+          getImageEnvironment().getView().setFocus();
         }
       });
 
