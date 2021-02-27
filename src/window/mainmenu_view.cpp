@@ -114,17 +114,19 @@ namespace pixpaint
     });
 
     QObject::connect(viewMenu->boxGridAction, &QAction::triggered, [parent](bool) {
-      BoxGridDialog dialog(parent);
+      if(image_env.isViewSet()) {
+        BoxGridDialog dialog(parent);
 
-      auto res = dialog.exec();
-      if(res == QDialog::Accepted) {
-        auto& image_env = getImageEnvironment();
-        auto& view = image_env.getView();
+        auto res = dialog.exec();
+        if(res == QDialog::Accepted) {
+          auto& image_env = getImageEnvironment();
+          auto& view = image_env.getView();
 
-        if(dialog.showGrid()) {
-          view.showBoxGrid(true, dialog.getWidth(), dialog.getHeight());
-        } else {
-          view.showBoxGrid(false, view.getBoxGridSize().width, view.getBoxGridSize().height);
+          if(dialog.showGrid()) {
+            view.showBoxGrid(true, dialog.getWidth(), dialog.getHeight());
+          } else {
+            view.showBoxGrid(false, view.getBoxGridSize().width, view.getBoxGridSize().height);
+          }
         }
       }
     });
