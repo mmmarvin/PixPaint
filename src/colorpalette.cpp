@@ -22,6 +22,7 @@
 #include <array>
 #include <ios>
 #include <fstream>
+#include <boost/endian.hpp>
 #include "assert.h"
 #include "default_color_template.h"
 
@@ -36,7 +37,7 @@ namespace pixpaint
   {
     std::ofstream out(filename, std::ios_base::binary);
     if(out.is_open()) {
-      uint32_t color_count = m_colors.size();
+      boost::endian::little_uint32_t color_count = m_colors.size();
       out.write(reinterpret_cast<char*>(&color_count), sizeof(color_count));
 
       for(size_t i = 0; i < color_count; ++i) {
@@ -53,7 +54,7 @@ namespace pixpaint
   {
     std::ifstream in(filename, std::ios_base::binary);
     if(in.is_open()) {
-      uint32_t color_count;
+      boost::endian::little_uint32_t color_count;
 
       in.read(reinterpret_cast<char*>(&color_count), sizeof(color_count));
       if(in.gcount() == sizeof(color_count) && color_count < MAX_COLOR_COUNT) {

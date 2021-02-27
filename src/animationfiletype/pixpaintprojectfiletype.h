@@ -20,6 +20,7 @@
 #ifndef PIXPAINTPROJECTFILETYPE_H
 #define PIXPAINTPROJECTFILETYPE_H
 
+#include <boost/endian.hpp>
 #include "animationfiletypebase.h"
 
 namespace pixpaint
@@ -32,20 +33,20 @@ namespace pixpaint
 #pragma pack(push, 1)
     struct ProjectHeader
     {
-      std::array<unsigned char, NUMBER_OF_HEADER_BITS> header;
-      std::int32_t num_frames;
+      std::array<unsigned char, NUMBER_OF_HEADER_BITS>  header;
+      boost::endian::little_uint32_t                    num_frames;
     };
 #pragma pack(pop)
 #pragma pack(push, 1)
     struct FrameHeader
     {
-      std::int32_t width;
-      std::int32_t height;
+      boost::endian::little_uint32_t width;
+      boost::endian::little_uint32_t height;
     };
 #pragma pack(pop)
 
-    static_assert(sizeof(ProjectHeader) == (NUMBER_OF_HEADER_BITS + sizeof(std::int32_t)), "Invalid size of ProjectHeader. Is there padding?");
-    static_assert(sizeof(FrameHeader) == (sizeof(std::int32_t) * 2), "Invalid size of ProjectHeader. Is there padding?");
+    static_assert(sizeof(ProjectHeader) == (NUMBER_OF_HEADER_BITS + sizeof(boost::endian::little_uint32_t)), "Invalid size of ProjectHeader. Is there padding?");
+    static_assert(sizeof(FrameHeader) == (sizeof(boost::endian::little_uint32_t) * 2), "Invalid size of ProjectHeader. Is there padding?");
 
   public:
     PixPaintProjectFileType() {}
