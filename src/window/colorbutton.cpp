@@ -78,6 +78,8 @@ namespace pixpaint
   {
     if(event->button() == Qt::MouseButton::MiddleButton) {
       middleClick();
+    } else {
+      QPushButton::mousePressEvent(event);
     }
   }
 
