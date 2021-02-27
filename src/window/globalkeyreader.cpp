@@ -105,7 +105,6 @@ namespace
               if(keySequence == tool_key_sequence) {
                 auto& paint_tool = paint_tool_information.getTool();
                 getPaintToolManager().setCurrentTool(paint_tool);
-                tool_helpers::onToolChange(paint_tool, &PaintToolHandlerBase::onToolChange);
                 break;
               }
             }

@@ -119,11 +119,9 @@ namespace pixpaint
         if(paintToolManager.currentToolSet()) {
           if(&paintToolManager.getCurrentTool() != &paintTool) {
             paintToolManager.setCurrentTool(paintTool);
-            tool_helpers::onToolChange(paintTool, &PaintToolHandlerBase::onToolChange);
           }
         } else {
           paintToolManager.setCurrentTool(paintTool);
-          tool_helpers::onToolChange(paintTool, &PaintToolHandlerBase::onToolChange);
         }
       });
       toolBtn->setMaximumSize(PAINTTOOLBOX_BUTTON_WIDTH, PAINTTOOLBOX_BUTTON_HEIGHT);
