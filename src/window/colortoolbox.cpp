@@ -265,15 +265,32 @@ namespace
         on_color_click();
       });
 
+      this->connect(color_btn, &ColorButton::middleClicked, [this, color_btn, i] {
+        auto btn = QMessageBox::question(this,
+                                         "Remove Color",
+                                         "Do you want to remove this color?",
+                                         QMessageBox::StandardButton::Yes,
+                                         QMessageBox::StandardButton::No);
+        if(btn == QMessageBox::Yes) {
+          getColorPalette().removeColor(i);
+
+          clearColorGrid();
+          updateColorGrid();
+        }
+      });
+
       this->connect(color_btn, &ColorButton::doubleClicked, [color_btn, i]{
-        auto color = QColorDialog::getColor(qt_utils::convertToQTColor(color_btn->getBackgroundColor()),
-                                            nullptr,
-                                            "Select Color",
-                                            QColorDialog::ShowAlphaChannel |
-                                            QColorDialog::DontUseNativeDialog);
-        if(color.isValid()) {
-          color_btn->setBackgroundColor(qt_utils::convertToColor(color));
-          getColorPalette().setColor(i, qt_utils::convertToColor(color));
+        // Must have atleast one color
+        if(getColorPalette().size() > 2) {
+          auto color = QColorDialog::getColor(qt_utils::convertToQTColor(color_btn->getBackgroundColor()),
+                                              nullptr,
+                                              "Select Color",
+                                              QColorDialog::ShowAlphaChannel |
+                                              QColorDialog::DontUseNativeDialog);
+          if(color.isValid()) {
+            color_btn->setBackgroundColor(qt_utils::convertToColor(color));
+            getColorPalette().setColor(i, qt_utils::convertToColor(color));
+          }
         }
       });
 
