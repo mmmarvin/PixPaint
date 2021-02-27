@@ -196,7 +196,7 @@ namespace
                                                    "PixPaint Palette (*.ppa)");
       if(filename.size()) {
         if(!getColorPalette().load(filename.toUtf8().constData())) {
-          QMessageBox::critical(this, tr("Error"), tr("There was an error saving the color palette!"));
+          QMessageBox::critical(this, tr("Error"), tr("There was an error loading the color palette!"));
           return;
         }
 

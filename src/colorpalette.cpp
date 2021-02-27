@@ -28,6 +28,9 @@
 
 namespace pixpaint
 {
+  static constexpr size_t PALETTE_HEADER_SIZE = 6;
+  static const std::array<unsigned char, PALETTE_HEADER_SIZE> PALETTE_HEADER = { 0x1F, 0xFF, 0xBC, 'P', 'P', 'A' };
+
   ColorPalette::ColorPalette()
   {
     m_colors = getDefaultColor();
@@ -37,6 +40,8 @@ namespace pixpaint
   {
     std::ofstream out(filename, std::ios_base::binary);
     if(out.is_open()) {
+      out.write(reinterpret_cast<const char*>(PALETTE_HEADER.data()), PALETTE_HEADER.size());
+
       boost::endian::little_uint32_t color_count = m_colors.size();
       out.write(reinterpret_cast<char*>(&color_count), sizeof(color_count));
 
@@ -54,22 +59,28 @@ namespace pixpaint
   {
     std::ifstream in(filename, std::ios_base::binary);
     if(in.is_open()) {
-      boost::endian::little_uint32_t color_count;
+      std::array<unsigned char, PALETTE_HEADER_SIZE> header;
+      in.read(reinterpret_cast<char*>(header.data()), header.size());
+      if(in.gcount() == header.size()) {
+        if(!std::memcmp(PALETTE_HEADER.data(), header.data(), PALETTE_HEADER_SIZE)) {
+          boost::endian::little_uint32_t color_count;
 
-      in.read(reinterpret_cast<char*>(&color_count), sizeof(color_count));
-      if(in.gcount() == sizeof(color_count) && color_count < MAX_COLOR_COUNT) {
-        std::vector<Color> colors;
-        colors.resize(color_count);
+          in.read(reinterpret_cast<char*>(&color_count), sizeof(color_count));
+          if(in.gcount() == sizeof(color_count) && color_count < MAX_COLOR_COUNT) {
+            std::vector<Color> colors;
+            colors.resize(color_count);
 
-        for(size_t i = 0; i < color_count; ++i)  {
-          in.read(reinterpret_cast<char*>(&colors[i]), sizeof(Color));
-          if(in.gcount() != sizeof(Color)) {
-            return false;
+            for(size_t i = 0; i < color_count; ++i)  {
+              in.read(reinterpret_cast<char*>(&colors[i]), sizeof(Color));
+              if(in.gcount() != sizeof(Color)) {
+                return false;
+              }
+            }
+
+            m_colors = std::move(colors);
+            return true;
           }
         }
-
-        m_colors = std::move(colors);
-        return true;
       }
     }
 
