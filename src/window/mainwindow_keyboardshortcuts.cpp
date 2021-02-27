@@ -73,11 +73,13 @@ namespace pixpaint
     configurationManager.addVariable(CONFIG_SECTION_SETTINGS, "image_height", "64", gengine2d::EVariableType::Integer);
     configurationManager.addVariable(CONFIG_SECTION_SETTINGS, "undo_max", "10", gengine2d::EVariableType::Integer);
     configurationManager.addVariable(CONFIG_SECTION_SETTINGS, "redo_max", "10", gengine2d::EVariableType::Integer);
+    configurationManager.addVariable(CONFIG_SECTION_SETTINGS, "last_location", ".", gengine2d::EVariableType::String);
 
     // add recent files
     for(int i = 0; i < NUMBER_OF_RECENT_FILES; ++i) {
       configurationManager.addVariable(CONFIG_SECTION_RECENT_FILES, std::string("File") + std::to_string(i + 1), "", gengine2d::EVariableType::String);
     }
+
   }
 
   void MainWindow::loadConfigValues()

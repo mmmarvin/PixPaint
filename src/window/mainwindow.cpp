@@ -84,7 +84,10 @@ namespace
                std::function<void(const std::string&, const std::string&)> saveFunc)
   {
     if(getImageEnvironment().isViewSet()) {
-      QFileDialog dialog(parent, QObject::tr(dialogTitle.c_str()), QObject::tr(""), filter.c_str());
+      QFileDialog dialog(parent,
+                         QObject::tr(dialogTitle.c_str()),
+                         gengine2d::getConfigurationManager().getString(CONFIG_SECTION_SETTINGS, "last_location")->c_str(),
+                         filter.c_str());
       dialog.setFileMode(QFileDialog::AnyFile);
       dialog.setAcceptMode(QFileDialog::AcceptSave);
       if(dialog.exec()) {
@@ -93,6 +96,26 @@ namespace
           saveFunc(std::string(filenames[0].toUtf8().constData()),
                    std::string(dialog.selectedNameFilter().toUtf8().constData()));
         }
+      }
+    }
+  }
+
+  void do_open(QMainWindow* parent,
+               const std::string& filter,
+               const std::string& dialogTitle,
+               std::function<void(const std::string&)> openFunc)
+  {
+    QFileDialog dialog(parent,
+                       QObject::tr(dialogTitle.c_str()),
+                       gengine2d::getConfigurationManager().getString(CONFIG_SECTION_SETTINGS, "last_location")->c_str(),
+                       filter.c_str());
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.selectNameFilter(QObject::tr("All Files (*.*)"));
+    if(dialog.exec()) {
+      auto filenames = dialog.selectedFiles();
+      if(filenames.size() == 1) {
+        openFunc(std::string(filenames[0].toUtf8().constData()));
       }
     }
   }
@@ -595,16 +618,25 @@ namespace
       filter += ";;All Files (*.*)";
     }
 
-    QFileDialog dialog(this, tr("Open..."), tr(""), filter.c_str());
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.selectNameFilter(tr("All Files (*.*)"));
-    if(dialog.exec()) {
-      auto filenames = dialog.selectedFiles();
-      if(filenames.size() == 1) {
-        openProject(std::string(filenames[0].toUtf8().constData()));
-      }
-    }
+//    QFileDialog dialog(this,
+//                       tr("Open..."),
+//                       tr(gengine2d::getConfigurationManager().getString(CONFIG_SECTION_SETTINGS, "last_location")->c_str()),
+//                       filter.c_str());
+//    dialog.setFileMode(QFileDialog::ExistingFile);
+//    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+//    dialog.selectNameFilter(tr("All Files (*.*)"));
+//    if(dialog.exec()) {
+//      auto filenames = dialog.selectedFiles();
+//      if(filenames.size() == 1) {
+//        openProject(std::string(filenames[0].toUtf8().constData()));
+//      }
+//    }
+    do_open(this,
+            filter,
+            "Open Project...",
+    [this](const std::string& filename) {
+      openProject(filename);
+    });
   }
 
   void MainWindow::slotSaveFile(bool)
@@ -652,16 +684,22 @@ namespace
       filter += ";;All Files (*.*)";
     }
 
-    QFileDialog dialog(this, tr("Open..."), tr(""), filter.c_str());
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.selectNameFilter(tr("All Files (*.*)"));
-    if(dialog.exec()) {
-      auto filenames = dialog.selectedFiles();
-      if(filenames.size() == 1) {
-        openAnimation(std::string(filenames[0].toUtf8().constData()));
-      }
-    }
+//    QFileDialog dialog(this, tr("Open..."), tr(""), filter.c_str());
+//    dialog.setFileMode(QFileDialog::ExistingFile);
+//    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+//    dialog.selectNameFilter(tr("All Files (*.*)"));
+//    if(dialog.exec()) {
+//      auto filenames = dialog.selectedFiles();
+//      if(filenames.size() == 1) {
+//        openAnimation(std::string(filenames[0].toUtf8().constData()));
+//      }
+//    }
+    do_open(this,
+            filter,
+            "Import Animation...",
+    [this](const std::string& filename) {
+      openAnimation(filename);
+    });
   }
 
   void MainWindow::slotExportAnimationFile(bool)
@@ -683,16 +721,22 @@ namespace
       filter += ";;All Files (*.*)";
     }
 
-    QFileDialog dialog(this, tr("Open..."), tr(""), filter.c_str());
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.selectNameFilter(tr("All Files (*.*)"));
-    if(dialog.exec()) {
-      auto filenames = dialog.selectedFiles();
-      if(filenames.size() == 1) {
-        openImage(std::string(filenames[0].toUtf8().constData()));
-      }
-    }
+//    QFileDialog dialog(this, tr("Open..."), tr(""), filter.c_str());
+//    dialog.setFileMode(QFileDialog::ExistingFile);
+//    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+//    dialog.selectNameFilter(tr("All Files (*.*)"));
+//    if(dialog.exec()) {
+//      auto filenames = dialog.selectedFiles();
+//      if(filenames.size() == 1) {
+//        openImage(std::string(filenames[0].toUtf8().constData()));
+//      }
+//    }
+    do_open(this,
+            filter,
+            "Import Image...",
+    [this](const std::string& filename) {
+      openImage(filename);
+    });
   }
 
   void MainWindow::slotExportImageFile(bool)

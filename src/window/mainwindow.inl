@@ -21,10 +21,12 @@
 
 #include <QMessageBox>
 #include <QTabBar>
+#include "../3rdparty/gengine/configuration.h"
 #include "../dialog/optiondialog.h"
 #include "../embed/headerstream.h"
 #include "../manager/documentmanager.h"
 #include "../utility/filetype_utility.h"
+#include "../define.h"
 #include "../document.h"
 #include "documentpanel.h"
 
@@ -65,6 +67,10 @@ namespace pixpaint
           return false;
         }
         if(res == ImageFileTypeBase::EOR_SUCCESS) {
+          gengine2d::getConfigurationManager().setVariable(CONFIG_SECTION_SETTINGS,
+                                                           "last_location",
+                                                           os_specific::filesystem::path(filename).parent_path().string());
+
           m_documentPanel->addPage(std::move(animationDocument));
           m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(document_manager.getDocument()), filename.c_str());
 
@@ -157,12 +163,14 @@ namespace pixpaint
               break;
             }
 
-            FileTypeSetterT()(document_manager, file_type_obj);
+            gengine2d::getConfigurationManager().setVariable(CONFIG_SECTION_SETTINGS,
+                                                             "last_location",
+                                                             os_specific::filesystem::path(filename).parent_path().string());
 
+            FileTypeSetterT()(document_manager, file_type_obj);
             if(shouldSetFilename) {
               document_manager.getDocument().setFilename(filename);
             }
-
             if(shouldSetTabText) {
               m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(document_manager.getDocument()),
                                                     filename.c_str());
@@ -187,12 +195,14 @@ namespace pixpaint
             break;
           }
 
-          FileTypeSetterT()(document_manager, file_type_obj);
+          gengine2d::getConfigurationManager().setVariable(CONFIG_SECTION_SETTINGS,
+                                                           "last_location",
+                                                           os_specific::filesystem::path(filename).parent_path().string());
 
+          FileTypeSetterT()(document_manager, file_type_obj);
           if(shouldSetFilename) {
             document_manager.getDocument().setFilename(filename_with_extension);
           }
-
           if(shouldSetTabText) {
             m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(getDocumentManager().getDocument()),
                                                   filename_with_extension.c_str());
