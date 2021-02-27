@@ -46,8 +46,10 @@ namespace selection_helpers
 {
   void tryFinalizeAllSelections(bool addToHistory)
   {
-    tryFinalizeSelection(addToHistory);
-    tryFinalizeTextSelection(addToHistory);
+    if(getImageEnvironment().isViewSet()) {
+      tryFinalizeSelection(addToHistory);
+      tryFinalizeTextSelection(addToHistory);
+    }
   }
 
   void tryFinalizeSelection(bool addToHistory)
