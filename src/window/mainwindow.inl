@@ -72,13 +72,13 @@ namespace pixpaint
                                                            os_specific::filesystem::path(filename).parent_path().string());
 
           m_documentPanel->addPage(std::move(animationDocument));
-          m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(document_manager.getDocument()), filename.c_str());
-
           FileTypeSetterT()(document_manager, file_type_obj);
 
           image_manager.refresh();
 
           if(shouldSetFilename) {
+            m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(document_manager.getDocument()),
+                                                  filename.c_str());
             document_manager.getDocument().setFilename(filename);
           }
           if(shouldAddToRecent) {
@@ -103,14 +103,13 @@ namespace pixpaint
           }
         } else if(res == ImageFileTypeBase::EOR_SUCCESS) {
           m_documentPanel->addPage(std::move(animationDocument));
-          m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(document_manager.getDocument()),
-                                                filename.c_str());
-
           FileTypeSetterT()(document_manager, file_type_obj);
 
           image_manager.refresh();
 
           if(shouldSetFilename) {
+            m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(document_manager.getDocument()),
+                                                  filename.c_str());
             document_manager.getDocument().setFilename(filename);
           }
           if(shouldAddToRecent) {

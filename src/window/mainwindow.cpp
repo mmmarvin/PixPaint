@@ -29,6 +29,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QMimeData>
 #include <QTabBar>
 #include <QStatusBar>
 #include "../3rdparty/gengine/configuration.h"
@@ -76,6 +77,23 @@
 
 namespace pixpaint
 {
+namespace
+{
+  std::string removeFileTag(std::string filename)
+  {
+    static const std::string file_tag = "file://";
+
+    if(filename.substr(0, file_tag.size()) == file_tag) {
+      filename = filename.substr(file_tag.size(), filename.size() - file_tag.size());
+    }
+
+    while(filename.back() == '\n' || isspace(filename.back())) {
+      filename.pop_back();
+    }
+
+    return filename;
+  }
+}
 namespace
 {
   void do_save(MainWindow* parent,
@@ -251,6 +269,7 @@ namespace
     this->setWindowState(Qt::WindowState::WindowMaximized);
     this->setWindowTitle(app_name.c_str());
     this->setWindowIcon(QIcon("res/pixpaint.png"));
+    this->setAcceptDrops(true);
 
     createConsoleWidget();
     getConsoleManager().writeMessageSystem(app_name + std::string(" Console"));
@@ -470,6 +489,50 @@ namespace
     }
 
     return QMainWindow::eventFilter(w, e);
+  }
+
+  void MainWindow::dragEnterEvent(QDragEnterEvent* event)
+  {
+    auto filename = removeFileTag(std::string(event->mimeData()->text().toUtf8().constData()));
+
+    HeaderStream stream;
+    stream.m_stream.open(filename, std::ios_base::binary);
+    if(stream.m_stream.is_open()) {
+      // try opening image
+      for(const auto& img_info: getImageFileTypeRegistrar()) {
+        if(img_info.getType().canReadHeader(stream)) {
+          event->acceptProposedAction();
+          return;
+        }
+        stream.reset();
+      }
+
+      // try opening animation
+      for(const auto& anim_info: getAnimationFileTypeRegistrar()) {
+        if(anim_info.getType().canReadHeader(stream)) {
+          event->acceptProposedAction();
+          return;
+        }
+        stream.reset();
+      }
+
+      // try opening project
+      for(const auto& proj_info: getProjectFileTypeRegistrar()) {
+        if(proj_info.getType().canReadHeader(stream)) {
+          event->acceptProposedAction();
+          return;
+        }
+        stream.reset();
+      }
+    }
+  }
+
+  void MainWindow::dropEvent(QDropEvent* event)
+  {
+    auto filename = removeFileTag(std::string(event->mimeData()->text().toUtf8().constData()));
+    tryOpenFile(filename, true);
+
+    event->acceptProposedAction();
   }
 
   void MainWindow::createConsoleWidget()
@@ -771,14 +834,14 @@ namespace
   {
     openImpl<ImageRegistrarGetter,
              ImageOpener,
-             ImageFiletypeSetter>(filename, false, false);
+             ImageFiletypeSetter>(filename, true, false);
   }
 
   void MainWindow::openAnimation(std::string filename)
   {
     openImpl<AnimationRegistrarGetter,
              AnimationOpener,
-             AnimationFiletypeSetter>(filename, false, false);
+             AnimationFiletypeSetter>(filename, true, false);
   }
 
   void MainWindow::saveProject(std::string filename, std::string mimeType)
@@ -828,11 +891,15 @@ namespace
     updateRecentActions();
   }
 
-  void MainWindow::tryOpenFile(const std::string& filename)
+  void MainWindow::tryOpenFile(const std::string& filename, bool showError)
   {
     if(!openImpl<ProjectRegistrarGetter, ProjectOpener, ProjectFileTypeSetter>(filename, true, true, false)) {
-      if(!openImpl<ImageRegistrarGetter, ImageOpener, ImageFiletypeSetter>(filename, false, false, false)) {
-        openImpl<AnimationRegistrarGetter, AnimationOpener, AnimationFiletypeSetter>(filename, false, false);
+      if(!openImpl<ImageRegistrarGetter, ImageOpener, ImageFiletypeSetter>(filename, true, false, false)) {
+        if(!openImpl<AnimationRegistrarGetter, AnimationOpener, AnimationFiletypeSetter>(filename, true, false)) {
+          if(showError) {
+            QMessageBox::critical(this, tr("Error"), (std::string("Cannot open file \"") + filename + std::string("\"!")).c_str());
+          }
+        }
       }
     }
   }
