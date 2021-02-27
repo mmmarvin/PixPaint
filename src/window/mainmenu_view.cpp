@@ -114,7 +114,7 @@ namespace pixpaint
     });
 
     QObject::connect(viewMenu->boxGridAction, &QAction::triggered, [parent](bool) {
-      if(image_env.isViewSet()) {
+      if(getImageEnvironment().isViewSet()) {
         BoxGridDialog dialog(parent);
 
         auto res = dialog.exec();
