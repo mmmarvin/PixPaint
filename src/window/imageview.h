@@ -23,11 +23,12 @@
 #include <QWidget>
 #include "../image/rect.h"
 #include "../image/size.h"
+#include "baseimageview.h"
 
 namespace pixpaint
 {
   class Image;
-  class ImageView : public QWidget
+  class ImageView : public BaseImageView
   {
   public:
     ImageView(QWidget* parent,
@@ -44,10 +45,6 @@ namespace pixpaint
     void setPixelSize(double pixelSize);
     double getPixelSize() const noexcept;
 
-    void setImage(Image& image) noexcept;
-    Image& getImage() noexcept;
-    const Image& getImage() const noexcept;
-
   protected:
     void paintEvent(QPaintEvent*) override;
 
@@ -57,17 +54,15 @@ namespace pixpaint
     DoubleRect getSmallestDrawableRegion(const DoubleRect& option);
 
   protected:
-    void paintBackground(QPainter& painter);
-    virtual void paintImage(QPainter& painter);
     void paintGrid();
     void paintBoxGrid();
 
   private:
-    Image*      m_image;
-    double      m_pixelSize;
+    using BaseImageView::setPixelSize;
+    using BaseImageView::getPixelSizeX;
+    using BaseImageView::getPixelSizeY;
 
     Size        m_boxGridDimension;
-
     bool        m_showBoxGrid;
     bool        m_showGrid;
   };
