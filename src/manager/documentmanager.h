@@ -20,7 +20,7 @@
 #ifndef DOCUMENTMANAGER_H
 #define DOCUMENTMANAGER_H
 
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 
 namespace pixpaint
 {

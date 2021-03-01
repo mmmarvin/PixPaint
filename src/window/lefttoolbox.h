@@ -23,8 +23,10 @@
 #include <QPushButton>
 #include <QWidget>
 #include "../manager/eventmanager.h"
+#include "../pattern/observer.h"
 #include "painttooloptionframe.h"
 
+class FlowLayout;
 namespace pixpaint
 {
   class PaintToolManager;
@@ -36,11 +38,10 @@ namespace gui_events
   struct TabRemoveEvent;
 }
   class LeftToolbox : public QWidget,
+                      public patterns::Observer,
                       EventListener<gui_events::TabAddEvent>,
                       EventListener<gui_events::TabRemoveEvent>
   {
-    static constexpr auto PAINT_TOOL_BTN_SIZE = 40;
-
   public:
     LeftToolbox(QWidget* parent);
 
@@ -52,12 +53,16 @@ namespace gui_events
     void onEmit(const gui_events::TabAddEvent& event) override;
     void onEmit(const gui_events::TabRemoveEvent& event) override;
 
+    void updateObserver(int id) override;
+
     QWidget* createToolbox();
     QWidget* createOptionFrame();
 
+    FlowLayout*           m_toolLayout;
     PaintToolOptionFrame* m_optionFrame;
-    QPushButton*          m_defaultTool;
-    QPushButton*          m_defaultSelectionTool;
+
+    size_t                m_defaultToolIndex;
+    size_t                m_defaultSelectionToolIndex;
   };
 }
 

@@ -58,6 +58,8 @@ namespace registerbase_detail
     typename container_type::const_iterator cend() const;
     typename container_type::reverse_iterator rend();
 
+    size_t size() const noexcept;
+
   private:
     id_container_type m_ids;
     container_type    m_items;

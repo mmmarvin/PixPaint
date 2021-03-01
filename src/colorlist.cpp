@@ -17,7 +17,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  **********/
-#include "colorpalette.h"
+#include "colorlist.h"
 
 #include <array>
 #include <ios>
@@ -28,19 +28,19 @@
 
 namespace pixpaint
 {
-  static constexpr size_t PALETTE_HEADER_SIZE = 6;
-  static const std::array<unsigned char, PALETTE_HEADER_SIZE> PALETTE_HEADER = { 0x1F, 0xFF, 0xBC, 'P', 'P', 'A' };
+  static constexpr size_t COLOR_LIST_HEADER_SIZE = 6;
+  static const std::array<unsigned char, COLOR_LIST_HEADER_SIZE> COLOR_LIST_HEADER = { 0x1F, 0xFF, 0xBC, 'P', 'P', 'A' };
 
-  ColorPalette::ColorPalette()
+  ColorList::ColorList()
   {
     m_colors = getDefaultColor();
   }
 
-  bool ColorPalette::save(const std::string& filename) const
+  bool ColorList::save(const std::string& filename) const
   {
     std::ofstream out(filename, std::ios_base::binary);
     if(out.is_open()) {
-      out.write(reinterpret_cast<const char*>(PALETTE_HEADER.data()), PALETTE_HEADER.size());
+      out.write(reinterpret_cast<const char*>(COLOR_LIST_HEADER.data()), COLOR_LIST_HEADER.size());
 
       boost::endian::little_uint32_t color_count = m_colors.size();
       out.write(reinterpret_cast<char*>(&color_count), sizeof(color_count));
@@ -55,14 +55,14 @@ namespace pixpaint
     return false;
   }
 
-  bool ColorPalette::load(const std::string& filename)
+  bool ColorList::load(const std::string& filename)
   {
     std::ifstream in(filename, std::ios_base::binary);
     if(in.is_open()) {
-      std::array<unsigned char, PALETTE_HEADER_SIZE> header;
+      std::array<unsigned char, COLOR_LIST_HEADER_SIZE> header;
       in.read(reinterpret_cast<char*>(header.data()), header.size());
       if(in.gcount() == header.size()) {
-        if(!std::memcmp(PALETTE_HEADER.data(), header.data(), PALETTE_HEADER_SIZE)) {
+        if(!std::memcmp(COLOR_LIST_HEADER.data(), header.data(), COLOR_LIST_HEADER_SIZE)) {
           boost::endian::little_uint32_t color_count;
 
           in.read(reinterpret_cast<char*>(&color_count), sizeof(color_count));
@@ -78,6 +78,8 @@ namespace pixpaint
             }
 
             m_colors = std::move(colors);
+            this->notifyObservers(1);
+
             return true;
           }
         }
@@ -87,49 +89,50 @@ namespace pixpaint
     return false;
   }
 
-  void ColorPalette::addColor(const Color& color)
+  void ColorList::addColor(const Color& color)
   {
     if(m_colors.size() < MAX_COLOR_COUNT) {
       m_colors.push_back(color);
+      this->notifyObservers(1);
     }
   }
 
-  void ColorPalette::setColor(size_t index, const Color& color)
+  void ColorList::setColor(size_t index, const Color& color)
   {
     PIXPAINT_ASSERT(index < m_colors.size(), "Index is out-of-bounds of colors");
     m_colors[index] = color;
+    this->notifyObservers(1);
   }
 
-  void ColorPalette::removeColor(size_t index)
+  void ColorList::removeColor(size_t index)
   {
     PIXPAINT_ASSERT(index < m_colors.size(), "Index is out-of-bounds of colors");
     m_colors.erase(m_colors.begin() + index);
+    this->notifyObservers(1);
   }
 
-  ColorPalette::iterator ColorPalette::begin()
+  ColorList::iterator ColorList::begin()
   {
     return m_colors.begin();
   }
 
-  ColorPalette::const_iterator ColorPalette::begin() const
+  ColorList::const_iterator ColorList::begin() const
   {
     return m_colors.begin();
   }
 
-  ColorPalette::iterator ColorPalette::end()
+  ColorList::iterator ColorList::end()
   {
     return m_colors.end();
   }
 
-  ColorPalette::const_iterator ColorPalette::end() const
+  ColorList::const_iterator ColorList::end() const
   {
     return m_colors.end();
   }
 
-  size_t ColorPalette::size() const noexcept
+  size_t ColorList::size() const noexcept
   {
     return m_colors.size();
   }
-
-  PIXPAINT_SINGLETON_FUNC_DEF(ColorPalette)
 }

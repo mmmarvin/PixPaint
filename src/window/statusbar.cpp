@@ -21,11 +21,6 @@
 
 namespace pixpaint
 {
-  void StatusBar::setToolDescription(const std::string& description)
-  {
-    toolDescription->setText(description.c_str());
-  }
-
   void StatusBar::setMousePositionText(int x, int y)
   {
     mousePosition->setText((std::string("[") +

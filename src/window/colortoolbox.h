@@ -56,7 +56,7 @@ namespace pixpaint
     void setSelectedBackgroundColor(const Color& color);
 
   private:
-    void updateObserver() override;
+    void updateObserver(int id) override;
 
   private:
     QWidget* createColorSelectionWidget();

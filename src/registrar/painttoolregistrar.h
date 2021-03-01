@@ -23,7 +23,7 @@
 #include <boost/bind/bind.hpp>
 #include <boost/python.hpp>
 #include "../tool/painttoolbase.h"
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 #include "information/painttoolinformation.h"
 #include "registrarbase.h"
 

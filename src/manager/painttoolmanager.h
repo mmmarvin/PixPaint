@@ -20,36 +20,35 @@
 #ifndef PAINTTOOLMANAGER_H
 #define PAINTTOOLMANAGER_H
 
-#include "../pixpaint_macro.h"
+#include <cstddef>
+#include "../pattern/observer.h"
+#include "../pattern/singleton.h"
 
 namespace pixpaint
 {
   class PaintToolHandlerBase;
 
-  class PaintToolManager
+  class PaintToolManager : public patterns::Subject
   {
     PaintToolManager() noexcept;
 
   public:
+    void setCurrentTool(size_t index) noexcept;
     void setToPreviousTool() noexcept;
 
     bool currentToolSet() const noexcept;
     bool previousToolSet() const noexcept;
-
     PaintToolHandlerBase& getCurrentTool() noexcept;
     const PaintToolHandlerBase& getCurrentTool() const noexcept;
+    std::make_signed_t<size_t> getCurrentToolIndex() const noexcept;
 
   private:
     PIXPAINT_SINGLETON_FUNC_FRIEND(PaintToolManager)
     friend class GlobalKeyReader;
     friend class LeftToolbox;
 
-    void setCurrentTool(PaintToolHandlerBase& currentTool) noexcept;
-
-    void updateStatusDescription();
-
-    PaintToolHandlerBase* m_currentTool;
-    PaintToolHandlerBase* m_previousTool;
+    std::make_signed_t<size_t> m_currentToolIndex;
+    std::make_signed_t<size_t> m_previousToolIndex;
   };
 
   PIXPAINT_SINGLETON_FUNC(PaintToolManager)

@@ -43,7 +43,7 @@ namespace pixpaint
     auto* previewGroup = new QGroupBox(this);
     previewGroup->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     previewGroup->setTitle(tr("Preview"));
-    previewGroup->setMinimumHeight(250);
+    previewGroup->setMinimumHeight(200);
     previewGroup->setFlat(true);
     m_preview = new PreviewWidget(previewGroup, imageManager.getImage());
     previewManager.registerPreview(*m_preview->getPreviewView());

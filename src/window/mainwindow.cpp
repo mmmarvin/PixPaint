@@ -71,6 +71,7 @@
 #include "frametoolbox.h"
 #include "imageeditorview.h"
 #include "layerwidget.h"
+#include "observerlabel.h"
 #include "lefttoolbox.h"
 #include "righttoolbox.h"
 #include "zoomablescrollarea.h"
@@ -134,6 +135,7 @@ namespace
       auto filenames = dialog.selectedFiles();
       if(filenames.size() == 1) {
         openFunc(std::string(filenames[0].toUtf8().constData()));
+        getPreviewManager().refreshResizeAll();
       }
     }
   }
@@ -265,7 +267,7 @@ namespace
                      APP_RELEASE_TYPE +
                      std::string("]"));
 
-    this->setMinimumSize(640, 480);
+    this->setMinimumSize(800, 600);
     this->setWindowState(Qt::WindowState::WindowMaximized);
     this->setWindowTitle(app_name.c_str());
     this->setWindowIcon(QIcon("res/pixpaint.png"));
@@ -569,7 +571,7 @@ namespace
     gui_env.m_leftToolboxDock->setWidget(gui_env.m_leftToolbox);
     this->addDockWidget(Qt::LeftDockWidgetArea, gui_env.m_leftToolboxDock);
 
-    gui_env.m_rightToolboxDock = new QDockWidget(tr(""), this);
+    gui_env.m_rightToolboxDock = new QDockWidget(tr("Layer Toolbar"), this);
     gui_env.m_rightToolbox = new RightToolbox(gui_env.m_rightToolboxDock);
     gui_env.m_rightToolboxDock->setWidget(gui_env.m_rightToolbox);
     gui_env.m_rightToolboxDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -632,18 +634,19 @@ namespace
   void MainWindow::createStatusBar()
   {
     auto& gui_env = getGUIEnvironment();
-    gui_env.getStatusBar().toolDescription = new QLabel(tr("Tool Description"), this->statusBar());
-    gui_env.getStatusBar().toolDescription->setToolTip(tr("Tool Description"));
+    gui_env.getStatusBar().m_toolDescription = new ObserverLabel("Tool Description", this->statusBar());
     gui_env.getStatusBar().mousePosition = new QLabel(tr("[0, 0]"), this->statusBar());
     gui_env.getStatusBar().mousePosition->setToolTip(tr("Mouse Position"));
     gui_env.getStatusBar().drawSize = new QLabel(tr("[0, 0]"), this->statusBar());
     gui_env.getStatusBar().imageZoomLevel = new QLabel(tr("0%"), this->statusBar());
     gui_env.getStatusBar().imageZoomLevel->setToolTip(tr("Image Zoom Level"));
 
-    this->statusBar()->insertWidget(0, gui_env.getStatusBar().toolDescription, 10);
+    this->statusBar()->insertWidget(0, gui_env.getStatusBar().m_toolDescription, 10);
     this->statusBar()->insertWidget(1, gui_env.getStatusBar().mousePosition, 1);
     this->statusBar()->insertWidget(2, gui_env.getStatusBar().drawSize, 1);
     this->statusBar()->insertWidget(3, gui_env.getStatusBar().imageZoomLevel, 1);
+
+    getPaintToolManager().registerObserver(*gui_env.getStatusBar().m_toolDescription);
   }
 
   void MainWindow::createRecentFiles()

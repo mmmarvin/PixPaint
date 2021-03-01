@@ -26,6 +26,8 @@ namespace pixpaint
   static constexpr auto CONFIG_SECTION_SETTINGS = "Settings";
   static constexpr auto CONFIG_SECTION_RECENT_FILES = "RecentFiles";
 
+  static constexpr auto CONFIG_COLOR_SELECTION_LOCATION = "./colors";
+
   static constexpr auto NUMBER_OF_RECENT_FILES = 5;
 
   static constexpr auto DEFAULT_IMAGE_WIDTH = 64;

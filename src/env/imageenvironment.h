@@ -22,7 +22,7 @@
 
 #include <cinttypes>
 #include <cstddef>
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 
 namespace pixpaint
 {

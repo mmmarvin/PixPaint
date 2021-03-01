@@ -35,7 +35,7 @@
 #include "../manager/textselectionmanager.h"
 #include "../tool/painttoolbase.h"
 #include "../utility/qt_utility.h"
-#include "../colorpalette.h"
+#include "../colorlist.h"
 #include "../debug_log.h"
 #include "../define.h"
 #include "../gui_define.h"
@@ -167,14 +167,14 @@ namespace
     layout->addWidget(createColorGridWidget());
 
     auto* btn_layout = new QVBoxLayout(this);
-    auto* save_btn = new QPushButton("Save Palette", this);
-    auto* load_btn = new QPushButton("Load Palette", this);
+    auto* save_btn = new QPushButton("Save", this);
+    auto* load_btn = new QPushButton("Load", this);
 
     this->connect(save_btn, &QPushButton::clicked, [this]() {
       auto filename = QFileDialog::getSaveFileName(this,
-                                                   tr("Save Palette..."),
-                                                   "./palette",
-                                                   "PixPaint Palette (*.ppa)");
+                                                   tr("Save Colors..."),
+                                                   CONFIG_COLOR_SELECTION_LOCATION,
+                                                   "PixPaint Colors(*.ppc)");
       if(filename.size()) {
         auto filename_s = std::string(filename.toUtf8().constData());
         auto filename_p = os_specific::filesystem::path(filename_s);
@@ -183,25 +183,22 @@ namespace
           filename_s += ".ppa";
         }
 
-        if(!getColorPalette().save(filename_s)) {
-          QMessageBox::critical(this, tr("Error"), tr("There was an error saving the color palette!"));
+        if(!getColorManager().getColorList().save(filename_s)) {
+          QMessageBox::critical(this, tr("Error"), tr("There was an error saving the color list!"));
         }
       }
     });
 
     this->connect(load_btn, &QPushButton::clicked, [this]() {
       auto filename = QFileDialog::getOpenFileName(this,
-                                                   tr("Load Palette..."),
-                                                   "./palette",
-                                                   "PixPaint Palette (*.ppa)");
+                                                   tr("Load Colors..."),
+                                                   CONFIG_COLOR_SELECTION_LOCATION,
+                                                   "PixPaint Colors(*.ppc)");
       if(filename.size()) {
-        if(!getColorPalette().load(filename.toUtf8().constData())) {
-          QMessageBox::critical(this, tr("Error"), tr("There was an error loading the color palette!"));
+        if(!getColorManager().getColorList().load(filename.toUtf8().constData())) {
+          QMessageBox::critical(this, tr("Error"), tr("There was an error loading the color list!"));
           return;
         }
-
-        clearColorGrid();
-        updateColorGrid();
       }
     });
 
@@ -212,6 +209,7 @@ namespace
     this->setLayout(layout);
 
     getColorManager().registerObserver(*this);
+    getColorManager().getColorList().registerObserver(*this);
   }
 
   void ColorToolbox::setSelectedForegroundColor(const Color& color)
@@ -224,10 +222,22 @@ namespace
     m_colorSelectionWidget->setSelectedBackgroundColor(color);
   }
 
-  void ColorToolbox::updateObserver()
+  void ColorToolbox::updateObserver(int id)
   {
-    m_colorSelectionWidget->setSelectedForegroundColor(getColorManager().getForegroundColor());
-    m_colorSelectionWidget->setSelectedBackgroundColor(getColorManager().getBackgroundColor());
+    switch(id) {
+    case 0:
+      m_colorSelectionWidget->setSelectedForegroundColor(getColorManager().getForegroundColor());
+      m_colorSelectionWidget->setSelectedBackgroundColor(getColorManager().getBackgroundColor());
+      break;
+
+    case 1:
+      clearColorGrid();
+      updateColorGrid();
+      break;
+
+    default:
+      break;
+    }
   }
 
   QWidget* ColorToolbox::createColorSelectionWidget()
@@ -256,7 +266,7 @@ namespace
   void ColorToolbox::updateColorGrid()
   {
     int x = 0, y = 0, i = 0;
-    for(const auto& color : getColorPalette()) {
+    for(const auto& color : getColorManager().getColorList()) {
       auto* color_btn = new ColorButton(m_colorGridSurface, color, true);
       color_btn->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
       color_btn->setFixedSize(COLOR_BUTTON_WIDTH, COLOR_BUTTON_HEIGHT);
@@ -278,24 +288,20 @@ namespace
                                          QMessageBox::StandardButton::Yes,
                                          QMessageBox::StandardButton::No);
         if(btn == QMessageBox::Yes) {
-          getColorPalette().removeColor(i);
-
-          clearColorGrid();
-          updateColorGrid();
+          getColorManager().getColorList().removeColor(i);
         }
       });
 
       this->connect(color_btn, &ColorButton::doubleClicked, [color_btn, i]{
         // Must have atleast one color
-        if(getColorPalette().size() > 2) {
+        if(getColorManager().getColorList().size() > 2) {
           auto color = QColorDialog::getColor(qt_utils::convertToQTColor(color_btn->getBackgroundColor()),
                                               nullptr,
                                               "Select Color",
                                               QColorDialog::ShowAlphaChannel |
                                               QColorDialog::DontUseNativeDialog);
           if(color.isValid()) {
-            color_btn->setBackgroundColor(qt_utils::convertToColor(color));
-            getColorPalette().setColor(i, qt_utils::convertToColor(color));
+            getColorManager().getColorList().setColor(i, qt_utils::convertToColor(color));
           }
         }
       });
@@ -312,13 +318,10 @@ namespace
     auto* add_btn = new QPushButton(tr("+"), this);
     add_btn->setFixedSize(COLOR_BUTTON_WIDTH, COLOR_BUTTON_HEIGHT);
     this->connect(add_btn, &QPushButton::clicked, [this]() {
-      getColorPalette().addColor(Color::BLACK);
-
-      clearColorGrid();
-      updateColorGrid();
+      getColorManager().getColorList().addColor(Color::BLACK);
     });
 
-    if(getColorPalette().size() < ColorPalette::MAX_COLOR_COUNT - 1) {
+    if(getColorManager().getColorList().size() < ColorList::MAX_COLOR_COUNT - 1) {
       add_btn->setEnabled(true);
     } else {
       add_btn->setEnabled(false);

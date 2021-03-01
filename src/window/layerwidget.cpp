@@ -236,6 +236,7 @@ namespace pixpaint
   {
     auto& preview_manager = getPreviewManager();
     auto* layer_item = new LayerWidgetItem(m_itemHolderWidget, index);
+    layer_item->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     layer_item->setFixedHeight(ITEM_HEIGHT);
     layer_item->setContextMenuPolicy(Qt::CustomContextMenu);
 

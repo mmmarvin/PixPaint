@@ -46,8 +46,8 @@ namespace gui_events
                        EventListener<gui_events::HistoryFrameChangeEvent>,
                        EventListener<gui_events::HistoryRecreateFrameEvent>
   {
-    static constexpr auto ITEM_WIDTH = FrameToolboxItem::FRAME_PREVIEW_WIDTH + 40;
-    static constexpr auto ITEM_HEIGHT = FrameToolboxItem::FRAME_PREVIEW_HEIGHT + 40;
+    static constexpr auto ITEM_WIDTH = FrameToolboxItem::FRAME_PREVIEW_WIDTH + 20;
+    static constexpr auto ITEM_HEIGHT = FrameToolboxItem::FRAME_PREVIEW_HEIGHT + 20;
 
   public:
     explicit FrameToolbox(QWidget* parent);
@@ -86,7 +86,12 @@ namespace gui_events
     QPushButton*                    m_addButton;
     QPushButton*                    m_addCpyButton;
     QPushButton*                    m_removeButton;
+
+    QPushButton*                    m_backBeginButton;
+    QPushButton*                    m_backButton;
     QPushButton*                    m_playButton;
+    QPushButton*                    m_forwardButton;
+    QPushButton*                    m_forwardEndButton;
 
     FrameToolboxItem*               m_selectedFrameItem;
     std::size_t                     m_selectedFrameIndex;

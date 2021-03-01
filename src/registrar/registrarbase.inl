@@ -122,4 +122,10 @@ namespace pixpaint
   {
     return m_items.rend();
   }
+
+  template<class T>
+  size_t RegistrarBase<T>::size() const noexcept
+  {
+    return m_items.size();
+  }
 }

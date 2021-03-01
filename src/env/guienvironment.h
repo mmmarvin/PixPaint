@@ -23,7 +23,7 @@
 #include <QDockWidget>
 #include "../window/mainmenu.h"
 #include "../window/statusbar.h"
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 
 namespace pixpaint
 {

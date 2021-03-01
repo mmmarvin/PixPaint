@@ -23,7 +23,7 @@
 #include "../drawer/drawerholder.h"
 #include "../image/maskablepixeldata.h"
 #include "../image/rect.h"
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 
 namespace pixpaint
 {

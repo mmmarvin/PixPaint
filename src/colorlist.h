@@ -17,26 +17,26 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  **********/
-#ifndef COLORPALETTE_H
-#define COLORPALETTE_H
+#ifndef COLORLIST_H
+#define COLORLIST_H
 
 #include <string>
 #include <vector>
 #include "image/color.h"
-#include "pixpaint_macro.h"
+#include "pattern/observer.h"
 
 namespace pixpaint
 {
-  class ColorPalette
+  class ColorList : public patterns::Subject
   {
     using container_type = std::vector<Color>;
     using iterator = container_type::iterator;
     using const_iterator = container_type::const_iterator;
 
-    ColorPalette();
-
   public:
     static constexpr size_t MAX_COLOR_COUNT = 50;
+
+    ColorList();
 
     bool save(const std::string& filename) const;
     bool load(const std::string& filename);
@@ -53,12 +53,8 @@ namespace pixpaint
     size_t size() const noexcept;
 
   private:
-    PIXPAINT_SINGLETON_FUNC_FRIEND(ColorPalette)
-
     container_type m_colors;
   };
-
-  PIXPAINT_SINGLETON_FUNC(ColorPalette)
 }
 
-#endif // COLORPALETTE_H
+#endif // COLORLIST_H

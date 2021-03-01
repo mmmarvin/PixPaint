@@ -24,6 +24,7 @@
 #include "../helper/selection_helpers.h"
 #include "../helper/tool_helpers.h"
 #include "../tool/painttoolbase.h"
+#include "../registrar/painttoolregistrar.h"
 #include "../window/imageeditorview.h"
 #include "../window/lefttoolbox.h"
 #include "../window/selectionwidget.h"
@@ -34,76 +35,74 @@
 namespace pixpaint
 {
   PaintToolManager::PaintToolManager() noexcept :
-    m_currentTool(nullptr),
-    m_previousTool(nullptr)
+    m_currentToolIndex(-1),
+    m_previousToolIndex(-1)
   {
+  }
+
+  void PaintToolManager::setCurrentTool(size_t index) noexcept
+  {
+    if(index >= getPaintToolRegistrar().size()) {
+      return;
+    }
+
+    if(m_currentToolIndex != -1) {
+      m_previousToolIndex = m_currentToolIndex;
+    }
+    m_currentToolIndex = index;
+
+    selection_helpers::tryFinalizeTextSelection(true);
+    tool_helpers::updateViewToolCursor();
+
+    this->notifyObservers();
+    getImageEnvironment().getSelection().setMode(SelectionWidget::ESelectionMode::NORMAL);
+
+    tool_helpers::onToolChange(getCurrentTool(), &PaintToolHandlerBase::onToolChange);
+    getImageEnvironment().getView().setFocus();
   }
 
   void PaintToolManager::setToPreviousTool() noexcept
   {
-    if(m_previousTool) {
-      m_currentTool = m_previousTool;
-      m_currentTool->m_button->click();
-      m_previousTool = nullptr;
+    if(m_previousToolIndex != -1) {
+      m_currentToolIndex = m_previousToolIndex;
+      m_previousToolIndex = -1;
 
       selection_helpers::tryFinalizeTextSelection(true);
       tool_helpers::updateViewToolCursor();
 
-      updateStatusDescription();
-
-      getGUIEnvironment().getLeftToolbox().getOptionFrame().setOptions(m_currentTool->getOptions());
+      this->notifyObservers();
       getImageEnvironment().getSelection().setMode(SelectionWidget::ESelectionMode::NORMAL);
 
-      tool_helpers::onToolChange(*m_currentTool, &PaintToolHandlerBase::onToolChange);
+      tool_helpers::onToolChange(getCurrentTool(), &PaintToolHandlerBase::onToolChange);
       getImageEnvironment().getView().setFocus();
     }
   }
 
   bool PaintToolManager::currentToolSet() const noexcept
   {
-    return m_currentTool != nullptr;
+    return m_currentToolIndex != -1;
   }
 
   bool PaintToolManager::previousToolSet() const noexcept
   {
-    return m_previousTool != nullptr;
+    return m_previousToolIndex != -1;
   }
 
   PaintToolHandlerBase& PaintToolManager::getCurrentTool() noexcept
   {
-    PIXPAINT_ASSERT(m_currentTool, "Current tool was not initialized");
-    return *m_currentTool;
+    PIXPAINT_ASSERT(m_currentToolIndex >= 0, "Current tool was not initialized");
+    return (getPaintToolRegistrar().begin() + m_currentToolIndex)->getTool();
   }
 
   const PaintToolHandlerBase& PaintToolManager::getCurrentTool() const noexcept
   {
-    PIXPAINT_ASSERT(m_currentTool, "Current tool was not initialized");
-    return *m_currentTool;
+    PIXPAINT_ASSERT(m_currentToolIndex >= 0, "Current tool was not initialized");
+    return (getPaintToolRegistrar().begin() + m_currentToolIndex)->getTool();
   }
 
-  void PaintToolManager::setCurrentTool(PaintToolHandlerBase& currentTool) noexcept
+  std::make_signed_t<size_t> PaintToolManager::getCurrentToolIndex() const noexcept
   {
-    if(m_currentTool) {
-      m_previousTool = m_currentTool;
-    }
-    m_currentTool = &currentTool;
-    m_currentTool->m_button->click();
-
-    selection_helpers::tryFinalizeTextSelection(true);
-    tool_helpers::updateViewToolCursor();
-
-    updateStatusDescription();
-
-    getGUIEnvironment().getLeftToolbox().getOptionFrame().setOptions(m_currentTool->getOptions());
-    getImageEnvironment().getSelection().setMode(SelectionWidget::ESelectionMode::NORMAL);
-
-    tool_helpers::onToolChange(*m_currentTool, &PaintToolHandlerBase::onToolChange);
-    getImageEnvironment().getView().setFocus();
-  }
-
-  void PaintToolManager::updateStatusDescription()
-  {
-    getGUIEnvironment().getStatusBar().setToolDescription(m_currentTool->getDescription());
+    return m_currentToolIndex;
   }
 
   PIXPAINT_SINGLETON_FUNC_DEF(PaintToolManager)

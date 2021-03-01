@@ -30,8 +30,8 @@ namespace pixpaint
     Q_OBJECT
 
   public:
-    static constexpr auto FRAME_PREVIEW_WIDTH = 80;
-    static constexpr auto FRAME_PREVIEW_HEIGHT = 80;
+    static constexpr auto FRAME_PREVIEW_WIDTH = 45;
+    static constexpr auto FRAME_PREVIEW_HEIGHT = 45;
 
     FrameToolboxItem(QWidget* parent, std::size_t frameIndex);
 

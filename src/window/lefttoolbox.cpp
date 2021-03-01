@@ -32,6 +32,7 @@
 #include "../manager/imagemanager.h"
 #include "../manager/painttoolmanager.h"
 #include "../manager/previewmanager.h"
+#include "../debug_log.h"
 #include "../gui_define.h"
 #include "imageeditorview.h"
 #include "statusbar.h"
@@ -39,20 +40,6 @@
 
 namespace pixpaint
 {
-  class PaintToolPushButton : public QPushButton, public PaintToolButton
-  {
-  public:
-    explicit PaintToolPushButton(QWidget* parent) :
-      QPushButton(parent)
-    {
-    }
-
-    void click() override
-    {
-      QPushButton::setChecked(true);
-    }
-  };
-
   LeftToolbox::LeftToolbox(QWidget* parent) :
     QWidget(parent)
   {
@@ -63,16 +50,18 @@ namespace pixpaint
     layout->addWidget(toolbox, 1);
     layout->addWidget(m_optionFrame, 9);
     this->setLayout(layout);
+
+    getPaintToolManager().registerObserver(*this);
   }
 
   void LeftToolbox::switchToDefaultTool()
   {
-    m_defaultTool->click();
+    getPaintToolManager().setCurrentTool(m_defaultToolIndex);
   }
 
   void LeftToolbox::switchToDefaultSelectionTool()
   {
-    m_defaultSelectionTool->click();
+    getPaintToolManager().setCurrentTool(m_defaultSelectionToolIndex);
   }
 
   PaintToolOptionFrame& LeftToolbox::getOptionFrame()
@@ -94,6 +83,16 @@ namespace pixpaint
     }
   }
 
+  void LeftToolbox::updateObserver(int)
+  {
+    const auto tool_index = getPaintToolManager().getCurrentToolIndex();
+
+    auto* tool_btn = static_cast<QPushButton*>(m_toolLayout->itemAt(tool_index)->widget());
+    tool_btn->setChecked(true);
+
+    m_optionFrame->setOptions(getPaintToolManager().getCurrentTool().getOptions());
+  }
+
   QWidget* LeftToolbox::createToolbox()
   {
     auto& paintToolManager = getPaintToolManager();
@@ -102,26 +101,27 @@ namespace pixpaint
     auto* widget = new QWidget(this);
     auto* buttonGroup = new QButtonGroup(widget);
 
-    auto* layout = new FlowLayout(widget);
-    layout->setSpacing(1);
-    layout->setAlignment(Qt::AlignTop);
+    m_toolLayout = new FlowLayout(widget);
+    m_toolLayout->setSpacing(1);
+    m_toolLayout->setAlignment(Qt::AlignTop);
 
-    for(auto& paintToolInformation : paintToolRegistrar) {
-      auto* toolBtn = new PaintToolPushButton(widget);
+    for(auto it = paintToolRegistrar.begin(),  it_end = paintToolRegistrar.end(); it != it_end; ++it) {
+      auto& paintToolInformation = *it;
+      auto* toolBtn = new QPushButton(widget);
       toolBtn->setToolTip((paintToolInformation.getName() +
                            std::string(" (") +
                            paintToolInformation.getShortcut() +
                            std::string(")")).c_str());
-      paintToolInformation.getTool().m_button = toolBtn;
+
       QObject::connect(toolBtn, &QPushButton::clicked,
-      [&paintToolManager, &paintToolInformation]() {
+      [it, &paintToolManager, &paintToolInformation, &paintToolRegistrar]() {
         auto& paintTool = paintToolInformation.getTool();
         if(paintToolManager.currentToolSet()) {
           if(&paintToolManager.getCurrentTool() != &paintTool) {
-            paintToolManager.setCurrentTool(paintTool);
+            paintToolManager.setCurrentTool(it - paintToolRegistrar.begin());
           }
         } else {
-          paintToolManager.setCurrentTool(paintTool);
+          paintToolManager.setCurrentTool(it - paintToolRegistrar.begin());
         }
       });
       toolBtn->setMaximumSize(PAINTTOOLBOX_BUTTON_WIDTH, PAINTTOOLBOX_BUTTON_HEIGHT);
@@ -130,15 +130,15 @@ namespace pixpaint
       toolBtn->setCheckable(true);
 
       buttonGroup->addButton(toolBtn);
-      layout->addWidget(toolBtn);
+      m_toolLayout->addWidget(toolBtn);
 
-      if(layout->count() == 1) {
-        m_defaultSelectionTool = toolBtn;
-      } else if(layout->count() == 2) {
-        m_defaultTool = toolBtn;
+      if(m_toolLayout->count() == 1) {
+        m_defaultSelectionToolIndex = it - paintToolRegistrar.begin();
+      } else if(m_toolLayout->count() == 2) {
+        m_defaultToolIndex = it - paintToolRegistrar.begin();
       }
     }
-    widget->setLayout(layout);
+    widget->setLayout(m_toolLayout);
     widget->move(5, 5);
 
     return widget ;

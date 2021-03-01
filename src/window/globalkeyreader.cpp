@@ -99,12 +99,13 @@ namespace
             return true;
           }
         } else {
-          for(auto& paint_tool_information : getPaintToolRegistrar()) {
+          const auto& paint_tool_registrar = getPaintToolRegistrar();
+          for(auto it = paint_tool_registrar.begin(), it_end = paint_tool_registrar.end(); it != it_end; ++it) {
+            const auto& paint_tool_information = *it;
             if(!paint_tool_information.getShortcut().empty()) {
               auto tool_key_sequence = QKeySequence(paint_tool_information.getShortcut().c_str());
               if(keySequence == tool_key_sequence) {
-                auto& paint_tool = paint_tool_information.getTool();
-                getPaintToolManager().setCurrentTool(paint_tool);
+                getPaintToolManager().setCurrentTool(it - paint_tool_registrar.begin());
                 break;
               }
             }

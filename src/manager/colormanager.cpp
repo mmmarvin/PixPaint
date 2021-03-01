@@ -33,13 +33,13 @@ namespace pixpaint
   void ColorManager::setForegroundColor(const Color& color) noexcept
   {
     m_foregroundColor = color;
-    this->notifyObservers();
+    this->notifyObservers(0);
   }
 
   void ColorManager::setBackgroundColor(const Color& color) noexcept
   {
     m_backgroundColor = color;
-    this->notifyObservers();
+    this->notifyObservers(0);
   }
 
   const Color& ColorManager::getForegroundColor() const noexcept
@@ -50,6 +50,16 @@ namespace pixpaint
   const Color& ColorManager::getBackgroundColor() const noexcept
   {
     return m_backgroundColor;
+  }
+
+  ColorList& ColorManager::getColorList() noexcept
+  {
+    return m_colorList;
+  }
+
+  const ColorList& ColorManager::getColorList() const noexcept
+  {
+    return m_colorList;
   }
 
   PIXPAINT_SINGLETON_FUNC_DEFP(ColorManager, Color::BLACK, Color::WHITE)

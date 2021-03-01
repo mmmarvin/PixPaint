@@ -53,7 +53,7 @@ namespace gui_events
                       EventListener<gui_events::HistoryRecreateLayerEvent>,
                       EventListener<gui_events::HistoryRefreshLayerEvent>
   {
-    static constexpr auto ITEM_HEIGHT = 100;
+    static constexpr auto ITEM_HEIGHT = 75;
 
   public:
     explicit LayerWidget(QWidget* parent);

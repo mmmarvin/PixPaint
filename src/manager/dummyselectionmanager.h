@@ -21,7 +21,7 @@
 #define DUMMYSELECTIONMANAGER_H
 
 #include "../image/rect.h"
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 
 namespace pixpaint
 {
