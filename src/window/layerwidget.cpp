@@ -25,6 +25,7 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QToolTip>
 #include "../env/imageenvironment.h"
 #include "../event/gui/frame_events.h"
 #include "../event/gui/history_events.h"
@@ -82,8 +83,23 @@ namespace pixpaint
     m_removeButton->setEnabled(false);
     QObject::connect(m_removeButton, &QPushButton::clicked, this, &LayerWidget::removeLayer);
 
-    btnLayout->addWidget(m_addButton);
-    btnLayout->addWidget(m_removeButton);
+    m_opacitySlider = new QSlider(Qt::Orientation::Horizontal, this);
+    m_opacitySlider->setTickPosition(QSlider::TicksRight);
+    m_opacitySlider->setMinimum(0);
+    m_opacitySlider->setMaximum(100);
+    m_opacitySlider->setTickInterval(1);
+    m_opacitySlider->setToolTip("Opacity");
+    connect(m_opacitySlider, &QSlider::sliderMoved, [](int value) {
+      getImageManager().getImage().getCurrentLayer().setOpacity(value);
+      getImageEnvironment().getView().repaint();
+      getPreviewManager().refreshAll();
+
+      QToolTip::showText(QCursor::pos(), (std::to_string(value) + std::string("%")).c_str(), nullptr);
+    });
+
+    btnLayout->addWidget(m_addButton, 1);
+    btnLayout->addWidget(m_removeButton, 1);
+    btnLayout->addWidget(m_opacitySlider, 10);
 
     outerLayer->addWidget(m_scrollArea, 9);
     outerLayer->addLayout(btnLayout, 1);
@@ -184,6 +200,8 @@ namespace pixpaint
   {
     clearItems();
     createItems();
+    m_opacitySlider->setValue(getImageManager().getImage().getCurrentLayer().getOpacity());
+
     if(getImageManager().getImage().getLayerCount() > 1) {
       m_removeButton->setEnabled(true);
     } else {
@@ -444,5 +462,6 @@ namespace pixpaint
 
     getImageManager().getImage().setCurrentLayerIndex(layerIndex);
     getDrawerManager().updateDrawers();
+    m_opacitySlider->setValue(getImageManager().getImage().getCurrentLayer().getOpacity());
   }
 }

@@ -25,6 +25,7 @@
 namespace pixpaint
 {
   class Image;
+  class PixelData;
 
   class BaseImageView : public QWidget
   {
@@ -46,6 +47,8 @@ namespace pixpaint
     void paintEvent(QPaintEvent*) override;
     virtual void paintImage(QPainter& painter);
     void paintBackground(QPainter& painter);
+    void paintLayer(QPainter& painter, const PixelData& layer);
+    void paintLayer(QPainter& painter, int x, int y, const PixelData& layer);
 
   private:
     Image* m_image;

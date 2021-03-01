@@ -52,8 +52,7 @@ namespace pixpaint
     if(selection_manager.selectionExists() && selection_manager.layerExists()) {
       for(std::size_t i = 0, isize = image.getLayerCount(); i < isize; ++i) {
         if(image.isVisible(i)) {
-          auto qimage = qt_utils::createQImage(image.getLayer(i));
-          painter.drawImage(0, 0, qimage);
+          paintLayer(painter, image.getLayer(i));
           if(m_frameIndex == document_manager.getDocument().getAnimation().getCurrentFrameIndex() &&
              i == current_layer_index) {
             this->paintSelection(painter);
@@ -63,8 +62,7 @@ namespace pixpaint
     } else {
       for(std::size_t i = 0, isize = image.getLayerCount(); i < isize; ++i) {
         if(image.isVisible(i)) {
-          auto qimage = qt_utils::createQImage(image.getLayer(i));
-          painter.drawImage(0, 0, qimage);
+          paintLayer(painter, image.getLayer(i));
         }
       }
     }

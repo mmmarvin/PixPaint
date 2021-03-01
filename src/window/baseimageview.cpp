@@ -85,8 +85,7 @@ namespace pixpaint
   {
     for(std::size_t i = 0, isize = m_image->getLayerCount(); i < isize; ++i) {
       if(m_image->isVisible(i)) {
-        auto qimage = qt_utils::createQImage(m_image->getLayer(i));
-        painter.drawImage(0, 0, qimage);
+        paintLayer(painter, m_image->getLayer(i));
       }
     }
   }
@@ -99,5 +98,20 @@ namespace pixpaint
                                         m_image->getWidth(),
                                         m_image->getHeight(),
                                         10);
+  }
+
+  void BaseImageView::paintLayer(QPainter& painter, const PixelData& layer)
+  {
+    paintLayer(painter, 0, 0, layer);
+  }
+
+  void BaseImageView::paintLayer(QPainter& painter, int x, int y, const PixelData& layer)
+  {
+    painter.setOpacity(static_cast<float>(layer.getOpacity()) / 100.f);
+
+    auto qimage = qt_utils::createQImage(layer);
+    painter.drawImage(x, y, qimage);
+
+    painter.setOpacity(1.f);
   }
 }

@@ -71,7 +71,7 @@ namespace pixpaint
         auto& image_env = getImageEnvironment();
         auto& image_manager = getImageManager();
         auto& document_manager = getDocumentManager();
-        auto& previewManager = getPreviewManager();
+        auto& preview_manager = getPreviewManager();
         auto* view = m_imageViews[index];
         auto* scroll_area = m_scrollAreas[index];
 
@@ -92,7 +92,7 @@ namespace pixpaint
         m_currentIndex = index;
 
         image_manager.refresh();
-        previewManager.refreshAll();
+        preview_manager.refreshAll();
       }
     });
     QObject::connect(this->tabBar(), &QTabBar::tabCloseRequested, this, &DocumentPanel::closePage);

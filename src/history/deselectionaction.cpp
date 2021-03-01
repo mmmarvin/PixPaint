@@ -34,7 +34,8 @@ namespace pixpaint
   DeselectionAction::DeselectionAction(const IntRect& rect,
                                        const MaskablePixelData& region,
                                        const PixelData& mask,
-                                       const MaskablePixelData& background)
+                                       const MaskablePixelData& background) :
+    SelectionAction("Deselect")
   {
     m_rect = rect;
     m_region = std::make_unique<MaskablePixelData>(region);

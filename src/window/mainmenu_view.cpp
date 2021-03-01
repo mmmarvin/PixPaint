@@ -59,11 +59,11 @@ namespace pixpaint
         viewMenu->zoomOutAction->setEnabled(false);
       }
 
-      auto& guiEnv = getGUIEnvironment();
-      viewMenu->leftToolbar->setChecked(guiEnv.getLeftToolboxDock().isVisible());
-      viewMenu->rightToolbar->setChecked(guiEnv.getRightToolboxDock().isVisible());
-      viewMenu->frameToolbar->setChecked(guiEnv.getFrameToolboxDock().isVisible());
-      viewMenu->consoleToolbar->setChecked(guiEnv.getConsoleToolboxDock().isVisible());
+      auto& gui_env = getGUIEnvironment();
+      viewMenu->leftToolbar->setChecked(gui_env.getLeftToolboxDock().isVisible());
+      viewMenu->rightToolbar->setChecked(gui_env.getRightToolboxDock().isVisible());
+      viewMenu->frameToolbar->setChecked(gui_env.getFrameToolboxDock().isVisible());
+      viewMenu->consoleToolbar->setChecked(gui_env.getConsoleToolboxDock().isVisible());
     });
 
     QObject::connect(viewMenu->menu, &QMenu::aboutToHide, [viewMenu]{

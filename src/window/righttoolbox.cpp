@@ -37,16 +37,16 @@ namespace pixpaint
   RightToolbox::RightToolbox(QWidget* parent) :
     QWidget(parent)
   {
-    auto& previewManager = getPreviewManager();
-    auto& imageManager = getImageManager();
+    auto& preview_manager = getPreviewManager();
+    auto& image_manager = getImageManager();
 
     auto* previewGroup = new QGroupBox(this);
     previewGroup->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     previewGroup->setTitle(tr("Preview"));
     previewGroup->setMinimumHeight(200);
     previewGroup->setFlat(true);
-    m_preview = new PreviewWidget(previewGroup, imageManager.getImage());
-    previewManager.registerPreview(*m_preview->getPreviewView());
+    m_preview = new PreviewWidget(previewGroup, image_manager.getImage());
+    preview_manager.registerPreview(*m_preview->getPreviewView());
 
     auto* previewLayout = new QHBoxLayout(previewGroup);
     previewLayout->addWidget(m_preview);

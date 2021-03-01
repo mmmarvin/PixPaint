@@ -69,7 +69,7 @@ namespace selection_helpers
                                                          selection_rect.y,
                                                          selection_rect.width,
                                                          selection_rect.height);
-          if(selection_manager.layerMaskExists()) {
+          if(!selection_manager.layerMaskExists()) {
             emitHistoryAction(DeselectionAction(selection_rect, selection_layer, background));
           } else {
             emitHistoryAction(DeselectionAction(selection_rect,

@@ -354,11 +354,11 @@ namespace
     if(event->key() == Qt::Key_Escape) {
       selection_helpers::tryFinalizeAllSelections(true);
     } else {
-      auto& imageEnv = getImageEnvironment();
-      auto& imageManager = getImageManager();
-      if(imageEnv.isViewSet()) {
+      auto& image_env = getImageEnvironment();
+      auto& image_manager = getImageManager();
+      if(image_env.isViewSet()) {
         auto& currentPaintTool = getPaintToolManager().getCurrentTool();
-        auto& view = imageEnv.getView();
+        auto& view = image_env.getView();
 
         if(getTextSelectionManager().selectionExists()) {
           getTextManager().onKeyPress(static_cast<EKey>(event->key()),
@@ -373,7 +373,7 @@ namespace
                                                  getColorManager().getForegroundColor(),
                                                  ControlState { shift_down, ctrl_down },
                                                  view.getPreviewLayer(),
-                                                 imageManager.getImage().getCurrentLayer());
+                                                 image_manager.getImage().getCurrentLayer());
 
           if(res & PaintToolBase::EChangeResult::ECCR_UPDATEIMAGE) {
             auto pixelSize = view.getPixelSize();
@@ -391,11 +391,11 @@ namespace
   void MainWindow::keyReleaseEvent(QKeyEvent* event)
   {
     if(event->key() != Qt::Key_Escape) {
-      auto& imageEnv = getImageEnvironment();
-      auto& imageManager = getImageManager();
-      if(imageEnv.isViewSet()) {
+      auto& image_env = getImageEnvironment();
+      auto& image_manager = getImageManager();
+      if(image_env.isViewSet()) {
         auto& currentPaintTool = getPaintToolManager().getCurrentTool();
-        auto& view = imageEnv.getView();
+        auto& view = image_env.getView();
 
         const bool shift_down = (event->modifiers() & Qt::ShiftModifier) != 0;
         const bool ctrl_down = (event->modifiers() & Qt::ControlModifier) != 0;
@@ -403,7 +403,7 @@ namespace
                                                  getColorManager().getForegroundColor(),
                                                  ControlState { shift_down, ctrl_down },
                                                  view.getPreviewLayer(),
-                                                 imageManager.getImage().getCurrentLayer());
+                                                 image_manager.getImage().getCurrentLayer());
 
         if(res & PaintToolBase::EChangeResult::ECCR_UPDATEIMAGE) {
           auto pixelSize = view.getPixelSize();
@@ -430,11 +430,11 @@ namespace
   {
     if(e->type() == QEvent::ShortcutOverride) {
       QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e);
-      auto& selectionManager = getSelectionManager();
-      auto& textSelectionManager = getTextSelectionManager();
-      auto& imageEnv = getImageEnvironment();
+      auto& selection_manager = getSelectionManager();
+      auto& text_selection_manager = getTextSelectionManager();
+      auto& image_env = getImageEnvironment();
 
-      if(selectionManager.selectionExists()) {
+      if(selection_manager.selectionExists()) {
         // if selection maanger is set, we ignore arrow keys to allow
         // it to be moved
         auto key = keyEvent->key();
@@ -449,7 +449,7 @@ namespace
         default:
           break;
         }
-      } else if(textSelectionManager.selectionExists() && imageEnv.isViewSet()) {
+      } else if(text_selection_manager.selectionExists() && image_env.isViewSet()) {
         // if the text selection manager is set, we ignore all shortcut keys
         auto key = keyEvent->key();
         auto c = static_cast<char>(key);

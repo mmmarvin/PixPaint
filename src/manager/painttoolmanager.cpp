@@ -55,7 +55,7 @@ namespace pixpaint
     tool_helpers::updateViewToolCursor();
 
     this->notifyObservers();
-    getImageEnvironment().getSelection().setMode(SelectionWidget::ESelectionMode::NORMAL);
+//    getImageEnvironment().getSelection().setMode(SelectionWidget::ESelectionMode::NORMAL);
 
     tool_helpers::onToolChange(getCurrentTool(), &PaintToolHandlerBase::onToolChange);
     getImageEnvironment().getView().setFocus();
@@ -71,7 +71,7 @@ namespace pixpaint
       tool_helpers::updateViewToolCursor();
 
       this->notifyObservers();
-      getImageEnvironment().getSelection().setMode(SelectionWidget::ESelectionMode::NORMAL);
+//      getImageEnvironment().getSelection().setMode(SelectionWidget::ESelectionMode::NORMAL);
 
       tool_helpers::onToolChange(getCurrentTool(), &PaintToolHandlerBase::onToolChange);
       getImageEnvironment().getView().setFocus();

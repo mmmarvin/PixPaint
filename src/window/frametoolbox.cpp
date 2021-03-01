@@ -94,7 +94,7 @@ namespace pixpaint
 
     m_backBeginButton = new QPushButton(outer_surface);
     m_backBeginButton->setIcon(QIcon("res/back_btn_icon.png"));
-    m_backBeginButton->setToolTip(tr("Previous Frame"));
+    m_backBeginButton->setToolTip(tr("Beginning Frame"));
     m_backBeginButton->setFixedSize(TOOLBOX_BUTTON_WIDTH, TOOLBOX_BUTTON_HEIGHT);
     connect(m_backBeginButton, &QPushButton::clicked, [this] {
       static_cast<FrameToolboxItem*>(m_itemHolderLayout->itemAt(0)->widget())->click();

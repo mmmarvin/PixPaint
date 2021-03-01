@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QSlider>
 #include <QWidget>
 
 #include "../manager/eventmanager.h"
@@ -98,6 +99,7 @@ namespace gui_events
     QScrollArea*                  m_scrollArea;
     QPushButton*                  m_addButton;
     QPushButton*                  m_removeButton;
+    QSlider*                      m_opacitySlider;
 
     LayerWidgetItem*              m_selectedLayerItem;
     std::size_t                   m_selectedLayerIndex;

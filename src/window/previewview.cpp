@@ -72,10 +72,10 @@ namespace pixpaint
     auto& selection_manager = getSelectionManager();
     auto selection_rect = selection_manager.getSelectionRect();
 
-    auto qimage = qt_utils::createQImage(selection_manager.getSelectionLayer());
-    painter.drawImage(selection_rect.x,
-                      selection_rect.y,
-                      qimage);
+    paintLayer(painter,
+               selection_rect.x,
+               selection_rect.y,
+               selection_manager.getSelectionLayer());
   }
 
   void PreviewView::paintImage(QPainter &painter)
@@ -90,8 +90,7 @@ namespace pixpaint
       auto current_layer_index = image.getCurrentLayerIndex();
       for(std::size_t i = 0, isize = image.getLayerCount(); i < isize; ++i) {
         if(image.isVisible(i)) {
-          auto qimage = qt_utils::createQImage(image.getLayer(i));
-          painter.drawImage(0, 0, qimage);
+          paintLayer(painter, image.getLayer(i));
           if(current_layer_index == i) {
             this->paintSelection(painter);
           }
@@ -100,8 +99,7 @@ namespace pixpaint
     } else {
       for(std::size_t i = 0, isize = image.getLayerCount(); i < isize; ++i) {
         if(image.isVisible(i)) {
-          auto qimage = qt_utils::createQImage(image.getLayer(i));
-          painter.drawImage(0, 0, qimage);
+          paintLayer(painter, image.getLayer(i));
         }
       }
     }

@@ -86,16 +86,16 @@ namespace pixpaint
   void ZoomableScrollArea::keyPressEvent(QKeyEvent* event)
   {
     auto key = event->key();
-    auto& selectionManager = getSelectionManager();
+    auto& selection_manager = getSelectionManager();
 
     if(getTextSelectionManager().selectionExists()) {
       event->ignore();
-    } else if(selectionManager.selectionExists()) {
+    } else if(selection_manager.selectionExists()) {
       switch(key) {
       case Qt::Key_Left:
       {
-        auto selectionRect = selectionManager.getSelectionRect();
-        selectionManager.moveSelectionRect(selectionRect.x - 1,
+        auto selectionRect = selection_manager.getSelectionRect();
+        selection_manager.moveSelectionRect(selectionRect.x - 1,
                                            selectionRect.y,
                                            true);
         m_selectionWidget->updateSelection();
@@ -104,8 +104,8 @@ namespace pixpaint
         break;
       case Qt::Key_Right:
       {
-        auto selectionRect = selectionManager.getSelectionRect();
-        selectionManager.moveSelectionRect(selectionRect.x + 1,
+        auto selectionRect = selection_manager.getSelectionRect();
+        selection_manager.moveSelectionRect(selectionRect.x + 1,
                                            selectionRect.y,
                                            true);
         m_selectionWidget->updateSelection();
@@ -114,8 +114,8 @@ namespace pixpaint
         break;
       case Qt::Key_Up:
       {
-        auto selectionRect = selectionManager.getSelectionRect();
-        selectionManager.moveSelectionRect(selectionRect.x,
+        auto selectionRect = selection_manager.getSelectionRect();
+        selection_manager.moveSelectionRect(selectionRect.x,
                                            selectionRect.y - 1,
                                            true);
         m_selectionWidget->updateSelection();
@@ -124,8 +124,8 @@ namespace pixpaint
         break;
       case Qt::Key_Down:
       {
-        auto selectionRect = selectionManager.getSelectionRect();
-        selectionManager.moveSelectionRect(selectionRect.x,
+        auto selectionRect = selection_manager.getSelectionRect();
+        selection_manager.moveSelectionRect(selectionRect.x,
                                            selectionRect.y + 1,
                                            true);
         m_selectionWidget->updateSelection();

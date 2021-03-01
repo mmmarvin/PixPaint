@@ -48,9 +48,9 @@ namespace
 {
   void on_color_click()
   {
-    auto& imageEnv = getImageEnvironment();
-    if(imageEnv.isViewSet()) {
-      auto& view = imageEnv.getView();
+    auto& image_env = getImageEnvironment();
+    if(image_env.isViewSet()) {
+      auto& view = image_env.getView();
       auto& currentPaintTool = getPaintToolManager().getCurrentTool();
 
       if(getTextManager().tryUpdateText()) {
@@ -168,7 +168,11 @@ namespace
 
     auto* btn_layout = new QVBoxLayout(this);
     auto* save_btn = new QPushButton("Save", this);
+    save_btn->setFixedHeight(25);
+    save_btn->setToolTip(tr("Save color list..."));
     auto* load_btn = new QPushButton("Load", this);
+    load_btn->setFixedHeight(25);
+    load_btn->setToolTip(tr("Load color list..."));
 
     this->connect(save_btn, &QPushButton::clicked, [this]() {
       auto filename = QFileDialog::getSaveFileName(this,
