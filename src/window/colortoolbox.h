@@ -23,11 +23,14 @@
 #include <QGridLayout>
 #include <QWidget>
 #include "../image/color.h"
+#include "../pattern/observer.h"
 
 namespace pixpaint
 {
   class ColorButton;
-  class ColorToolbox : public QWidget
+
+  class ColorToolbox : public QWidget,
+                       public patterns::Observer
   {
     class ColorSelectionWidget : public QWidget
     {
@@ -51,6 +54,9 @@ namespace pixpaint
 
     void setSelectedForegroundColor(const Color& color);
     void setSelectedBackgroundColor(const Color& color);
+
+  private:
+    void updateObserver() override;
 
   private:
     QWidget* createColorSelectionWidget();

@@ -21,11 +21,12 @@
 #define COLORMANAGER_H
 
 #include "../image/color.h"
+#include "../pattern/observer.h"
 #include "../pixpaint_macro.h"
 
 namespace pixpaint
 {
-  class ColorManager
+  class ColorManager : public patterns::Subject
   {
     ColorManager(const Color& foregroundColor, const Color& background);
 

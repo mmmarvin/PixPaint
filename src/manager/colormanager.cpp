@@ -33,13 +33,13 @@ namespace pixpaint
   void ColorManager::setForegroundColor(const Color& color) noexcept
   {
     m_foregroundColor = color;
-    getGUIEnvironment().getColorToolbox().setSelectedForegroundColor(color);
+    this->notifyObservers();
   }
 
   void ColorManager::setBackgroundColor(const Color& color) noexcept
   {
     m_backgroundColor = color;
-    getGUIEnvironment().getColorToolbox().setSelectedBackgroundColor(color);
+    this->notifyObservers();
   }
 
   const Color& ColorManager::getForegroundColor() const noexcept

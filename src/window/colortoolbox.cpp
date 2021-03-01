@@ -210,6 +210,8 @@ namespace
     layout->addLayout(btn_layout);
 
     this->setLayout(layout);
+
+    getColorManager().registerObserver(*this);
   }
 
   void ColorToolbox::setSelectedForegroundColor(const Color& color)
@@ -220,6 +222,12 @@ namespace
   void ColorToolbox::setSelectedBackgroundColor(const Color& color)
   {
     m_colorSelectionWidget->setSelectedBackgroundColor(color);
+  }
+
+  void ColorToolbox::updateObserver()
+  {
+    m_colorSelectionWidget->setSelectedForegroundColor(getColorManager().getForegroundColor());
+    m_colorSelectionWidget->setSelectedBackgroundColor(getColorManager().getBackgroundColor());
   }
 
   QWidget* ColorToolbox::createColorSelectionWidget()
