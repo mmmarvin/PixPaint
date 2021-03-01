@@ -33,8 +33,8 @@ namespace pixpaint
   {
     Q_OBJECT
 
-    static constexpr auto LAYER_PREVIEW_WIDTH = 75;
-    static constexpr auto LAYER_PREVIEW_HEIGHT = 75;
+    static constexpr auto LAYER_PREVIEW_WIDTH = 45;
+    static constexpr auto LAYER_PREVIEW_HEIGHT = 45;
 
   public:
     LayerWidgetItem(QWidget* parent, std::size_t layerIndex);

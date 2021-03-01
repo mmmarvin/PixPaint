@@ -22,7 +22,7 @@
 
 #include <vector>
 #include "../3rdparty/ska/unordered_map.hpp"
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 
 namespace pixpaint
 {

@@ -24,7 +24,7 @@
 #include <boost/bind/bind.hpp>
 #include <boost/python.hpp>
 #include "../filetype/imagefiletypebase.h"
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 #include "information/fileinformation.h"
 #include "registrarbase.h"
 

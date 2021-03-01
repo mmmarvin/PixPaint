@@ -40,9 +40,12 @@ namespace pixpaint
   public:
     Q_SIGNAL void doubleClicked();
     Q_SLOT void doubleClick();
+    Q_SIGNAL void middleClicked();
+    Q_SLOT void middleClick();
 
   protected:
     void paintEvent(QPaintEvent*) override;
+    void mousePressEvent(QMouseEvent* event) override;
     void mouseDoubleClickEvent(QMouseEvent* event) override;
 
   private:

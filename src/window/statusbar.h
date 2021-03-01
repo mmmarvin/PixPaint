@@ -24,10 +24,11 @@
 
 namespace pixpaint
 {
+  class ObserverLabel;
+
   class StatusBar
   {
   public:
-    void setToolDescription(const std::string& description);
     void setMousePositionText(int x, int y);
     void setDrawSize(int x, int y);
     void setZoomLevelText(int level);
@@ -35,10 +36,10 @@ namespace pixpaint
   private:
     friend class MainWindow;
 
-    QLabel* toolDescription;
-    QLabel* mousePosition;
-    QLabel* drawSize;
-    QLabel* imageZoomLevel;
+    ObserverLabel*  m_toolDescription;
+    QLabel*                     mousePosition;
+    QLabel*                     drawSize;
+    QLabel*                     imageZoomLevel;
   };
 }
 

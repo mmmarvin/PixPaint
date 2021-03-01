@@ -23,7 +23,7 @@
 #include <cinttypes>
 #include "../3rdparty/ska/unordered_map.hpp"
 #include "../idgenerator.h"
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 
 namespace pixpaint
 {

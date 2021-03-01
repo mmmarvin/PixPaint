@@ -37,7 +37,7 @@ namespace pixpaint
     image.moveLayer(m_to, m_from);
     image.setCurrentLayerIndex(m_from);
 
-    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_REFRESH_LAYER_LIST);
+    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_RECREATE_LAYER_LIST);
   }
 
   MoveLayerAction::EActionResult MoveLayerAction::redo()
@@ -46,6 +46,6 @@ namespace pixpaint
     image.moveLayer(m_from, m_to);
     image.setCurrentLayerIndex(m_to);
 
-    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_REFRESH_LAYER_LIST);
+    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_RECREATE_LAYER_LIST);
   }
 }

@@ -48,8 +48,7 @@ namespace pixpaint
 
   void LayerPreviewView::paintImage(QPainter& painter)
   {
-    auto qimage = qt_utils::createQImage(this->getImage().getLayer(m_layerIndex));
-    painter.drawImage(0, 0, qimage);
+    paintLayer(painter, this->getImage().getLayer(m_layerIndex));
 
     auto& image_env = getImageEnvironment();
     auto& selection_manager = getSelectionManager();

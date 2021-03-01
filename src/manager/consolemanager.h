@@ -21,7 +21,7 @@
 #define CONSOLEMANAGER_H
 
 #include <string>
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 
 namespace pixpaint
 {

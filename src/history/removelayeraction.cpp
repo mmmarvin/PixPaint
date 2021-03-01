@@ -43,7 +43,7 @@ namespace pixpaint
     image.setCurrentLayerIndex(m_index);
     m_layer.reset(nullptr);
 
-    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_REFRESH_LAYER_LIST);
+    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_RECREATE_LAYER_LIST);
   }
 
   RemoveLayerAction::EActionResult RemoveLayerAction::redo()
@@ -59,6 +59,6 @@ namespace pixpaint
       image.setCurrentLayerIndex(0);
     }
 
-    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_REFRESH_LAYER_LIST);
+    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_RECREATE_LAYER_LIST);
   }
 }

@@ -21,7 +21,8 @@
 
 #include <algorithm>
 #include <cstring>
-#include <leptonica/allheaders.h>
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include "../3rdparty/stbi/stb_image_resize.h"
 #include "../utility/general_utility.h"
 #include "../utility/math_utility.h"
 #include "../utility/qt_utility.h"
@@ -104,26 +105,6 @@ namespace pixeldata_detail
 }
 namespace
 {
-  PIX get_pix(PixelData& layer)
-  {
-    PIX p;
-    p.w = layer.getWidth();
-    p.h = layer.getHeight();
-    p.d = 32;
-    p.spp = 4;
-    p.wpl = layer.getWidth();
-    p.refcount = 1;
-    p.xres = 0;
-    p.yres = 0;
-    p.informat = 3;
-    p.special = 0;
-    p.text = nullptr;
-    p.colormap = nullptr;
-    p.data = reinterpret_cast<std::uint32_t*>(layer.getData());
-
-    return p;
-  }
-
   PixelData fast_scale(const PixelData& layer, dimension_t width, dimension_t height)
   {
     PixelData ret(width, height);
@@ -162,10 +143,12 @@ namespace
     PixelData ret(width, height);
 
     if(width && height) {
-      auto p = get_pix(layer);
-      auto* np = pixScale(&p, float(width) / layer.getWidth(), float(height) / layer.getHeight());
-      std::memcpy(ret.getData(), np->data, width * height * 4);
-      pixDestroy(&np);
+      auto* src = layer.getData();
+      auto* dst = ret.getData();
+
+      stbir_resize_uint8(src, layer.getWidth(), layer.getHeight(), layer.getWidth() * 4,
+                         dst, width, height, width * 4,
+                         4);
     }
 
     return ret;
@@ -186,8 +169,8 @@ namespace
 
     auto c = center(layer);
     auto rad = math_utils::toRadian(degree);
-    auto x0 = c.x;
-    auto y0 = c.y;
+    double x0 = c.x;
+    double y0 = c.y;
     auto cos_r = std::cos(rad);
     auto sin_r = std::sin(rad);
 
@@ -197,8 +180,10 @@ namespace
     for(std::size_t j = 0, jsize = layer_height; j < jsize; ++j) {
       auto* src_ptr = src;
       for(std::size_t i = 0, isize = layer_width; i < isize; ++i) {
-        position_t dst_x = (cos_r * (i - x0)) - (sin_r * (j - y0)) + x0;
-        position_t dst_y = (sin_r * (i - x0)) + (cos_r * (j - y0)) + y0;
+        double dx = i - x0;
+        double dy = j - y0;
+        position_t dst_x = std::round((cos_r * dx) - (sin_r * dy) + x0);
+        position_t dst_y = std::round((sin_r * dx) + (cos_r * dy) + y0);
         if(dst_x < 0 || dst_x > layer_width ||
            dst_y < 0 || dst_y > layer_height) {
           src_ptr += 4;
@@ -214,21 +199,10 @@ namespace
 
     return ret;
   }
-
-//  PixelData smoothRotate(PixelData& layer, float degree, ERotationDirection direction)
-//  {
-//    PixelData ret(layer.getWidth(), layer.getHeight());
-
-//    auto p = getPix(layer);
-//    auto* np = pixRotateShear(&p, center(layer).x, center(layer).y, degree, 0);
-//    std::memcpy(ret.getData(), np->data, layer.getWidth() * layer.getHeight() * 4);
-//    pixDestroy(&np);
-
-//    return ret;
-//  }
 }
   PixelData::PixelData(dimension_t width, dimension_t height, const Color& color) :
     m_data(nullptr),
+    m_opacity(100),
     m_width(0),
     m_height(0)
   {
@@ -245,6 +219,7 @@ namespace
 
   PixelData::PixelData(const PixelData& rhs) :
     m_data(nullptr),
+    m_opacity(100),
     m_width(0),
     m_height(0)
   {
@@ -255,6 +230,7 @@ namespace
 
       m_width = rhs.m_width;
       m_height = rhs.m_height;
+      m_opacity = rhs.m_opacity;
       m_data = temp.release();
     }
   }
@@ -264,6 +240,7 @@ namespace
     PixelData temp(rhs);
     std::swap(temp.m_width, m_width);
     std::swap(temp.m_height, m_height);
+    std::swap(temp.m_opacity, m_opacity);
     std::swap(temp.m_data, m_data);
 
     return *this;
@@ -271,11 +248,13 @@ namespace
 
   PixelData::PixelData(PixelData&& rhs) noexcept :
     m_data(nullptr),
+    m_opacity(100),
     m_width(0),
     m_height(0)
   {
     std::swap(rhs.m_width, m_width);
     std::swap(rhs.m_height, m_height);
+    std::swap(rhs.m_opacity, m_opacity);
     std::swap(rhs.m_data, m_data);
   }
 
@@ -283,6 +262,7 @@ namespace
   {
     std::swap(rhs.m_width, m_width);
     std::swap(rhs.m_height, m_height);
+    std::swap(rhs.m_opacity, m_opacity);
     std::swap(rhs.m_data, m_data);
 
     return *this;
@@ -290,8 +270,6 @@ namespace
 
   PixelData::~PixelData()
   {
-    // FIX: Filling with transparent color then any other color,
-    // causes free(): invalid next size (normal)
     if(m_data) {
       delete[] m_data;
     }
@@ -373,6 +351,16 @@ namespace
   dimension_t PixelData::getHeight() const noexcept
   {
     return m_height;
+  }
+
+  void PixelData::setOpacity(std::uint_least32_t opacity)
+  {
+    m_opacity = opacity;
+  }
+
+  std::uint_least32_t PixelData::getOpacity() const noexcept
+  {
+    return m_opacity;
   }
 
   void PixelData::combine(const PixelData& pixelData, bool hard)

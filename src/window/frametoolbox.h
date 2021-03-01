@@ -37,17 +37,17 @@ namespace gui_events
   struct TabRemoveEvent;
   struct TabChangeEvent;
   struct HistoryFrameChangeEvent;
-  struct HistoryRefreshFrameEvent;
+  struct HistoryRecreateFrameEvent;
 }
   class FrameToolbox : public QWidget,
                        EventListener<gui_events::TabAddEvent>,
                        EventListener<gui_events::TabRemoveEvent>,
                        EventListener<gui_events::TabChangeEvent>,
                        EventListener<gui_events::HistoryFrameChangeEvent>,
-                       EventListener<gui_events::HistoryRefreshFrameEvent>
+                       EventListener<gui_events::HistoryRecreateFrameEvent>
   {
-    static constexpr auto ITEM_WIDTH = FrameToolboxItem::FRAME_PREVIEW_WIDTH + 40;
-    static constexpr auto ITEM_HEIGHT = FrameToolboxItem::FRAME_PREVIEW_HEIGHT + 40;
+    static constexpr auto ITEM_WIDTH = FrameToolboxItem::FRAME_PREVIEW_WIDTH + 20;
+    static constexpr auto ITEM_HEIGHT = FrameToolboxItem::FRAME_PREVIEW_HEIGHT + 20;
 
   public:
     explicit FrameToolbox(QWidget* parent);
@@ -60,7 +60,7 @@ namespace gui_events
     void onEmit(const gui_events::TabRemoveEvent& event) override;
     void onEmit(const gui_events::TabChangeEvent& event) override;
     void onEmit(const gui_events::HistoryFrameChangeEvent& event) override;
-    void onEmit(const gui_events::HistoryRefreshFrameEvent& event) override;
+    void onEmit(const gui_events::HistoryRecreateFrameEvent& event) override;
 
     FrameToolboxItem* createItem(std::size_t index, bool addAtIndex = false);
     void createItems();
@@ -86,7 +86,12 @@ namespace gui_events
     QPushButton*                    m_addButton;
     QPushButton*                    m_addCpyButton;
     QPushButton*                    m_removeButton;
+
+    QPushButton*                    m_backBeginButton;
+    QPushButton*                    m_backButton;
     QPushButton*                    m_playButton;
+    QPushButton*                    m_forwardButton;
+    QPushButton*                    m_forwardEndButton;
 
     FrameToolboxItem*               m_selectedFrameItem;
     std::size_t                     m_selectedFrameIndex;

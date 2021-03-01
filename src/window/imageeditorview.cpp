@@ -32,13 +32,13 @@
 #include "../manager/drawermanager.h"
 #include "../manager/historymanager.h"
 #include "../manager/painttoolmanager.h"
+#include "../manager/previewmanager.h"
 #include "../manager/selectionmanager.h"
 #include "../manager/textselectionmanager.h"
 #include "../registrar/information/painttoolinformation.h"
 #include "../utility/general_utility.h"
 #include "../utility/qt_utility.h"
 #include "../debug_log.h"
-#include "../manager/previewmanager.h"
 #include "statusbar.h"
 #include "selectionwidget.h"
 #include "zoomablescrollarea.h"
@@ -303,41 +303,36 @@ namespace pixpaint
       for(std::size_t i = 0, isize = this->getImage().getLayerCount(); i < isize; ++i) {
         if(this->getImage().isVisible(i)) {
           if(i == current_layer_index) {
-            auto layer_qimage = qt_utils::createQImage(this->getImage().getLayer(i));
-            painter.drawImage(0, 0, layer_qimage);
+            paintLayer(painter, this->getImage().getLayer(i));
             if(selection_manager.selectionExists() &&
                selection_manager.layerExists()) {
               auto selection_rect = selection_manager.getSelectionRect();
-
-              auto selection_qimage = qt_utils::createQImage(selection_manager.getSelectionLayer());
-              auto selection_preview_qimage = qt_utils::createQImage(selection_manager.getSelectionPreviewLayer());
-              painter.drawImage(selection_rect.x,
-                                selection_rect.y,
-                                selection_qimage);
-              painter.drawImage(selection_rect.x,
-                                selection_rect.y,
-                                selection_preview_qimage);
+              paintLayer(painter,
+                         selection_rect.x,
+                         selection_rect.y,
+                         selection_manager.getSelectionLayer());
+              paintLayer(painter,
+                         selection_rect.x,
+                         selection_rect.y,
+                         selection_manager.getSelectionPreviewLayer());
             } else if(text_selection_manager.selectionExists()) {
-              auto text_selection_qimage = qt_utils::createQImage(text_selection_manager.getTextLayer());
               auto selectionRect = text_selection_manager.getSelectionRect();
-              painter.drawImage(selectionRect.x,
-                                selectionRect.y,
-                                text_selection_qimage);
+              paintLayer(painter,
+                         selectionRect.x,
+                         selectionRect.y,
+                         text_selection_manager.getTextLayer());
             } else {
-              auto preview_qimage = qt_utils::createQImage(m_previewLayer);
-              painter.drawImage(0, 0, preview_qimage);
+              paintLayer(painter, m_previewLayer);
             }
           } else {
-            auto layer_qimage = qt_utils::createQImage(this->getImage().getLayer(i));
-            painter.drawImage(0, 0, layer_qimage);
+            paintLayer(painter, this->getImage().getLayer(i));
           }
         }
       }
     } else {
       for(std::size_t i = 0, isize = m_temporaryImage->getLayerCount(); i < isize; ++i) {
         if(m_temporaryImage->isVisible(i)) {
-          auto temp_qimage = qt_utils::createQImage(m_temporaryImage->getLayer(i));
-          painter.drawImage(0, 0, temp_qimage);
+          paintLayer(painter, m_temporaryImage->getLayer(i));
         }
       }
     }

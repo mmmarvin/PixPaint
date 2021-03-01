@@ -23,7 +23,7 @@
 #include <boost/bind/bind.hpp>
 #include <boost/python.hpp>
 #include "../effect/effectbase.h"
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 #include "information/effectinformation.h"
 #include "registrarbase.h"
 

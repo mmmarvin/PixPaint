@@ -87,6 +87,9 @@ namespace pixeldata_detail
     dimension_t getWidth() const noexcept;
     dimension_t getHeight() const noexcept;
 
+    void setOpacity(std::uint_least32_t opacity);
+    std::uint_least32_t getOpacity() const noexcept;
+
     void combine(const PixelData& pixelData, bool hard = false);
     void combine(const PixelMap& pixelMap, bool hard = false);
     void combine(const PixelData& pixelData, position_t x, position_t y, bool hard = false);
@@ -118,9 +121,10 @@ namespace pixeldata_detail
     void combine(const PixelData& pixelData, position_t x, position_t y, bool hard, HardFunc hardFunc, Func func);
 
   private:
-    Color*        m_data;
-    dimension_t   m_width;
-    dimension_t   m_height;
+    Color*              m_data;
+    std::uint_least32_t m_opacity;
+    dimension_t         m_width;
+    dimension_t         m_height;
   };
 
   Point center(const PixelData& layer);

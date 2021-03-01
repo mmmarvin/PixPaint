@@ -193,7 +193,6 @@ namespace pixpaint
     friend class PaintToolManager;
 
     PaintToolBase*    m_paintToolBase;
-    PaintToolButton*  m_button;
   };
 
   class BuiltInPaintToolHandler : public PaintToolHandlerBase

@@ -24,19 +24,19 @@
 #include <QResizeEvent>
 #include "../env/imageenvironment.h"
 #include "../image/image.h"
-#include "../utility/qt_utility.h"
-#include "../assert.h"
 #include "../manager/imagemanager.h"
 #include "../manager/selectionmanager.h"
+#include "../utility/qt_utility.h"
+#include "../assert.h"
+#include "../debug_log.h"
 #include "imageeditorview.h"
 
 namespace pixpaint
 {
   PreviewView::PreviewView(QWidget* parent,
                            Image& image) :
-    ImageView(parent, image, 1.0)
+    BaseImageView(parent, image, 1.0, 1.0)
   {
-    this->showGrid(false);
   }
 
   void PreviewView::refreshResize()
@@ -55,8 +55,9 @@ namespace pixpaint
                                         this->geometry().height() - 1,
                                         10);
 
-    auto pixel_size = this->getPixelSize();
-    painter.setWorldTransform(QTransform().scale(pixel_size, pixel_size));
+    const auto pixel_size_x = this->getPixelSizeX();
+    const auto pixel_size_y = this->getPixelSizeY();
+    painter.setWorldTransform(QTransform().scale(pixel_size_x, pixel_size_y));
     this->paintImage(painter);
   }
 
@@ -71,10 +72,10 @@ namespace pixpaint
     auto& selection_manager = getSelectionManager();
     auto selection_rect = selection_manager.getSelectionRect();
 
-    auto qimage = qt_utils::createQImage(selection_manager.getSelectionLayer());
-    painter.drawImage(selection_rect.x,
-                      selection_rect.y,
-                      qimage);
+    paintLayer(painter,
+               selection_rect.x,
+               selection_rect.y,
+               selection_manager.getSelectionLayer());
   }
 
   void PreviewView::paintImage(QPainter &painter)
@@ -89,8 +90,7 @@ namespace pixpaint
       auto current_layer_index = image.getCurrentLayerIndex();
       for(std::size_t i = 0, isize = image.getLayerCount(); i < isize; ++i) {
         if(image.isVisible(i)) {
-          auto qimage = qt_utils::createQImage(image.getLayer(i));
-          painter.drawImage(0, 0, qimage);
+          paintLayer(painter, image.getLayer(i));
           if(current_layer_index == i) {
             this->paintSelection(painter);
           }
@@ -99,8 +99,7 @@ namespace pixpaint
     } else {
       for(std::size_t i = 0, isize = image.getLayerCount(); i < isize; ++i) {
         if(image.isVisible(i)) {
-          auto qimage = qt_utils::createQImage(image.getLayer(i));
-          painter.drawImage(0, 0, qimage);
+          paintLayer(painter, image.getLayer(i));
         }
       }
     }
@@ -108,20 +107,15 @@ namespace pixpaint
 
   void PreviewView::handleResize(int width, int height)
   { 
-    auto window_width = width;
-    auto window_height = height;
-    auto image_width = this->getImage().getWidth();
-    auto image_height = this->getImage().getHeight();
+    const auto window_width = width;
+    const auto window_height = height;
+    const auto image_width = this->getImage().getWidth();
+    const auto image_height = this->getImage().getHeight();
 
-    auto ratio_x = static_cast<double>(window_width) / image_width;
-    auto ratio_y = static_cast<double>(window_height) / image_height;
+    const auto ratio_x = static_cast<double>(window_width) / static_cast<double>(image_width);
+    const auto ratio_y = static_cast<double>(window_height) / static_cast<double>(image_height);
 
-    if(ratio_x < ratio_y) {
-      this->setPixelSize(ratio_x);
-      this->repaint();
-    } else {
-      this->setPixelSize(ratio_y);
-      this->repaint();
-    }
+    this->setPixelSize(ratio_x, ratio_y);
+    this->repaint();
   }
 }

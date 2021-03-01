@@ -52,6 +52,11 @@ namespace pixpaint
     Q_EMIT doubleClicked();
   }
 
+  void ColorButton::middleClick()
+  {
+    Q_EMIT middleClicked();
+  }
+
   void ColorButton::paintEvent(QPaintEvent*)
   {
     QPainter painter(this);
@@ -66,6 +71,15 @@ namespace pixpaint
     if(m_showBorder) {
       painter.setPen(QPen(QColor(0, 0, 0, 255)));
       painter.drawRect(0, 0, w, h);
+    }
+  }
+
+  void ColorButton::mousePressEvent(QMouseEvent* event)
+  {
+    if(event->button() == Qt::MouseButton::MiddleButton) {
+      middleClick();
+    } else {
+      QPushButton::mousePressEvent(event);
     }
   }
 

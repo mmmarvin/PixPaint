@@ -59,6 +59,9 @@ namespace pixpaint
     void closeEvent(QCloseEvent* event) override;
     bool eventFilter(QObject* watched, QEvent* event) override;
 
+    void dragEnterEvent(QDragEnterEvent* event) override;
+    void dropEvent(QDropEvent* event) override;
+
   private:
     void createConsoleWidget();
     void createMainWidget();
@@ -105,7 +108,7 @@ namespace pixpaint
                   bool shouldAddToRecent);
 
     void addToRecent(std::string filename);
-    void tryOpenFile(const std::string& filename);
+    void tryOpenFile(const std::string& filename, bool showError = false);
     void updateRecentActions();
 
     int                       m_lastImageWidth;

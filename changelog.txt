@@ -1,5 +1,23 @@
 PixPaint Changelog:
 
+v.1.02:
+* Added ability to load / save color list 
+* Added ability to add / remove colors on the color list
+* Added last known save / open location
+* Added ability to open files using drag method
+* Added layer opacity
+* Reduced sizes of toolbar to increase workspace size
+* Fixed layer / image rotation
+* Fixed bug where saving the project with a filename that doesn't include a file extension 
+  causes the next consequent saves to save to a filename with no file extension
+* Fixed bug where program crashes after clicking the box grid menu button on an empty view
+* Fixed bug where selecting all causes the program to crash on an empty view
+* Fixed UI bug where a hidden layer appears checked when change between frames
+* Fixed UI bug where the image does not occupy the whole preview view
+* Fixed bug where color picker does not update the cursor after use
+* Fixed bug where opening an image / animation / project causes the setModified flag to be set
+* Fixed bug where deselecting a selection then undo-ing that deselection, causes the selection to not allow drawing to that selection
+
 v.1.01:
 * Added the Custom Brush Tool
 * Added shortcut keys to tools

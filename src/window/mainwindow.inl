@@ -21,10 +21,12 @@
 
 #include <QMessageBox>
 #include <QTabBar>
+#include "../3rdparty/gengine/configuration.h"
 #include "../dialog/optiondialog.h"
 #include "../embed/headerstream.h"
 #include "../manager/documentmanager.h"
 #include "../utility/filetype_utility.h"
+#include "../define.h"
 #include "../document.h"
 #include "documentpanel.h"
 
@@ -65,20 +67,29 @@ namespace pixpaint
           return false;
         }
         if(res == ImageFileTypeBase::EOR_SUCCESS) {
-          m_documentPanel->addPage(std::move(animationDocument));
-          m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(document_manager.getDocument()), filename.c_str());
+          gengine2d::getConfigurationManager().setVariable(CONFIG_SECTION_SETTINGS,
+                                                           "last_location",
+                                                           os_specific::filesystem::path(filename).parent_path().string());
 
+          m_documentPanel->addPage(std::move(animationDocument));
           FileTypeSetterT()(document_manager, file_type_obj);
 
           image_manager.refresh();
 
           if(shouldSetFilename) {
+            m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(document_manager.getDocument()),
+                                                  filename.c_str());
             document_manager.getDocument().setFilename(filename);
           }
           if(shouldAddToRecent) {
             addToRecent(filename);
           }
 
+          // reset the setModified flags just in case the setPixel was used by the opener
+          auto& animation = document_manager.getDocument().getAnimation();
+          for(size_t i = 0, isize = animation.getFrameCount(); i < isize; ++i) {
+            animation.getFrame(i).setModified(false);
+          }
           m_lastImageWidth = image_manager.getImage().getWidth();
           m_lastImageHeight = image_manager.getImage().getHeight();
           return true;
@@ -97,20 +108,24 @@ namespace pixpaint
           }
         } else if(res == ImageFileTypeBase::EOR_SUCCESS) {
           m_documentPanel->addPage(std::move(animationDocument));
-          m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(document_manager.getDocument()),
-                                                filename.c_str());
-
           FileTypeSetterT()(document_manager, file_type_obj);
 
           image_manager.refresh();
 
           if(shouldSetFilename) {
+            m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(document_manager.getDocument()),
+                                                  filename.c_str());
             document_manager.getDocument().setFilename(filename);
           }
           if(shouldAddToRecent) {
             addToRecent(filename);
           }
 
+          // reset the setModified flags just in case the setPixel was used by the opener
+          auto& animation = document_manager.getDocument().getAnimation();
+          for(size_t i = 0, isize = animation.getFrameCount(); i < isize; ++i) {
+            animation.getFrame(i).setModified(false);
+          }
           m_lastImageWidth = image_manager.getImage().getWidth();
           m_lastImageHeight = image_manager.getImage().getHeight();
         }
@@ -157,12 +172,14 @@ namespace pixpaint
               break;
             }
 
-            FileTypeSetterT()(document_manager, file_type_obj);
+            gengine2d::getConfigurationManager().setVariable(CONFIG_SECTION_SETTINGS,
+                                                             "last_location",
+                                                             os_specific::filesystem::path(filename).parent_path().string());
 
+            FileTypeSetterT()(document_manager, file_type_obj);
             if(shouldSetFilename) {
               document_manager.getDocument().setFilename(filename);
             }
-
             if(shouldSetTabText) {
               m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(document_manager.getDocument()),
                                                     filename.c_str());
@@ -171,14 +188,12 @@ namespace pixpaint
               addToRecent(filename);
             }
 
-            auto& animation = document_manager.getDocument().getAnimation();
-            for(size_t i = 0, isize = animation.getFrameCount(); i < isize; ++i) {
-              animation.getFrame(i).setModified(false);
-            }
+            ModifySetterT()(document_manager.getDocument().getAnimation());
             break;
           }
         } else {
-          auto res = FileSaverT()(filetype_utils::addExtension(filename, file_type_information),
+          auto filename_with_extension = filetype_utils::addExtension(filename, file_type_information);
+          auto res = FileSaverT()(filename_with_extension,
                                   file_type_obj,
                                   document_manager.getDocument());
           if(res == ImageFileTypeBase::EOR_ERROR) {
@@ -186,15 +201,17 @@ namespace pixpaint
             break;
           }
 
+          gengine2d::getConfigurationManager().setVariable(CONFIG_SECTION_SETTINGS,
+                                                           "last_location",
+                                                           os_specific::filesystem::path(filename).parent_path().string());
+
           FileTypeSetterT()(document_manager, file_type_obj);
-
           if(shouldSetFilename) {
-            document_manager.getDocument().setFilename(filename);
+            document_manager.getDocument().setFilename(filename_with_extension);
           }
-
           if(shouldSetTabText) {
             m_documentPanel->tabBar()->setTabText(m_documentPanel->getDocumentIndex(getDocumentManager().getDocument()),
-                                                  filename.c_str());
+                                                  filename_with_extension.c_str());
           }
           if(shouldAddToRecent) {
             addToRecent(filename);

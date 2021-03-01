@@ -21,7 +21,7 @@
 #define DRAWERMANAGER_H
 
 #include "../drawer/drawer.h"
-#include "../pixpaint_macro.h"
+#include "../pattern/singleton.h"
 
 namespace pixpaint
 {

@@ -102,15 +102,15 @@ namespace pixpaint
   void HVResizeHandle::mouseReleaseEvent(QMouseEvent* event)
   {
     m_resizeStart = false;
-    auto viewGeometry = m_view->geometry();
+    auto view_geometry = m_view->geometry();
     auto geometry = this->geometry();
 
-    auto oldWidth = m_view->getImage().getWidth();
-    auto oldHeight = m_view->getImage().getHeight();
-    position_t width = static_cast<double>(geometry.x() - viewGeometry.x()) / m_view->getPixelSize();
-    position_t height = static_cast<double>(geometry.y() - viewGeometry.y()) / m_view->getPixelSize();
+    auto old_width = m_view->getImage().getWidth();
+    auto old_height = m_view->getImage().getHeight();
+    position_t width = static_cast<double>(geometry.x() - view_geometry.x()) / m_view->getPixelSize();
+    position_t height = static_cast<double>(geometry.y() - view_geometry.y()) / m_view->getPixelSize();
 
-    if(oldWidth != width || oldHeight != height) {
+    if(old_width != width || old_height != height) {
       auto& animation = getDocumentManager().getDocument().getAnimation();
 
       emitHistoryAction(AnimationResizeAction(animation));
@@ -119,13 +119,13 @@ namespace pixpaint
         animation.getFrame(i).resize(width, height);
       }
 
-      auto& previewManager = getPreviewManager();
+      auto& preview_manager = getPreviewManager();
 
       m_view->updateSize();
       m_view->updateDrawers();
       getImageManager().refresh();
-      previewManager.refreshAll();
-      previewManager.refreshResizeAll();
+      preview_manager.refreshAll();
+      preview_manager.refreshResizeAll();
     }
     m_parent->updateResizeHandles();
     event->accept();

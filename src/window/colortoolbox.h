@@ -20,13 +20,17 @@
 #ifndef COLORTOOLBOX_H
 #define COLORTOOLBOX_H
 
+#include <QGridLayout>
 #include <QWidget>
 #include "../image/color.h"
+#include "../pattern/observer.h"
 
 namespace pixpaint
 {
   class ColorButton;
-  class ColorToolbox : public QWidget
+
+  class ColorToolbox : public QWidget,
+                       public patterns::Observer
   {
     class ColorSelectionWidget : public QWidget
     {
@@ -46,15 +50,23 @@ namespace pixpaint
     };
 
   public:
-    ColorToolbox(QWidget* parent, const std::vector<Color>& colors);
+    explicit ColorToolbox(QWidget* parent);
 
     void setSelectedForegroundColor(const Color& color);
     void setSelectedBackgroundColor(const Color& color);
 
   private:
-    QWidget* createColorSelectionWidget();
-    QWidget* createColorGridWidget(const std::vector<Color>& colors);
+    void updateObserver(int id) override;
 
+  private:
+    QWidget* createColorSelectionWidget();
+    QWidget* createColorGridWidget();
+
+    void clearColorGrid();
+    void updateColorGrid();
+
+    QWidget*              m_colorGridSurface;
+    QGridLayout*          m_colorGrid;
     ColorSelectionWidget* m_colorSelectionWidget;
   };
 }

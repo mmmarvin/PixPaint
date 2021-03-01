@@ -28,24 +28,33 @@ namespace pixpaint
     static const std::vector<Color> DEFAULT_COLORS =
     {
       Color::BLACK,
-      Color(128, 128, 128, 255),
-      Color(128, 0, 0, 255),
-      Color(128, 100, 0, 255),
-      Color(128, 128, 0, 255),
-      Color(0, 128, 0, 255),
-      Color(0, 128, 128, 255),
-      Color(0, 0, 128, 255),
-      Color(128, 0, 128, 255),
-      Color::TRANSPARENT,
       Color::WHITE,
+
+      Color(128, 128, 128, 255),
       Color(192, 192, 192, 255),
+
+      Color(128, 0, 0, 255),
       Color::RED,
+
+      Color(128, 100, 0, 255),
       Color(255, 128, 0, 255),
+
+      Color(128, 128, 0, 255),
       Color::YELLOW,
+
+      Color(0, 128, 0, 255),
       Color::GREEN,
+
+      Color(0, 128, 128, 255),
       Color::CYAN,
+
+      Color(0, 0, 128, 255),
       Color::BLUE,
-      Color(255, 0, 255, 255)
+
+      Color(128, 0, 128, 255),
+      Color(255, 0, 255, 255),
+
+      Color::TRANSPARENT
     };
 
     return DEFAULT_COLORS;

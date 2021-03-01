@@ -49,7 +49,7 @@ namespace pixpaint
     }
 
     return toEActionResult(EActionResult::EAR_REFRESH_IMAGE |
-                           EActionResult::EAR_REFRESH_FRAME_LIST);
+                           EActionResult::EAR_RECREATE_FRAME_LIST);
   }
 
   AddFrameAction::EActionResult AddFrameAction::redo()
@@ -60,6 +60,6 @@ namespace pixpaint
     animation.setCurrentFrameIndex(m_index);
 
     return toEActionResult(EActionResult::EAR_REFRESH_IMAGE |
-                           EActionResult::EAR_REFRESH_FRAME_LIST);
+                           EActionResult::EAR_RECREATE_FRAME_LIST);
   }
 }

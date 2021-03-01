@@ -54,24 +54,24 @@ namespace pixpaint
   void PaintToolOptionFrame::setOptions(const PaintToolBase::option_container_type& options)
   {
     static const auto flagSetter = [](bool) {
-      auto& imageEnv = getImageEnvironment();
-      if(imageEnv.isViewSet()) {
+      auto& image_env = getImageEnvironment();
+      if(image_env.isViewSet()) {
         tool_helpers::onToolChange(getPaintToolManager().getCurrentTool(),
                                    &PaintToolHandlerBase::onOptionChange);
       }
     };
 
     static const auto intSetter = [](int) {
-      auto& imageEnv = getImageEnvironment();
-      if(imageEnv.isViewSet()) {
+      auto& image_env = getImageEnvironment();
+      if(image_env.isViewSet()) {
         tool_helpers::onToolChange(getPaintToolManager().getCurrentTool(),
                                    &PaintToolHandlerBase::onOptionChange);
       }
     };
 
     static const auto strSetter = [](const std::string&) {
-      auto& imageEnv = getImageEnvironment();
-      if(imageEnv.isViewSet()) {
+      auto& image_env = getImageEnvironment();
+      if(image_env.isViewSet()) {
         tool_helpers::onToolChange(getPaintToolManager().getCurrentTool(),
                                    &PaintToolHandlerBase::onOptionChange);
       }

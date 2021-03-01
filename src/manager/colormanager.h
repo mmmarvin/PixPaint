@@ -21,11 +21,13 @@
 #define COLORMANAGER_H
 
 #include "../image/color.h"
-#include "../pixpaint_macro.h"
+#include "../pattern/observer.h"
+#include "../pattern/singleton.h"
+#include "../colorlist.h"
 
 namespace pixpaint
 {
-  class ColorManager
+  class ColorManager : public patterns::Subject
   {
     ColorManager(const Color& foregroundColor, const Color& background);
 
@@ -35,12 +37,15 @@ namespace pixpaint
 
     const Color& getForegroundColor() const noexcept;
     const Color& getBackgroundColor() const noexcept;
+    ColorList& getColorList() noexcept;
+    const ColorList& getColorList() const noexcept;
 
   private:
     PIXPAINT_SINGLETON_FUNC_FRIEND(ColorManager)
 
-    Color m_foregroundColor;
-    Color m_backgroundColor;
+    ColorList  m_colorList;
+    Color         m_foregroundColor;
+    Color         m_backgroundColor;
   };
 
   PIXPAINT_SINGLETON_FUNC(ColorManager)

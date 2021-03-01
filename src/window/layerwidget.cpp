@@ -25,6 +25,7 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QToolTip>
 #include "../env/imageenvironment.h"
 #include "../event/gui/frame_events.h"
 #include "../event/gui/history_events.h"
@@ -36,6 +37,8 @@
 #include "../history/movelayeraction.h"
 #include "../history/removelayeraction.h"
 #include "../history/renamelayeraction.h"
+#include "../history/showlayeraction.h"
+#include "../history/hidelayeraction.h"
 #include "../manager/drawermanager.h"
 #include "../manager/imagemanager.h"
 #include "../manager/historymanager.h"
@@ -80,8 +83,23 @@ namespace pixpaint
     m_removeButton->setEnabled(false);
     QObject::connect(m_removeButton, &QPushButton::clicked, this, &LayerWidget::removeLayer);
 
-    btnLayout->addWidget(m_addButton);
-    btnLayout->addWidget(m_removeButton);
+    m_opacitySlider = new QSlider(Qt::Orientation::Horizontal, this);
+    m_opacitySlider->setTickPosition(QSlider::TicksRight);
+    m_opacitySlider->setMinimum(0);
+    m_opacitySlider->setMaximum(100);
+    m_opacitySlider->setTickInterval(1);
+    m_opacitySlider->setToolTip("Opacity");
+    connect(m_opacitySlider, &QSlider::sliderMoved, [](int value) {
+      getImageManager().getImage().getCurrentLayer().setOpacity(value);
+      getImageEnvironment().getView().repaint();
+      getPreviewManager().refreshAll();
+
+      QToolTip::showText(QCursor::pos(), (std::to_string(value) + std::string("%")).c_str(), nullptr);
+    });
+
+    btnLayout->addWidget(m_addButton, 1);
+    btnLayout->addWidget(m_removeButton, 1);
+    btnLayout->addWidget(m_opacitySlider, 10);
 
     outerLayer->addWidget(m_scrollArea, 9);
     outerLayer->addLayout(btnLayout, 1);
@@ -145,6 +163,8 @@ namespace pixpaint
 
     if(event->button() == Qt::MouseButton::LeftButton) {
       if(m_selectedLayerItem && m_moveDstLayer) {
+        selection_helpers::tryFinalizeAllSelections(true);
+
         auto& image = image_manager.getImage();
         image.moveLayer(m_selectedLayerIndex, m_moveDstLayerIndex);
         emitHistoryAction(MoveLayerAction(m_selectedLayerIndex, m_moveDstLayerIndex));
@@ -180,6 +200,8 @@ namespace pixpaint
   {
     clearItems();
     createItems();
+    m_opacitySlider->setValue(getImageManager().getImage().getCurrentLayer().getOpacity());
+
     if(getImageManager().getImage().getLayerCount() > 1) {
       m_removeButton->setEnabled(true);
     } else {
@@ -203,26 +225,43 @@ namespace pixpaint
     slotClicked(static_cast<LayerWidgetItem*>(m_itemHolderLayout->itemAt(layer_index)->widget()), layer_index);
   }
 
-  void LayerWidget::onEmit(const gui_events::HistoryRefreshLayerEvent&)
+  void LayerWidget::onEmit(const gui_events::HistoryRecreateLayerEvent&)
   {
     clearItems();
     createItems();
 
     auto layer_index = getImageManager().getImage().getCurrentLayerIndex();
     slotClicked(static_cast<LayerWidgetItem*>(m_itemHolderLayout->itemAt(layer_index)->widget()), layer_index);
+    m_scrollArea->repaint();
+  }
+
+  void LayerWidget::onEmit(const gui_events::HistoryRefreshLayerEvent&)
+  {
+    PIXPAINT_ASSERT(static_cast<size_t>(m_itemHolderLayout->count()) == getImageManager().getImage().getLayerCount(),
+                    "Count doesn't match");
+
+    for(int i = 0, isize = m_itemHolderLayout->count(); i < isize; ++i) {
+      auto* item = static_cast<LayerWidgetItem*>(m_itemHolderLayout->itemAt(i)->widget());
+      const auto& layer_name = getImageManager().getImage().getLayerName(i);
+      auto layer_visibility = getImageManager().getImage().isVisible(i);
+
+      item->setLayerName(layer_name);
+      item->setLayerVisibility(layer_visibility);
+    }
   }
 
   LayerWidgetItem* LayerWidget::createItem(std::size_t index, bool addAtIndex)
   {
     auto& preview_manager = getPreviewManager();
     auto* layer_item = new LayerWidgetItem(m_itemHolderWidget, index);
+    layer_item->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     layer_item->setFixedHeight(ITEM_HEIGHT);
     layer_item->setContextMenuPolicy(Qt::CustomContextMenu);
 
     if(!addAtIndex) {
-      m_itemHolderLayout ->addWidget(layer_item);
+      m_itemHolderLayout->addWidget(layer_item);
     } else {
-      m_itemHolderLayout ->insertWidget(index, layer_item);
+      m_itemHolderLayout->insertWidget(index, layer_item);
     }
     preview_manager.registerPreview(*layer_item->m_view);
 
@@ -371,9 +410,9 @@ namespace pixpaint
       auto layerIndex = layerItem->getLayerIndex();
       auto visible = getImageManager().getImage().isVisible(layerIndex);
       if(!visible) {
-        // HISTORY FIX: Show Layer
+        emitHistoryAction(ShowLayerAction(layerIndex));
       } else {
-        // HISTORY FIX: Hide Layer
+        emitHistoryAction(HideLayerAction(layerIndex));
       }
 
       layerItem->toggled(!visible);
@@ -423,5 +462,6 @@ namespace pixpaint
 
     getImageManager().getImage().setCurrentLayerIndex(layerIndex);
     getDrawerManager().updateDrawers();
+    m_opacitySlider->setValue(getImageManager().getImage().getCurrentLayer().getOpacity());
   }
 }

@@ -31,9 +31,7 @@ namespace pixpaint
   ImageView::ImageView(QWidget* parent,
                        Image& image,
                        double pixelSize) :
-    QWidget(parent),
-    m_image(&image),
-    m_pixelSize(pixelSize),
+    BaseImageView(parent, image, pixelSize, pixelSize),
     m_boxGridDimension(64, 64),
     m_showBoxGrid(false),
     m_showGrid(true)
@@ -72,85 +70,43 @@ namespace pixpaint
 
   void ImageView::setPixelSize(double pixelSize)
   {
-    m_pixelSize = pixelSize;
+    BaseImageView::setPixelSize(pixelSize, pixelSize);
   }
 
   double ImageView::getPixelSize() const noexcept
   {
-    return m_pixelSize;
+    return BaseImageView::getPixelSizeX();
   }
 
-  void ImageView::setImage(Image& image) noexcept
+  void ImageView::paintEvent(QPaintEvent* event)
   {
-    m_image = &image;
-  }
-
-  Image& ImageView::getImage() noexcept
-  {
-    PIXPAINT_ASSERT(m_image, "Image was not initialzied");
-    return *m_image;
-  }
-
-  const Image& ImageView::getImage() const noexcept
-  {
-    PIXPAINT_ASSERT(m_image, "Image was not initialzied");
-    return *m_image;
-  }
-
-  void ImageView::paintEvent(QPaintEvent*)
-  {
-    PIXPAINT_ASSERT(m_image, "Image was not initialzied");
+    BaseImageView::paintEvent(event);
 
     QPainter painter(this);
-    painter.setWorldTransform(QTransform().scale(m_pixelSize, m_pixelSize));
+    painter.setWorldTransform(QTransform().scale(this->getPixelSize(), this->getPixelSize()));
 
-//    PIXPAINT_PROFILER_START_TIME("ImageView paintEvent", general_utils::pointerToInt(this));
-
-    paintBackground(painter);
-    this->paintImage(painter);
-    if(m_showGrid && m_pixelSize >= 3) {
+    if(m_showGrid && this->getPixelSize() >= 3) {
       paintGrid();
     }
 
     if(m_showBoxGrid) {
       paintBoxGrid();
     }
-//    PIXPAINT_PROFILER_END_TIME("ImageView paintEvent", general_utils::pointerToInt(this));
   }
 
   DoubleRect ImageView::getDrawableRegion() const
   {
-    return paint_helpers::paint_helpers_detail::getDrawableRegion(*m_image,
+    return paint_helpers::paint_helpers_detail::getDrawableRegion(getImage(),
                                                                   Point(this->geometry().width(), this->geometry().height()),
-                                                                  m_pixelSize);
+                                                                  this->getPixelSize());
   }
 
   DoubleRect ImageView::getSmallestDrawableRegion(const DoubleRect& option)
   {
-    return paint_helpers::paint_helpers_detail::getSmallestDrawableRegion(*m_image,
+    return paint_helpers::paint_helpers_detail::getSmallestDrawableRegion(getImage(),
                                                                           option,
                                                                           Point(this->geometry().width(), this->geometry().height()),
-                                                                          m_pixelSize);
-  }
-
-  void ImageView::paintBackground(QPainter& painter)
-  {
-    qt_utils::drawTransparentBackground(painter,
-                                        0,
-                                        0,
-                                        m_image->getWidth(),
-                                        m_image->getHeight(),
-                                        10);
-  }
-
-  void ImageView::paintImage(QPainter& painter)
-  {
-    for(std::size_t i = 0, isize = m_image->getLayerCount(); i < isize; ++i) {
-      if(m_image->isVisible(i)) {
-        auto qimage = qt_utils::createQImage(m_image->getLayer(i));
-        painter.drawImage(0, 0, qimage);
-      }
-    }
+                                                                          this->getPixelSize());
   }
 
   void ImageView::paintGrid()
@@ -161,13 +117,14 @@ namespace pixpaint
     pen.setWidth(1);
     painter.setPen(pen);
 
-    auto adjusted_image_width = m_image->getWidth() * m_pixelSize;
-    auto adjusted_image_height = m_image->getHeight() * m_pixelSize;
+    const auto pixel_size = this->getPixelSize();
+    const auto adjusted_image_width = this->getImage().getWidth() * pixel_size;
+    const auto adjusted_image_height = this->getImage().getHeight() * pixel_size;
 
-    for(position_t y = 0; y <= adjusted_image_height; y += m_pixelSize) {
+    for(position_t y = 0; y <= adjusted_image_height; y += pixel_size) {
       painter.drawLine(QPoint(0, y), QPoint(adjusted_image_width, y));
     }
-    for(position_t x = 0; x <= adjusted_image_width; x += m_pixelSize) {
+    for(position_t x = 0; x <= adjusted_image_width; x += pixel_size) {
       painter.drawLine(QPoint(x, 0), QPoint(x, adjusted_image_height));
     }
   }
@@ -180,10 +137,11 @@ namespace pixpaint
     pen.setWidth(3);
     painter.setPen(pen);
 
-    auto adjusted_image_width = m_image->getWidth() * m_pixelSize;
-    auto adjusted_image_height = m_image->getHeight() * m_pixelSize;
-    auto w = m_boxGridDimension.width * m_pixelSize;
-    auto h = m_boxGridDimension.height * m_pixelSize;
+    const auto pixel_size = this->getPixelSize();
+    const auto adjusted_image_width = getImage().getWidth() * pixel_size;
+    const auto adjusted_image_height = getImage().getHeight() * pixel_size;
+    const auto w = m_boxGridDimension.width * pixel_size;
+    const auto h = m_boxGridDimension.height * pixel_size;
 
     for(position_t y = 0; y <= adjusted_image_height; y += h) {
       painter.drawLine(QPoint(0, y), QPoint(adjusted_image_width, y));

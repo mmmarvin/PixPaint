@@ -29,6 +29,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QMimeData>
 #include <QTabBar>
 #include <QStatusBar>
 #include "../3rdparty/gengine/configuration.h"
@@ -70,6 +71,7 @@
 #include "frametoolbox.h"
 #include "imageeditorview.h"
 #include "layerwidget.h"
+#include "observerlabel.h"
 #include "lefttoolbox.h"
 #include "righttoolbox.h"
 #include "zoomablescrollarea.h"
@@ -78,13 +80,33 @@ namespace pixpaint
 {
 namespace
 {
+  std::string removeFileTag(std::string filename)
+  {
+    static const std::string file_tag = "file://";
+
+    if(filename.substr(0, file_tag.size()) == file_tag) {
+      filename = filename.substr(file_tag.size(), filename.size() - file_tag.size());
+    }
+
+    while(filename.back() == '\n' || isspace(filename.back())) {
+      filename.pop_back();
+    }
+
+    return filename;
+  }
+}
+namespace
+{
   void do_save(MainWindow* parent,
                const std::string& filter,
                const std::string& dialogTitle,
                std::function<void(const std::string&, const std::string&)> saveFunc)
   {
     if(getImageEnvironment().isViewSet()) {
-      QFileDialog dialog(parent, QObject::tr(dialogTitle.c_str()), QObject::tr(""), filter.c_str());
+      QFileDialog dialog(parent,
+                         QObject::tr(dialogTitle.c_str()),
+                         gengine2d::getConfigurationManager().getString(CONFIG_SECTION_SETTINGS, "last_location")->c_str(),
+                         filter.c_str());
       dialog.setFileMode(QFileDialog::AnyFile);
       dialog.setAcceptMode(QFileDialog::AcceptSave);
       if(dialog.exec()) {
@@ -93,6 +115,27 @@ namespace
           saveFunc(std::string(filenames[0].toUtf8().constData()),
                    std::string(dialog.selectedNameFilter().toUtf8().constData()));
         }
+      }
+    }
+  }
+
+  void do_open(MainWindow* parent,
+               const std::string& filter,
+               const std::string& dialogTitle,
+               std::function<void(const std::string&)> openFunc)
+  {
+    QFileDialog dialog(parent,
+                       QObject::tr(dialogTitle.c_str()),
+                       gengine2d::getConfigurationManager().getString(CONFIG_SECTION_SETTINGS, "last_location")->c_str(),
+                       filter.c_str());
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.selectNameFilter(QObject::tr("All Files (*.*)"));
+    if(dialog.exec()) {
+      auto filenames = dialog.selectedFiles();
+      if(filenames.size() == 1) {
+        openFunc(std::string(filenames[0].toUtf8().constData()));
+        getPreviewManager().refreshResizeAll();
       }
     }
   }
@@ -224,10 +267,11 @@ namespace
                      APP_RELEASE_TYPE +
                      std::string("]"));
 
-    this->setMinimumSize(640, 480);
+    this->setMinimumSize(800, 600);
     this->setWindowState(Qt::WindowState::WindowMaximized);
     this->setWindowTitle(app_name.c_str());
     this->setWindowIcon(QIcon("res/pixpaint.png"));
+    this->setAcceptDrops(true);
 
     createConsoleWidget();
     getConsoleManager().writeMessageSystem(app_name + std::string(" Console"));
@@ -310,11 +354,11 @@ namespace
     if(event->key() == Qt::Key_Escape) {
       selection_helpers::tryFinalizeAllSelections(true);
     } else {
-      auto& imageEnv = getImageEnvironment();
-      auto& imageManager = getImageManager();
-      if(imageEnv.isViewSet()) {
+      auto& image_env = getImageEnvironment();
+      auto& image_manager = getImageManager();
+      if(image_env.isViewSet()) {
         auto& currentPaintTool = getPaintToolManager().getCurrentTool();
-        auto& view = imageEnv.getView();
+        auto& view = image_env.getView();
 
         if(getTextSelectionManager().selectionExists()) {
           getTextManager().onKeyPress(static_cast<EKey>(event->key()),
@@ -329,7 +373,7 @@ namespace
                                                  getColorManager().getForegroundColor(),
                                                  ControlState { shift_down, ctrl_down },
                                                  view.getPreviewLayer(),
-                                                 imageManager.getImage().getCurrentLayer());
+                                                 image_manager.getImage().getCurrentLayer());
 
           if(res & PaintToolBase::EChangeResult::ECCR_UPDATEIMAGE) {
             auto pixelSize = view.getPixelSize();
@@ -347,11 +391,11 @@ namespace
   void MainWindow::keyReleaseEvent(QKeyEvent* event)
   {
     if(event->key() != Qt::Key_Escape) {
-      auto& imageEnv = getImageEnvironment();
-      auto& imageManager = getImageManager();
-      if(imageEnv.isViewSet()) {
+      auto& image_env = getImageEnvironment();
+      auto& image_manager = getImageManager();
+      if(image_env.isViewSet()) {
         auto& currentPaintTool = getPaintToolManager().getCurrentTool();
-        auto& view = imageEnv.getView();
+        auto& view = image_env.getView();
 
         const bool shift_down = (event->modifiers() & Qt::ShiftModifier) != 0;
         const bool ctrl_down = (event->modifiers() & Qt::ControlModifier) != 0;
@@ -359,7 +403,7 @@ namespace
                                                  getColorManager().getForegroundColor(),
                                                  ControlState { shift_down, ctrl_down },
                                                  view.getPreviewLayer(),
-                                                 imageManager.getImage().getCurrentLayer());
+                                                 image_manager.getImage().getCurrentLayer());
 
         if(res & PaintToolBase::EChangeResult::ECCR_UPDATEIMAGE) {
           auto pixelSize = view.getPixelSize();
@@ -386,11 +430,11 @@ namespace
   {
     if(e->type() == QEvent::ShortcutOverride) {
       QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e);
-      auto& selectionManager = getSelectionManager();
-      auto& textSelectionManager = getTextSelectionManager();
-      auto& imageEnv = getImageEnvironment();
+      auto& selection_manager = getSelectionManager();
+      auto& text_selection_manager = getTextSelectionManager();
+      auto& image_env = getImageEnvironment();
 
-      if(selectionManager.selectionExists()) {
+      if(selection_manager.selectionExists()) {
         // if selection maanger is set, we ignore arrow keys to allow
         // it to be moved
         auto key = keyEvent->key();
@@ -405,7 +449,7 @@ namespace
         default:
           break;
         }
-      } else if(textSelectionManager.selectionExists() && imageEnv.isViewSet()) {
+      } else if(text_selection_manager.selectionExists() && image_env.isViewSet()) {
         // if the text selection manager is set, we ignore all shortcut keys
         auto key = keyEvent->key();
         auto c = static_cast<char>(key);
@@ -449,6 +493,50 @@ namespace
     return QMainWindow::eventFilter(w, e);
   }
 
+  void MainWindow::dragEnterEvent(QDragEnterEvent* event)
+  {
+    auto filename = removeFileTag(std::string(event->mimeData()->text().toUtf8().constData()));
+
+    HeaderStream stream;
+    stream.m_stream.open(filename, std::ios_base::binary);
+    if(stream.m_stream.is_open()) {
+      // try opening image
+      for(const auto& img_info: getImageFileTypeRegistrar()) {
+        if(img_info.getType().canReadHeader(stream)) {
+          event->acceptProposedAction();
+          return;
+        }
+        stream.reset();
+      }
+
+      // try opening animation
+      for(const auto& anim_info: getAnimationFileTypeRegistrar()) {
+        if(anim_info.getType().canReadHeader(stream)) {
+          event->acceptProposedAction();
+          return;
+        }
+        stream.reset();
+      }
+
+      // try opening project
+      for(const auto& proj_info: getProjectFileTypeRegistrar()) {
+        if(proj_info.getType().canReadHeader(stream)) {
+          event->acceptProposedAction();
+          return;
+        }
+        stream.reset();
+      }
+    }
+  }
+
+  void MainWindow::dropEvent(QDropEvent* event)
+  {
+    auto filename = removeFileTag(std::string(event->mimeData()->text().toUtf8().constData()));
+    tryOpenFile(filename, true);
+
+    event->acceptProposedAction();
+  }
+
   void MainWindow::createConsoleWidget()
   {
     auto& gui_env = getGUIEnvironment();
@@ -483,14 +571,14 @@ namespace
     gui_env.m_leftToolboxDock->setWidget(gui_env.m_leftToolbox);
     this->addDockWidget(Qt::LeftDockWidgetArea, gui_env.m_leftToolboxDock);
 
-    gui_env.m_rightToolboxDock = new QDockWidget(tr(""), this);
+    gui_env.m_rightToolboxDock = new QDockWidget(tr("Layer Toolbar"), this);
     gui_env.m_rightToolbox = new RightToolbox(gui_env.m_rightToolboxDock);
     gui_env.m_rightToolboxDock->setWidget(gui_env.m_rightToolbox);
     gui_env.m_rightToolboxDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     this->addDockWidget(Qt::RightDockWidgetArea, gui_env.m_rightToolboxDock);
 
     auto* dock = new QDockWidget(tr("Colors Toolbar"), this);
-    gui_env.m_colorToolbox = new ColorToolbox(dock, getDefaultColor());
+    gui_env.m_colorToolbox = new ColorToolbox(dock);
     dock->setFeatures(static_cast<QDockWidget::DockWidgetFeature>(0));
     dock->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     dock->setAllowedAreas(Qt::BottomDockWidgetArea);
@@ -546,18 +634,19 @@ namespace
   void MainWindow::createStatusBar()
   {
     auto& gui_env = getGUIEnvironment();
-    gui_env.getStatusBar().toolDescription = new QLabel(tr("Tool Description"), this->statusBar());
-    gui_env.getStatusBar().toolDescription->setToolTip(tr("Tool Description"));
+    gui_env.getStatusBar().m_toolDescription = new ObserverLabel("Tool Description", this->statusBar());
     gui_env.getStatusBar().mousePosition = new QLabel(tr("[0, 0]"), this->statusBar());
     gui_env.getStatusBar().mousePosition->setToolTip(tr("Mouse Position"));
     gui_env.getStatusBar().drawSize = new QLabel(tr("[0, 0]"), this->statusBar());
     gui_env.getStatusBar().imageZoomLevel = new QLabel(tr("0%"), this->statusBar());
     gui_env.getStatusBar().imageZoomLevel->setToolTip(tr("Image Zoom Level"));
 
-    this->statusBar()->insertWidget(0, gui_env.getStatusBar().toolDescription, 10);
+    this->statusBar()->insertWidget(0, gui_env.getStatusBar().m_toolDescription, 10);
     this->statusBar()->insertWidget(1, gui_env.getStatusBar().mousePosition, 1);
     this->statusBar()->insertWidget(2, gui_env.getStatusBar().drawSize, 1);
     this->statusBar()->insertWidget(3, gui_env.getStatusBar().imageZoomLevel, 1);
+
+    getPaintToolManager().registerObserver(*gui_env.getStatusBar().m_toolDescription);
   }
 
   void MainWindow::createRecentFiles()
@@ -595,16 +684,12 @@ namespace
       filter += ";;All Files (*.*)";
     }
 
-    QFileDialog dialog(this, tr("Open..."), tr(""), filter.c_str());
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.selectNameFilter(tr("All Files (*.*)"));
-    if(dialog.exec()) {
-      auto filenames = dialog.selectedFiles();
-      if(filenames.size() == 1) {
-        openProject(std::string(filenames[0].toUtf8().constData()));
-      }
-    }
+    do_open(this,
+            filter,
+            "Open Project...",
+    [this](const std::string& filename) {
+      openProject(filename);
+    });
   }
 
   void MainWindow::slotSaveFile(bool)
@@ -652,16 +737,12 @@ namespace
       filter += ";;All Files (*.*)";
     }
 
-    QFileDialog dialog(this, tr("Open..."), tr(""), filter.c_str());
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.selectNameFilter(tr("All Files (*.*)"));
-    if(dialog.exec()) {
-      auto filenames = dialog.selectedFiles();
-      if(filenames.size() == 1) {
-        openAnimation(std::string(filenames[0].toUtf8().constData()));
-      }
-    }
+    do_open(this,
+            filter,
+            "Import Animation...",
+    [this](const std::string& filename) {
+      openAnimation(filename);
+    });
   }
 
   void MainWindow::slotExportAnimationFile(bool)
@@ -683,16 +764,12 @@ namespace
       filter += ";;All Files (*.*)";
     }
 
-    QFileDialog dialog(this, tr("Open..."), tr(""), filter.c_str());
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.selectNameFilter(tr("All Files (*.*)"));
-    if(dialog.exec()) {
-      auto filenames = dialog.selectedFiles();
-      if(filenames.size() == 1) {
-        openImage(std::string(filenames[0].toUtf8().constData()));
-      }
-    }
+    do_open(this,
+            filter,
+            "Import Image...",
+    [this](const std::string& filename) {
+      openImage(filename);
+    });
   }
 
   void MainWindow::slotExportImageFile(bool)
@@ -727,14 +804,14 @@ namespace
   {
     openImpl<ImageRegistrarGetter,
              ImageOpener,
-             ImageFiletypeSetter>(filename, false, false);
+             ImageFiletypeSetter>(filename, true, false);
   }
 
   void MainWindow::openAnimation(std::string filename)
   {
     openImpl<AnimationRegistrarGetter,
              AnimationOpener,
-             AnimationFiletypeSetter>(filename, false, false);
+             AnimationFiletypeSetter>(filename, true, false);
   }
 
   void MainWindow::saveProject(std::string filename, std::string mimeType)
@@ -784,11 +861,15 @@ namespace
     updateRecentActions();
   }
 
-  void MainWindow::tryOpenFile(const std::string& filename)
+  void MainWindow::tryOpenFile(const std::string& filename, bool showError)
   {
     if(!openImpl<ProjectRegistrarGetter, ProjectOpener, ProjectFileTypeSetter>(filename, true, true, false)) {
-      if(!openImpl<ImageRegistrarGetter, ImageOpener, ImageFiletypeSetter>(filename, false, false, false)) {
-        openImpl<AnimationRegistrarGetter, AnimationOpener, AnimationFiletypeSetter>(filename, false, false);
+      if(!openImpl<ImageRegistrarGetter, ImageOpener, ImageFiletypeSetter>(filename, true, false, false)) {
+        if(!openImpl<AnimationRegistrarGetter, AnimationOpener, AnimationFiletypeSetter>(filename, true, false)) {
+          if(showError) {
+            QMessageBox::critical(this, tr("Error"), (std::string("Cannot open file \"") + filename + std::string("\"!")).c_str());
+          }
+        }
       }
     }
   }

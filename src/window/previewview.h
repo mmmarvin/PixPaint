@@ -21,14 +21,14 @@
 #define PREVIEWVIEW_H
 
 #include <QWidget>
-#include "imageview.h"
+#include "baseimageview.h"
 
 namespace pixpaint
 {
   class Image;
   class ImageView;
 
-  class PreviewView : public ImageView
+  class PreviewView : public BaseImageView
   {
   public:
     PreviewView(QWidget* parent,
@@ -42,9 +42,6 @@ namespace pixpaint
     virtual void paintSelection(QPainter& painter);
 
   private:
-    using ImageView::showGrid;
-    using ImageView::isGridShown;
-
     void paintImage(QPainter &painter) override;
     void handleResize(int width, int height);
   };

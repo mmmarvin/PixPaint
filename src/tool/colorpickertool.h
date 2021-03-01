@@ -49,6 +49,9 @@ namespace pixpaint
     IntRect getDrawRect() const override;
 
     std::string getDescription() const override;
+
+  private:
+    bool m_selected;
   };
 }
 

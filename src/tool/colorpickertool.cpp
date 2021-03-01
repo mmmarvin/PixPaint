@@ -26,7 +26,8 @@
 namespace pixpaint
 {
   ColorPickerTool::ColorPickerTool() :
-    CursorToolBase("res/cursor/color_picker_cursor.png", false)
+    CursorToolBase("res/cursor/color_picker_cursor.png", false),
+    m_selected(false)
   {
   }
 
@@ -38,8 +39,14 @@ namespace pixpaint
                                      ModifyablePixelData&,
                                      MaskablePixelData& currentLayer)
   {
-    getColorManager().setForegroundColor(currentLayer.getPixel(currentPoint.x, currentPoint.y));
-    return true;
+    if(currentPoint.x >= 0 && currentPoint.y >= 0 &&
+       currentPoint.x < currentLayer.getWidth() &&
+       currentPoint.y < currentLayer.getHeight()) {
+      getColorManager().setForegroundColor(currentLayer.getPixel(currentPoint.x, currentPoint.y));
+      m_selected = true;
+    }
+
+    return false;
   }
 
   int ColorPickerTool::onMouseRelease(const Point&,
@@ -50,7 +57,11 @@ namespace pixpaint
                                       ModifyablePixelData&,
                                       MaskablePixelData&)
   {
-    getPaintToolManager().setToPreviousTool();
+    if(m_selected) {
+      getPaintToolManager().setToPreviousTool();
+      m_selected = false;
+    }
+
     return EChangeResult::ECCR_NONE;
   }
 

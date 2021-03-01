@@ -29,8 +29,8 @@ namespace pixpaint
 
   class PreviewWidget : public QWidget
   {
-    static constexpr auto PREVIEW_WIDTH = 200;
-    static constexpr auto PREVIEW_HEIGHT = 200;
+    static constexpr auto PREVIEW_WIDTH = 150;
+    static constexpr auto PREVIEW_HEIGHT = 150;
 
   public:
     PreviewWidget(QWidget* parent,

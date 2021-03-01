@@ -61,7 +61,7 @@ namespace pixpaint
 
     auto* layout = new QVBoxLayout(outer_surface);
     m_scrollArea = new QScrollArea(outer_surface);
-    m_scrollArea->setMinimumHeight(150);
+    m_scrollArea->setMinimumHeight(90);
     layout->addWidget(m_scrollArea);
 
     auto* button_layout = new QHBoxLayout;
@@ -92,6 +92,28 @@ namespace pixpaint
       getDocumentManager().getDocument().getAnimation().setCurrentFrameDuration(v);
     });
 
+    m_backBeginButton = new QPushButton(outer_surface);
+    m_backBeginButton->setIcon(QIcon("res/back_btn_icon.png"));
+    m_backBeginButton->setToolTip(tr("Beginning Frame"));
+    m_backBeginButton->setFixedSize(TOOLBOX_BUTTON_WIDTH, TOOLBOX_BUTTON_HEIGHT);
+    connect(m_backBeginButton, &QPushButton::clicked, [this] {
+      static_cast<FrameToolboxItem*>(m_itemHolderLayout->itemAt(0)->widget())->click();
+    });
+    m_backButton = new QPushButton(outer_surface);
+    m_backButton->setIcon(QIcon("res/back_btn_icon.png"));
+    m_backButton->setToolTip(tr("Previous Frame"));
+    m_backButton->setFixedSize(TOOLBOX_BUTTON_WIDTH, TOOLBOX_BUTTON_HEIGHT);
+    connect(m_backButton, &QPushButton::clicked, [this] {
+      auto& document_manager = getDocumentManager();
+      auto frame_index = document_manager.getDocument().getAnimation().getCurrentFrameIndex();
+      if(frame_index == 0) {
+        frame_index = document_manager.getDocument().getAnimation().getFrameCount() - 1;
+      } else {
+        --frame_index;
+      }
+
+      static_cast<FrameToolboxItem*>(m_itemHolderLayout->itemAt(frame_index)->widget())->click();
+    });
     m_playButton = new QPushButton(outer_surface);
     m_playButton->setIcon(QIcon("res/play_btn_icon.png"));
     m_playButton->setToolTip(tr("Play Animation"));
@@ -131,13 +153,37 @@ namespace pixpaint
         getImageEnvironment().getView().setTemporaryImage(document_manager.getDocument().getAnimation().getFrame(current_index));
       }
     });
+    m_forwardButton = new QPushButton(outer_surface);
+    m_forwardButton->setIcon(QIcon("res/forward_btn_icon.png"));
+    m_forwardButton->setToolTip(tr("Next Frame"));
+    m_forwardButton->setFixedSize(TOOLBOX_BUTTON_WIDTH, TOOLBOX_BUTTON_HEIGHT);
+    connect(m_forwardButton, &QPushButton::clicked, [this] {
+      auto& document_manager = getDocumentManager();
+      auto frame_index = document_manager.getDocument().getAnimation().getCurrentFrameIndex();
+      frame_index = (frame_index + 1) % document_manager.getDocument().getAnimation().getFrameCount();
+
+      static_cast<FrameToolboxItem*>(m_itemHolderLayout->itemAt(frame_index)->widget())->click();
+    });
+    m_forwardEndButton = new QPushButton(outer_surface);
+    m_forwardEndButton->setIcon(QIcon("res/forward_end_btn_icon.png"));
+    m_forwardEndButton->setToolTip(tr("Last Frame"));
+    m_forwardEndButton->setFixedSize(TOOLBOX_BUTTON_WIDTH, TOOLBOX_BUTTON_HEIGHT);
+    connect(m_forwardEndButton, &QPushButton::clicked, [this] {
+      const auto frame_index = getDocumentManager().getDocument().getAnimation().getFrameCount() - 1;
+      static_cast<FrameToolboxItem*>(m_itemHolderLayout->itemAt(frame_index)->widget())->click();
+    });
 
     button_layout->addWidget(m_addButton);
     button_layout->addWidget(m_addCpyButton);
     button_layout->addWidget(m_removeButton);
     button_layout->addSpacerItem(new QSpacerItem(100, TOOLBOX_BUTTON_HEIGHT));
     button_layout->addWidget(m_timerText);
+
+    button_layout->addWidget(m_backBeginButton);
+    button_layout->addWidget(m_backButton);
     button_layout->addWidget(m_playButton);
+    button_layout->addWidget(m_forwardButton);
+    button_layout->addWidget(m_forwardEndButton);
 
     layout->addLayout(button_layout);
     outer_layer->addWidget(outer_surface);
@@ -192,13 +238,14 @@ namespace pixpaint
     emitEvent(gui_events::FrameChangeEvent { previous_frame_index, frame_index });
   }
 
-  void FrameToolbox::onEmit(const gui_events::HistoryRefreshFrameEvent&)
+  void FrameToolbox::onEmit(const gui_events::HistoryRecreateFrameEvent&)
   {
     clearItems();
     createItems();
 
     auto frame_index = getDocumentManager().getDocument().getAnimation().getCurrentFrameIndex();
     slotClicked(static_cast<FrameToolboxItem*>(m_itemHolderLayout->itemAt(frame_index)->widget()), frame_index);
+    m_scrollArea->repaint();
   }
 
   FrameToolboxItem* FrameToolbox::createItem(std::size_t index, bool addAtIndex)

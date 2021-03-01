@@ -20,7 +20,10 @@
 #include "colortoolbox.h"
 
 #include <QColorDialog>
+#include <QFileDialog>
 #include <QHBoxLayout>
+#include <QMessageBox>
+#include "../3rdparty/gengine/configuration.h"
 #include "../env/imageenvironment.h"
 #include "../helper/tool_helpers.h"
 #include "../image/image.h"
@@ -32,7 +35,9 @@
 #include "../manager/textselectionmanager.h"
 #include "../tool/painttoolbase.h"
 #include "../utility/qt_utility.h"
+#include "../colorlist.h"
 #include "../debug_log.h"
+#include "../define.h"
 #include "../gui_define.h"
 #include "colorbutton.h"
 #include "imageeditorview.h"
@@ -43,9 +48,9 @@ namespace
 {
   void on_color_click()
   {
-    auto& imageEnv = getImageEnvironment();
-    if(imageEnv.isViewSet()) {
-      auto& view = imageEnv.getView();
+    auto& image_env = getImageEnvironment();
+    if(image_env.isViewSet()) {
+      auto& view = image_env.getView();
       auto& currentPaintTool = getPaintToolManager().getCurrentTool();
 
       if(getTextManager().tryUpdateText()) {
@@ -148,7 +153,7 @@ namespace
     QWidget::resizeEvent(event);
   }
 
-  ColorToolbox::ColorToolbox(QWidget* parent, const std::vector<Color>& colors) :
+  ColorToolbox::ColorToolbox(QWidget* parent) :
     QWidget(parent)
   {
     this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -159,9 +164,56 @@ namespace
 
     m_colorSelectionWidget = static_cast<ColorSelectionWidget*>(createColorSelectionWidget());
     layout->addWidget(m_colorSelectionWidget);
-    layout->addWidget(createColorGridWidget(colors));
+    layout->addWidget(createColorGridWidget());
+
+    auto* btn_layout = new QVBoxLayout(this);
+    auto* save_btn = new QPushButton("Save", this);
+    save_btn->setFixedHeight(25);
+    save_btn->setToolTip(tr("Save color list..."));
+    auto* load_btn = new QPushButton("Load", this);
+    load_btn->setFixedHeight(25);
+    load_btn->setToolTip(tr("Load color list..."));
+
+    this->connect(save_btn, &QPushButton::clicked, [this]() {
+      auto filename = QFileDialog::getSaveFileName(this,
+                                                   tr("Save Colors..."),
+                                                   CONFIG_COLOR_SELECTION_LOCATION,
+                                                   "PixPaint Colors(*.ppc)");
+      if(filename.size()) {
+        auto filename_s = std::string(filename.toUtf8().constData());
+        auto filename_p = os_specific::filesystem::path(filename_s);
+        if(filename_p.extension().string().empty() ||
+           filename_p.extension().string() != "ppa") {
+          filename_s += ".ppa";
+        }
+
+        if(!getColorManager().getColorList().save(filename_s)) {
+          QMessageBox::critical(this, tr("Error"), tr("There was an error saving the color list!"));
+        }
+      }
+    });
+
+    this->connect(load_btn, &QPushButton::clicked, [this]() {
+      auto filename = QFileDialog::getOpenFileName(this,
+                                                   tr("Load Colors..."),
+                                                   CONFIG_COLOR_SELECTION_LOCATION,
+                                                   "PixPaint Colors(*.ppc)");
+      if(filename.size()) {
+        if(!getColorManager().getColorList().load(filename.toUtf8().constData())) {
+          QMessageBox::critical(this, tr("Error"), tr("There was an error loading the color list!"));
+          return;
+        }
+      }
+    });
+
+    btn_layout->addWidget(save_btn);
+    btn_layout->addWidget(load_btn);
+    layout->addLayout(btn_layout);
 
     this->setLayout(layout);
+
+    getColorManager().registerObserver(*this);
+    getColorManager().getColorList().registerObserver(*this);
   }
 
   void ColorToolbox::setSelectedForegroundColor(const Color& color)
@@ -174,52 +226,111 @@ namespace
     m_colorSelectionWidget->setSelectedBackgroundColor(color);
   }
 
+  void ColorToolbox::updateObserver(int id)
+  {
+    switch(id) {
+    case 0:
+      m_colorSelectionWidget->setSelectedForegroundColor(getColorManager().getForegroundColor());
+      m_colorSelectionWidget->setSelectedBackgroundColor(getColorManager().getBackgroundColor());
+      break;
+
+    case 1:
+      clearColorGrid();
+      updateColorGrid();
+      break;
+
+    default:
+      break;
+    }
+  }
+
   QWidget* ColorToolbox::createColorSelectionWidget()
   {
     return new ColorSelectionWidget(this);
   }
 
-  QWidget* ColorToolbox::createColorGridWidget(const std::vector<Color>& colors)
+  QWidget* ColorToolbox::createColorGridWidget()
   {
-    auto* surface = new QWidget(this);
-    auto* layout = new QGridLayout(surface);
+    m_colorGridSurface = new QWidget(this);
+    m_colorGrid = new QGridLayout(m_colorGridSurface);
 
-    int x = 0, y = 0;
-    for(const auto& color : colors) {
-      auto* colorBtn = new ColorButton(surface, color, true);
-      colorBtn->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
-      colorBtn->setFixedSize(COLOR_BUTTON_WIDTH, COLOR_BUTTON_HEIGHT);
+    updateColorGrid();
 
-      connect(colorBtn, &ColorButton::clicked, [colorBtn] {
-        getColorManager().setForegroundColor(colorBtn->getBackgroundColor());
+    m_colorGridSurface->setLayout(m_colorGrid);
+    return m_colorGridSurface;
+  }
+
+  void ColorToolbox::clearColorGrid()
+  {
+    while(m_colorGrid->itemAt(0)) {
+      delete m_colorGrid->itemAt(0)->widget();
+    }
+  }
+
+  void ColorToolbox::updateColorGrid()
+  {
+    int x = 0, y = 0, i = 0;
+    for(const auto& color : getColorManager().getColorList()) {
+      auto* color_btn = new ColorButton(m_colorGridSurface, color, true);
+      color_btn->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
+      color_btn->setFixedSize(COLOR_BUTTON_WIDTH, COLOR_BUTTON_HEIGHT);
+
+      this->connect(color_btn, &ColorButton::clicked, [color_btn] {
+        getColorManager().setForegroundColor(color_btn->getBackgroundColor());
         on_color_click();
       });
 
-      connect(colorBtn, &ColorButton::customContextMenuRequested, [colorBtn] {
-        getColorManager().setBackgroundColor(colorBtn->getBackgroundColor());
+      this->connect(color_btn, &ColorButton::customContextMenuRequested, [color_btn] {
+        getColorManager().setBackgroundColor(color_btn->getBackgroundColor());
         on_color_click();
       });
 
-      connect(colorBtn, &ColorButton::doubleClicked, [colorBtn]{
-        auto color = QColorDialog::getColor(qt_utils::convertToQTColor(colorBtn->getBackgroundColor()),
-                                            nullptr,
-                                            "Select Color",
-                                            QColorDialog::ShowAlphaChannel |
-                                            QColorDialog::DontUseNativeDialog);
-        if(color.isValid()) {
-          colorBtn->setBackgroundColor(qt_utils::convertToColor(color));
+      this->connect(color_btn, &ColorButton::middleClicked, [this, color_btn, i] {
+        auto btn = QMessageBox::question(this,
+                                         "Remove Color",
+                                         "Do you want to remove this color?",
+                                         QMessageBox::StandardButton::Yes,
+                                         QMessageBox::StandardButton::No);
+        if(btn == QMessageBox::Yes) {
+          getColorManager().getColorList().removeColor(i);
         }
       });
 
-      layout->addWidget(colorBtn, y, x, 1, 1);
-      if(x == (colors.size() / 2)) {
-        ++y; x = 0;
+      this->connect(color_btn, &ColorButton::doubleClicked, [color_btn, i]{
+        // Must have atleast one color
+        if(getColorManager().getColorList().size() > 2) {
+          auto color = QColorDialog::getColor(qt_utils::convertToQTColor(color_btn->getBackgroundColor()),
+                                              nullptr,
+                                              "Select Color",
+                                              QColorDialog::ShowAlphaChannel |
+                                              QColorDialog::DontUseNativeDialog);
+          if(color.isValid()) {
+            getColorManager().getColorList().setColor(i, qt_utils::convertToColor(color));
+          }
+        }
+      });
+
+      m_colorGrid->addWidget(color_btn, y, x, 1, 1);
+      if(y == 1) {
+        y = 0; ++x;
       } else {
-        ++x;
+        ++y;
       }
+      ++i;
     }
 
-    surface->setLayout(layout);
-    return surface;
+    auto* add_btn = new QPushButton(tr("+"), this);
+    add_btn->setFixedSize(COLOR_BUTTON_WIDTH, COLOR_BUTTON_HEIGHT);
+    this->connect(add_btn, &QPushButton::clicked, [this]() {
+      getColorManager().getColorList().addColor(Color::BLACK);
+    });
+
+    if(getColorManager().getColorList().size() < ColorList::MAX_COLOR_COUNT - 1) {
+      add_btn->setEnabled(true);
+    } else {
+      add_btn->setEnabled(false);
+    }
+
+    m_colorGrid->addWidget(add_btn, y, x, 1, 1);
   }
 }

@@ -42,7 +42,7 @@ namespace pixpaint
     animation.setCurrentFrameIndex(m_index);
     m_frame.reset(nullptr);
 
-    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_REFRESH_FRAME_LIST);
+    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_RECREATE_FRAME_LIST);
   }
 
   RemoveFrameAction::EActionResult RemoveFrameAction::redo()
@@ -58,6 +58,6 @@ namespace pixpaint
       animation.setCurrentFrameIndex(0);
     }
 
-    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_REFRESH_FRAME_LIST);
+    return toEActionResult(EActionResult::EAR_REFRESH_IMAGE | EActionResult::EAR_RECREATE_FRAME_LIST);
   }
 }

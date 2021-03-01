@@ -36,8 +36,10 @@ namespace gui_events
     size_t layerIndex;
   };
 
+  struct HistoryRecreateLayerEvent {};
+  struct HistoryRecreateFrameEvent {};
   struct HistoryRefreshLayerEvent {};
-  struct HistoryRefreshFrameEvent {};
+//  struct HistoryRefreshFrameEvent {};
 }
 }
 
