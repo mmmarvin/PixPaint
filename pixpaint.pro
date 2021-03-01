@@ -14,10 +14,6 @@ INCLUDE_PATH_CLIP = # Add include location for clip here
 LIB_PATH_CLIP = # Add library location for clip here
 LIB_NAME_CLIP = libclip.a
 
-INCLUDE_PATH_LEPTONICA = # Add include location for leptonica here
-LIB_PATH_LEPTONICA = # Add lib location for leptonica here
-LIB_NAME_LEPTONICA = libleptonica.a
-
 INCLUDE_PATH_PYTHON = # Add include lcoation for python here
 
 # CONFIGS
@@ -62,6 +58,7 @@ HEADERS += \
     src/3rdparty/ska/flat_hash_map.hpp \
     src/3rdparty/ska/unordered_map.hpp \
     src/3rdparty/stbi/stb_image.h \
+    src/3rdparty/stbi/stb_image_resize.h \
     src/3rdparty/stbi/stb_image_write.h \
     src/3rdparty/high_resolution_clock.h \
     src/3rdparty/time.h \
@@ -115,6 +112,7 @@ HEADERS += \
     src/history/animationresizeaction.h \
     src/history/deselectionaction.h \
     src/history/draweraction.h \
+    src/history/hidelayeraction.h \
     src/history/history.h \
     src/history/historyaction.h \
     src/history/imagerestoreaction.h \
@@ -129,6 +127,7 @@ HEADERS += \
     src/history/selectionpasteaction.h \
     src/history/selectionregionrestoreaction.h \
     src/history/selectionresize.h \
+    src/history/showlayeraction.h \
     src/history/textdeselectionaction.h \
     src/history/textselectionaction.h \
     src/image/animation.h \
@@ -156,6 +155,8 @@ HEADERS += \
     src/manager/selectionmanager.h \
     src/manager/textmanager.h \
     src/manager/textselectionmanager.h \
+    src/pattern/observer.h \
+    src/pattern/singleton.h \
     src/registrar/information/effectinformation.h \
     src/registrar/information/fileinformation.h \
     src/registrar/information/painttoolinformation.h \
@@ -191,6 +192,7 @@ HEADERS += \
     src/utility/thread_utility.h \
     src/value/optionvalue.h \
     src/value/optionvaluelist.h \
+    src/window/baseimageview.h \
     src/window/colorbutton.h \
     src/window/colortoolbox.h \
     src/window/consoletoolbox.h \
@@ -212,6 +214,7 @@ HEADERS += \
     src/window/mainmenu.h \
     src/window/mainwindow.h \
     src/window/nonselectionpreviewview.h \
+    src/window/observerlabel.h \
     src/window/optioncheckbox.h \
     src/window/optionchoice.h \
     src/window/optionslider.h \
@@ -226,6 +229,7 @@ HEADERS += \
     src/window/zoomablescrollarea.h \
     src/animation_filetype_importer.h \
     src/assert.h \
+    src/colorlist.h \
     src/config.h \
     src/cursor.h \
     src/debug_log.h \
@@ -240,7 +244,6 @@ HEADERS += \
     src/linestyle.h \
     src/macro.h \
     src/os_specific_headers.h \
-    src/pixpaint_macro.h \
     src/project_filetype_importer.h \
     src/singleton.h \
     src/tool_importer.h \
@@ -302,6 +305,7 @@ SOURCES += \
     src/history/animationresizeaction.cpp \
     src/history/deselectionaction.cpp \
     src/history/draweraction.cpp \
+    src/history/hidelayeraction.cpp \
     src/history/history.cpp \
     src/history/history.inl \
     src/history/historyaction.cpp \
@@ -317,6 +321,7 @@ SOURCES += \
     src/history/selectionpasteaction.cpp \
     src/history/selectionregionrestoreaction.cpp \
     src/history/selectionresize.cpp \
+    src/history/showlayeraction.cpp \
     src/history/textdeselectionaction.cpp \
     src/history/textselectionaction.cpp \
     src/image/animation.cpp \
@@ -346,6 +351,7 @@ SOURCES += \
     src/manager/selectionmanager.cpp \
     src/manager/textmanager.cpp \
     src/manager/textselectionmanager.cpp \
+    src/pattern/observer.cpp \
     src/registrar/information/effectinformation.cpp \
     src/registrar/information/fileinformation.inl \
     src/registrar/information/painttoolinformation.cpp \
@@ -382,6 +388,7 @@ SOURCES += \
     src/utility/thread_utility.inl \
     src/value/optionvalue.cpp \
     src/value/optionvaluelist.cpp \
+    src/window/baseimageview.cpp \
     src/window/colorbutton.cpp \
     src/window/colortoolbox.cpp \
     src/window/consoletoolbox.cpp \
@@ -402,11 +409,16 @@ SOURCES += \
     src/window/layerwidgetitem.cpp \
     src/window/lefttoolbox.cpp \
     src/window/mainmenu.cpp \
+    src/window/mainmenu_edit.cpp \
+    src/window/mainmenu_file.cpp \
+    src/window/mainmenu_help.cpp \
+    src/window/mainmenu_select.cpp \
+    src/window/mainmenu_view.cpp \
     src/window/mainwindow.cpp \
     src/window/mainwindow.inl \
-    src/window/mainwindow_keyboardshortcuts.cpp \
     src/window/mainwindow_shortcuts.cpp \
     src/window/nonselectionpreviewview.cpp \
+    src/window/observerlabel.cpp \
     src/window/optioncheckbox.cpp \
     src/window/optionchoice.cpp \
     src/window/optionslider.cpp \
@@ -420,6 +432,7 @@ SOURCES += \
     src/window/verticalresizehandle.cpp \
     src/window/zoomablescrollarea.cpp \
     src/animation_filetype_importer.cpp \
+    src/colorlist.cpp \
     src/cursor.cpp \
     src/debug_log.cpp \
     src/debug_log.inl \
@@ -436,11 +449,9 @@ SOURCES += \
 
 INCLUDEPATH += \
     $${INCLUDE_PATH_PYTHON} \
-    $${INCLUDE_PATH_CLIP} \
-    $${INCLUDE_PATH_LEPTONICA}
+    $${INCLUDE_PATH_CLIP}
 
 LIBS += \
     -lpython3.9 -lboost_python39 -lpng -lxcb -lz \
-    $${LIB_PATH_CLIP}/$${LIB_NAME_CLIP} \
-    $${LIB_PATH_LEPTONICA}/$${LIB_NAME_LEPTONICA}
+    $${LIB_PATH_CLIP}/$${LIB_NAME_CLIP}
 
