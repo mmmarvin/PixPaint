@@ -76,11 +76,11 @@ namespace pixpaint
       for(int x = 0; x < width; ++x) {
         unsigned char* pixel = data.getData() + ((x + y * width) * n);
         image.getLayer(0).setPixel(x,
-                                       y,
-                                       Color(pixel[0],
-                                             pixel[1],
-                                             pixel[2],
-                                             pixel[3]));
+                                   y,
+                                   Color(pixel[0],
+                                         pixel[1],
+                                         pixel[2],
+                                         pixel[3]));
       }
     }
 

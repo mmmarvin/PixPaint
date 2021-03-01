@@ -85,6 +85,11 @@ namespace pixpaint
             addToRecent(filename);
           }
 
+          // reset the setModified flags just in case the setPixel was used by the opener
+          auto& animation = document_manager.getDocument().getAnimation();
+          for(size_t i = 0, isize = animation.getFrameCount(); i < isize; ++i) {
+            animation.getFrame(i).setModified(false);
+          }
           m_lastImageWidth = image_manager.getImage().getWidth();
           m_lastImageHeight = image_manager.getImage().getHeight();
           return true;
@@ -116,6 +121,11 @@ namespace pixpaint
             addToRecent(filename);
           }
 
+          // reset the setModified flags just in case the setPixel was used by the opener
+          auto& animation = document_manager.getDocument().getAnimation();
+          for(size_t i = 0, isize = animation.getFrameCount(); i < isize; ++i) {
+            animation.getFrame(i).setModified(false);
+          }
           m_lastImageWidth = image_manager.getImage().getWidth();
           m_lastImageHeight = image_manager.getImage().getHeight();
         }
@@ -178,10 +188,7 @@ namespace pixpaint
               addToRecent(filename);
             }
 
-            auto& animation = document_manager.getDocument().getAnimation();
-            for(size_t i = 0, isize = animation.getFrameCount(); i < isize; ++i) {
-              animation.getFrame(i).setModified(false);
-            }
+            ModifySetterT()(document_manager.getDocument().getAnimation());
             break;
           }
         } else {

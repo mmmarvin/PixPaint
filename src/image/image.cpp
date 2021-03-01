@@ -26,8 +26,7 @@ namespace pixpaint
   Image::Image(position_t width, position_t height, const Color& color) :
     m_currentLayerIndex(0),
     m_width(width),
-    m_height(height),
-    m_modified(false)
+    m_height(height)
   {
     addLayer(color);
     setModified(false);

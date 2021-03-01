@@ -684,19 +684,6 @@ namespace
       filter += ";;All Files (*.*)";
     }
 
-//    QFileDialog dialog(this,
-//                       tr("Open..."),
-//                       tr(gengine2d::getConfigurationManager().getString(CONFIG_SECTION_SETTINGS, "last_location")->c_str()),
-//                       filter.c_str());
-//    dialog.setFileMode(QFileDialog::ExistingFile);
-//    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-//    dialog.selectNameFilter(tr("All Files (*.*)"));
-//    if(dialog.exec()) {
-//      auto filenames = dialog.selectedFiles();
-//      if(filenames.size() == 1) {
-//        openProject(std::string(filenames[0].toUtf8().constData()));
-//      }
-//    }
     do_open(this,
             filter,
             "Open Project...",
@@ -750,16 +737,6 @@ namespace
       filter += ";;All Files (*.*)";
     }
 
-//    QFileDialog dialog(this, tr("Open..."), tr(""), filter.c_str());
-//    dialog.setFileMode(QFileDialog::ExistingFile);
-//    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-//    dialog.selectNameFilter(tr("All Files (*.*)"));
-//    if(dialog.exec()) {
-//      auto filenames = dialog.selectedFiles();
-//      if(filenames.size() == 1) {
-//        openAnimation(std::string(filenames[0].toUtf8().constData()));
-//      }
-//    }
     do_open(this,
             filter,
             "Import Animation...",
@@ -787,16 +764,6 @@ namespace
       filter += ";;All Files (*.*)";
     }
 
-//    QFileDialog dialog(this, tr("Open..."), tr(""), filter.c_str());
-//    dialog.setFileMode(QFileDialog::ExistingFile);
-//    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-//    dialog.selectNameFilter(tr("All Files (*.*)"));
-//    if(dialog.exec()) {
-//      auto filenames = dialog.selectedFiles();
-//      if(filenames.size() == 1) {
-//        openImage(std::string(filenames[0].toUtf8().constData()));
-//      }
-//    }
     do_open(this,
             filter,
             "Import Image...",
