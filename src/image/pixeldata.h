@@ -45,8 +45,6 @@ namespace pixeldata_detail
                         std::make_signed_t<dimension_t> layer_width,
                         std::make_signed_t<dimension_t> layer_height);
 }
-  class PixelMap;
-
   enum class ERotationDirection : unsigned char
   {
     CLOCKWISE = 0,
@@ -106,7 +104,6 @@ namespace pixeldata_detail
     EBlendMode getBlendMode() const noexcept;
 
     void combine(const PixelData& pixelData, bool hard = false);
-    void combine(const PixelMap& pixelMap, bool hard = false);
     void combine(const PixelData& pixelData, position_t x, position_t y, bool hard = false);
 
     void composite(const PixelData& pixelData, position_t x = 0, position_t y = 0);

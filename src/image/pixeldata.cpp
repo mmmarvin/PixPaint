@@ -385,20 +385,6 @@ namespace
     combine(pixelData, 0, 0, hard);
   }
 
-  void PixelData::combine(const PixelMap& pixelMap, bool hard)
-  {
-    using setter_func_t = std::function<void(position_t, position_t, const Color&)>;
-    const auto pixelSetter = hard ?
-      setter_func_t([this](position_t x, position_t y, const Color& color) { setPixel(x, y, color); }) :
-      setter_func_t([this](position_t x, position_t y, const Color& color) { setPixelSoft(x, y, color); });
-
-    for(const auto& t : pixelMap.m_pixels) {
-      const auto& point = std::get<0>(t);
-      const auto& color = std::get<1>(t);
-      pixelSetter(point.first, point.second, color);
-    }
-  }
-
   void PixelData::combine(const PixelData& pixelData, position_t x, position_t y, bool hard)
   {
     combine(pixelData, x, y, hard,
