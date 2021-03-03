@@ -233,10 +233,10 @@ namespace color_detail
 
   Color& operator+=(Color& lhs, const Color& rhs)
   {
-    lhs.r = color_channel_t(general_utils::min<int>(static_cast<int>(lhs.r) + rhs.r, 255));
-    lhs.g = color_channel_t(general_utils::min<int>(static_cast<int>(lhs.g) + rhs.g, 255));
-    lhs.b = color_channel_t(general_utils::min<int>(static_cast<int>(lhs.b) + rhs.b, 255));
-    lhs.a = color_channel_t(general_utils::min<int>(static_cast<int>(lhs.a) + rhs.a, 255));
+    lhs.r = general_utils::min<uint32_t>(static_cast<uint32_t>(lhs.r) + rhs.r, 255);
+    lhs.g = general_utils::min<uint32_t>(static_cast<uint32_t>(lhs.g) + rhs.g, 255);
+    lhs.b = general_utils::min<uint32_t>(static_cast<uint32_t>(lhs.b) + rhs.b, 255);
+    lhs.a = general_utils::min<uint32_t>(static_cast<uint32_t>(lhs.a) + rhs.a, 255);
 
     return lhs;
   }
@@ -250,10 +250,10 @@ namespace color_detail
 
   Color& operator-=(Color& lhs, const Color& rhs)
   {
-    lhs.r = color_channel_t(general_utils::max<int>(static_cast<int>(lhs.r) - rhs.r, 0));
-    lhs.g = color_channel_t(general_utils::max<int>(static_cast<int>(lhs.g) - rhs.g, 0));
-    lhs.b = color_channel_t(general_utils::max<int>(static_cast<int>(lhs.b) - rhs.b, 0));
-    lhs.a = color_channel_t(general_utils::max<int>(static_cast<int>(lhs.a) - rhs.a, 0));
+    lhs.r = general_utils::max<int32_t>(static_cast<int32_t>(lhs.r) - rhs.r, 0);
+    lhs.g = general_utils::max<int32_t>(static_cast<int32_t>(lhs.g) - rhs.g, 0);
+    lhs.b = general_utils::max<int32_t>(static_cast<int32_t>(lhs.b) - rhs.b, 0);
+    lhs.a = general_utils::max<int32_t>(static_cast<int32_t>(lhs.a) - rhs.a, 0);
 
     return lhs;
   }
@@ -267,10 +267,10 @@ namespace color_detail
 
   Color& operator*=(Color& lhs, const Color& rhs)
   {
-    lhs.r = color_channel_t((static_cast<int>(lhs.r) * rhs.r) / 255);
-    lhs.g = color_channel_t((static_cast<int>(lhs.g) * rhs.g) / 255);
-    lhs.b = color_channel_t((static_cast<int>(lhs.b) * rhs.b) / 255);
-    lhs.a = color_channel_t((static_cast<int>(lhs.a) * rhs.a) / 255);
+    lhs.r = (static_cast<uint32_t>(lhs.r) * rhs.r) / 255;
+    lhs.g = (static_cast<uint32_t>(lhs.g) * rhs.g) / 255;
+    lhs.b = (static_cast<uint32_t>(lhs.b) * rhs.b) / 255;
+    lhs.a = (static_cast<uint32_t>(lhs.a) * rhs.a) / 255;
 
     return lhs;
   }
