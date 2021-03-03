@@ -168,20 +168,20 @@ namespace
     PixelData ret(layer_width, layer_height);
 
     auto c = center(layer);
-    auto rad = math_utils::toRadian(degree);
-    double x0 = c.x;
-    double y0 = c.y;
-    auto cos_r = std::cos(rad);
-    auto sin_r = std::sin(rad);
+    float rad = math_utils::toRadian(degree);
+    float x0 = c.x;
+    float y0 = c.y;
+    float cos_r = std::cos(rad);
+    float sin_r = std::sin(rad);
 
     auto* dst = ret.getData();
     auto* src = layer.getData();
     auto line_width = layer_width * 4;
-    for(std::size_t j = 0, jsize = layer_height; j < jsize; ++j) {
+    for(float j = 0, jsize = layer_height; j < jsize; j += 1.f) {
       auto* src_ptr = src;
-      for(std::size_t i = 0, isize = layer_width; i < isize; ++i) {
-        double dx = i - x0;
-        double dy = j - y0;
+      for(float i = 0, isize = layer_width; i < isize; i += 1.f) {
+        float dx = i - x0;
+        float dy = j - y0;
         position_t dst_x = std::round((cos_r * dx) - (sin_r * dy) + x0);
         position_t dst_y = std::round((sin_r * dx) + (cos_r * dy) + y0);
         if(dst_x < 0 || dst_x > layer_width ||
