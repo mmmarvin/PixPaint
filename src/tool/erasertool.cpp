@@ -60,6 +60,10 @@ namespace pixpaint
     end_y += m_size;
 
     auto hs = m_size / 2;
+    getLayerDrawer().getDrawerCommander()->addCommand(start_x,
+                                                      start_y,
+                                                      end_x - start_x,
+                                                      end_y - start_y);
     currentLayer.combine(m_brush, currentPoint.x - hs, currentPoint.y - hs, true);
 
     auto sp = Point(m_size, m_size);
@@ -90,6 +94,10 @@ namespace pixpaint
       end_x += m_size;
       end_y += m_size;
 
+      getLayerDrawer().getDrawerCommander()->addCommand(start_x,
+                                                        start_y,
+                                                        end_x - start_x,
+                                                        end_y - start_y);
       geometry_utils::drawLine(m_brush, currentLayer, currentPoint, previousPoint, true);
     } else {
       auto tx = general_utils::minmax(previousPoint.x, currentPoint.x);
@@ -104,6 +112,10 @@ namespace pixpaint
       end_x += m_size;
       end_y += m_size;
 
+      getLayerDrawer().getDrawerCommander()->addCommand(start_x,
+                                                        start_y,
+                                                        end_x - start_x,
+                                                        end_y - start_y);
       geometry_utils::drawLine(m_brush, currentLayer, currentPoint, previousPoint, true);
     }
 
