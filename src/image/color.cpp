@@ -28,6 +28,8 @@ namespace color_detail
 {
   void alphaBlend(color_channel_t* dst, const color_channel_t* src)
   {
+    // formula:
+    // s * a + (d * (1 - a))
     unsigned int s_r = src[0], s_g = src[1], s_b = src[2], s_a = src[3];
     unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2], d_a = dst[3];
     unsigned int s_ia = 255 - s_a;
@@ -44,6 +46,75 @@ namespace color_detail
       dst[2] = ((s_b * s_a) + (d_b * s_ia)) / 255;
       dst[3] = s_a + (d_a * s_ia / 255);
     }
+  }
+
+  void multiplyBlend(color_channel_t* dst, const color_channel_t* src)
+  {
+    // formula:
+    // d * s
+    unsigned int s_r = src[0], s_g = src[1], s_b = src[2];
+    unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2];
+
+    dst[0] = d_r * s_r / 255;
+    dst[1] = d_g * s_g / 255;
+    dst[2] = d_b * s_b / 255;
+  }
+
+  void screenBlend(color_channel_t* dst, const color_channel_t* src)
+  {
+    // formula:
+    // 1 - (1 - d)(1 - s)
+    unsigned int s_r = src[0], s_g = src[1], s_b = src[2];
+    unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2];
+
+    dst[0] = 255 - (((255 - d_r) * (255 - s_r)) / 255);
+    dst[1] = 255 - (((255 - d_g) * (255 - s_g)) / 255);
+    dst[2] = 255 - (((255 - d_b) * (255 - s_b)) / 255);
+  }
+
+  void overlayBlend(color_channel_t* dst, const color_channel_t* src)
+  {
+    // formula:
+    // 2ds                 if a < 0.5
+    // 1 - 2(1 - d)(1 - s) otherwise
+    unsigned int s_r = src[0], s_g = src[1], s_b = src[2];
+    unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2];
+
+    if(dst[3] < 128) {
+      dst[0] = 2 * d_r * s_r / 255;
+      dst[1] = 2 * d_g * s_g / 255;
+      dst[2] = 2 * d_b * s_b / 255;
+    } else {
+      dst[0] = 255 - ((2 * (255 - d_r) * (255 - s_r)) / 255);
+      dst[1] = 255 - ((2 * (255 - d_g) * (255 - s_g)) / 255);
+      dst[2] = 255 - ((2 * (255 - d_b) * (255 - s_b)) / 255);
+    }
+  }
+
+  // TODO: Hard light, soft light
+  void additionBlend(color_channel_t* dst, const color_channel_t* src)
+  {
+    // formula:
+    // d + s
+    unsigned int s_r = src[0], s_g = src[1], s_b = src[2];
+    unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2];
+
+    dst[0] = general_utils::min<uint32_t>(255, s_r + d_r);
+    dst[1] = general_utils::min<uint32_t>(255, s_g + d_g);
+    dst[2] = general_utils::min<uint32_t>(255, s_b + d_b);
+  }
+
+  void differenceBlend(color_channel_t* dst, const color_channel_t* src)
+  {
+    // formula:
+    // s - d      if s > d
+    // d - s      otherwise
+    unsigned int s_r = src[0], s_g = src[1], s_b = src[2];
+    unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2];
+
+    dst[0] = s_r >= d_r ? s_r - d_r : d_r - s_r;
+    dst[1] = s_g >= d_g ? s_g - d_g : d_g - s_g;
+    dst[2] = s_b >= d_b ? s_b - d_b : d_b - s_b;
   }
 }
   const Color Color::TRANSPARENT = Color(255, 255, 255, 0);
