@@ -19,6 +19,7 @@
  **********/
 #include "color.h"
 
+#include <cstring>
 #include "../utility/general_utility.h"
 
 namespace pixpaint
@@ -27,13 +28,22 @@ namespace color_detail
 {
   void alphaBlend(color_channel_t* dst, const color_channel_t* src)
   {
-    unsigned int a = src[3];
-    unsigned int b = 255 - src[3];
+    unsigned int s_r = src[0], s_g = src[1], s_b = src[2], s_a = src[3];
+    unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2], d_a = dst[3];
+    unsigned int s_ia = 255 - s_a;
 
-    dst[0] = static_cast<unsigned char>((a * src[0] + b * dst[0]) / 255);
-    dst[1] = static_cast<unsigned char>((a * src[1] + b * dst[1]) / 255);
-    dst[2] = static_cast<unsigned char>((a * src[2] + b * dst[2]) / 255);
-    dst[3] = static_cast<unsigned char>(general_utils::min<int>(src[3] + dst[3], 255));
+    if(!s_a) {
+      return;
+    }
+
+    if(!d_a || !s_ia) {
+      std::memcpy(dst, src, 4);
+    } else {
+      dst[0] = ((s_r * s_a) + (d_r * s_ia)) / 255;
+      dst[1] = ((s_g * s_a) + (d_g * s_ia)) / 255;
+      dst[2] = ((s_b * s_a) + (d_b * s_ia)) / 255;
+      dst[3] = s_a + (d_a * s_ia / 255);
+    }
   }
 }
   const Color Color::TRANSPARENT = Color(255, 255, 255, 0);

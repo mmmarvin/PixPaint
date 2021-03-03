@@ -355,7 +355,7 @@ namespace
 
   void PixelData::setOpacity(std::uint_least32_t opacity)
   {
-    m_opacity = opacity;
+    m_opacity = general_utils::min<uint_least32_t>(100, opacity);
   }
 
   std::uint_least32_t PixelData::getOpacity() const noexcept
