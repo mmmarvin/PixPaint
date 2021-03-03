@@ -20,6 +20,8 @@
 #ifndef RIGHTTOOLBOX_H
 #define RIGHTTOOLBOX_H
 
+#include <QComboBox>
+#include <QGroupBox>
 #include <QWidget>
 #include "../manager/eventmanager.h"
 
@@ -48,7 +50,6 @@ namespace gui_events
   public:
     explicit RightToolbox(QWidget* parent);
 
-    PreviewWidget& getPreviewWidget();
     LayerWidget& getLayerWidget();
 
   private:
@@ -59,6 +60,10 @@ namespace gui_events
     void onEmit(const gui_events::AnimationPauseEvent& event) override;
     void onEmit(const gui_events::AnimationStopEvent& event) override;
 
+    QGroupBox* createPreviewGroup();
+    QGroupBox* createLayerGroup();
+
+    QComboBox*      m_blendCombo;
     PreviewWidget*  m_preview;
     LayerWidget*    m_layer;
   };
