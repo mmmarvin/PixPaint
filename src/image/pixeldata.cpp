@@ -27,7 +27,6 @@
 #include "../utility/math_utility.h"
 #include "../utility/qt_utility.h"
 #include "../debug_log.h"
-#include "pixelmap.h"
 
 namespace pixpaint
 {
@@ -608,9 +607,7 @@ namespace
     auto* data = getData();
 
     for(std::size_t i = 0; i < size; ++i) {
-      data[0] = general_utils::max<int>(255 - data[0], 0);
-      data[1] = general_utils::max<int>(255 - data[1], 0);
-      data[2] = general_utils::max<int>(255 - data[2], 0);
+      color_detail::invert(data);
       data += 4;
     }
   }

@@ -126,6 +126,18 @@ namespace pixpaint
       case EBlendMode::DIFFERENCE:
         blend_func = &color_detail::differenceBlend;
         break;
+      case EBlendMode::DARKEN:
+        blend_func = &color_detail::darkenBlend;
+        break;
+      case EBlendMode::LIGHTEN:
+        blend_func = &color_detail::lightenBlend;
+        break;
+      case EBlendMode::COLOR_DODGE:
+        blend_func = &color_detail::colorDodgeBlend;
+        break;
+      case EBlendMode::COLOR_BURN:
+        blend_func = &color_detail::colorBurnBlend;
+        break;
       default:
         break;
       }

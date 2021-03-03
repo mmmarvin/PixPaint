@@ -73,7 +73,16 @@ namespace pixeldata_detail
       HARDLIGHT,
       SOFTLIGHT,
       ADDITION,
-      DIFFERENCE
+      DIFFERENCE,
+      DARKEN,
+      LIGHTEN,
+      COLOR_DODGE,
+      COLOR_BURN,
+
+      SRC_IN,
+      DST_IN,
+      SRC_OUT,
+      DST_OUT
     };
 
     PixelData(dimension_t width, dimension_t height, const Color& color = Color::WHITE);

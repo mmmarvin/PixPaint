@@ -91,7 +91,16 @@ namespace color_detail
     }
   }
 
-  // TODO: Hard light, soft light
+//  void hardLightBlend(color_channel_t* dst, const color_channel_t* src)
+//  {
+
+//  }
+
+//  void softLightBlend(color_channel_t* dst, const color_channel_t* src)
+//  {
+
+//  }
+
   void additionBlend(color_channel_t* dst, const color_channel_t* src)
   {
     // formula:
@@ -115,6 +124,69 @@ namespace color_detail
     dst[0] = s_r >= d_r ? s_r - d_r : d_r - s_r;
     dst[1] = s_g >= d_g ? s_g - d_g : d_g - s_g;
     dst[2] = s_b >= d_b ? s_b - d_b : d_b - s_b;
+  }
+
+  void darkenBlend(color_channel_t* dst, const color_channel_t* src)
+  {
+    // formula:
+    // min(s, d)
+    dst[0] = general_utils::min(dst[0], src[0]);
+    dst[1] = general_utils::min(dst[1], src[1]);
+    dst[2] = general_utils::min(dst[2], src[2]);
+  }
+
+  void lightenBlend(color_channel_t* dst, const color_channel_t* src)
+  {
+    // formula:
+    // max(s, d)
+    dst[0] = general_utils::max(dst[0], src[0]);
+    dst[1] = general_utils::max(dst[1], src[1]);
+    dst[2] = general_utils::max(dst[2], src[2]);
+  }
+
+  void colorDodgeBlend(color_channel_t* dst, const color_channel_t* src)
+  {
+    // formula:
+    // d / (1 - s)
+    dst[0] /= (255 - src[0]);
+    dst[1] /= (255 - src[1]);
+    dst[2] /= (255 - src[2]);
+  }
+
+  void colorBurnBlend(color_channel_t* dst, const color_channel_t* src)
+  {
+    // formula:
+    // (1 - d) / s
+    dst[0] = (255 - dst[0]) / src[0];
+    dst[1] = (255 - dst[1]) / src[1];
+    dst[2] = (255 - dst[2]) / src[2];
+  }
+
+//  void srcInBlend(color_channel_t* dst, const color_channel_t* src)
+//  {
+
+//  }
+
+//  void dstInBlend(color_channel_t* dst, const color_channel_t* src)
+//  {
+
+//  }
+
+//  void srcOutBlend(color_channel_t* dst, const color_channel_t* src)
+//  {
+
+//  }
+
+//  void dstOutBlend(color_channel_t* dst, const color_channel_t* src)
+//  {
+
+//  }
+
+  void invert(color_channel_t* color)
+  {
+    color[0] = 255 - color[0];
+    color[1] = 255 - color[1];
+    color[2] = 255 - color[2];
   }
 }
   const Color Color::TRANSPARENT = Color(255, 255, 255, 0);
@@ -213,7 +285,16 @@ namespace color_detail
   Color alphaBlend(const Color& background, const Color& foreground)
   {
     Color ret = background;
-    color_detail::alphaBlend(reinterpret_cast<unsigned char*>(&ret), reinterpret_cast<const unsigned char*>(&foreground));
+    color_detail::alphaBlend(reinterpret_cast<unsigned char*>(&ret),
+                             reinterpret_cast<const unsigned char*>(&foreground));
+
+    return ret;
+  }
+
+  Color invert(const Color& color)
+  {
+    Color ret = color;
+    color_detail::invert(reinterpret_cast<color_channel_t*>(&ret));
 
     return ret;
   }
