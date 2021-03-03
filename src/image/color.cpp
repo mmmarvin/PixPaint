@@ -105,12 +105,13 @@ namespace color_detail
   {
     // formula:
     // d + s
-    unsigned int s_r = src[0], s_g = src[1], s_b = src[2];
-    unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2];
+    unsigned int s_r = src[0], s_g = src[1], s_b = src[2], s_a = src[3];
+    unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2], d_a = dst[3];
 
     dst[0] = general_utils::min<uint32_t>(255, s_r + d_r);
     dst[1] = general_utils::min<uint32_t>(255, s_g + d_g);
     dst[2] = general_utils::min<uint32_t>(255, s_b + d_b);
+    dst[3] = general_utils::min<uint32_t>(255, s_a + d_a);
   }
 
   void differenceBlend(color_channel_t* dst, const color_channel_t* src)
