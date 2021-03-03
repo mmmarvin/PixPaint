@@ -118,7 +118,12 @@ namespace pixeldata_detail
 
   protected:
     template<class HardFunc, class Func>
-    void combine(const PixelData& pixelData, position_t x, position_t y, bool hard, HardFunc hardFunc, Func func);
+    void combine(const PixelData& pixelData,
+                 position_t x,
+                 position_t y,
+                 bool hard,
+                 HardFunc hardFunc,
+                 Func func);
 
   private:
     Color*              m_data;

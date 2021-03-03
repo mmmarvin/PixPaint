@@ -22,7 +22,12 @@
 namespace pixpaint
 {
   template<class HardFunc, class Func>
-  void PixelData::combine(const PixelData& pixelData, position_t x, position_t y, bool hard, HardFunc hardFunc, Func func)
+  void PixelData::combine(const PixelData& pixelData,
+                          position_t x,
+                          position_t y,
+                          bool hard,
+                          HardFunc hardFunc,
+                          Func func)
   {
     auto layer_width = static_cast<std::make_signed_t<dimension_t>>(getWidth());
     auto layer_height = static_cast<std::make_signed_t<dimension_t>>(getHeight());
