@@ -204,7 +204,8 @@ namespace
     m_data(nullptr),
     m_opacity(100),
     m_width(0),
-    m_height(0)
+    m_height(0),
+    m_mode(EBlendMode::NORMAL)
   {
     auto size = width * height;
     if(size) {
@@ -221,7 +222,8 @@ namespace
     m_data(nullptr),
     m_opacity(100),
     m_width(0),
-    m_height(0)
+    m_height(0),
+    m_mode(EBlendMode::NORMAL)
   {
     auto size = rhs.m_width * rhs.m_height;
     if(size) {
@@ -231,6 +233,7 @@ namespace
       m_width = rhs.m_width;
       m_height = rhs.m_height;
       m_opacity = rhs.m_opacity;
+      m_mode = rhs.m_mode;
       m_data = temp.release();
     }
   }
@@ -241,6 +244,7 @@ namespace
     std::swap(temp.m_width, m_width);
     std::swap(temp.m_height, m_height);
     std::swap(temp.m_opacity, m_opacity);
+    std::swap(temp.m_mode, m_mode);
     std::swap(temp.m_data, m_data);
 
     return *this;
@@ -250,11 +254,13 @@ namespace
     m_data(nullptr),
     m_opacity(100),
     m_width(0),
-    m_height(0)
+    m_height(0),
+    m_mode(EBlendMode::NORMAL)
   {
     std::swap(rhs.m_width, m_width);
     std::swap(rhs.m_height, m_height);
     std::swap(rhs.m_opacity, m_opacity);
+    std::swap(rhs.m_mode, m_mode);
     std::swap(rhs.m_data, m_data);
   }
 
@@ -263,6 +269,7 @@ namespace
     std::swap(rhs.m_width, m_width);
     std::swap(rhs.m_height, m_height);
     std::swap(rhs.m_opacity, m_opacity);
+    std::swap(rhs.m_mode, m_mode);
     std::swap(rhs.m_data, m_data);
 
     return *this;
@@ -363,6 +370,16 @@ namespace
     return m_opacity;
   }
 
+  void PixelData::setBlendMode(EBlendMode mode)
+  {
+    m_mode = mode;
+  }
+
+  PixelData::EBlendMode PixelData::getBlendMode() const noexcept
+  {
+    return m_mode;
+  }
+
   void PixelData::combine(const PixelData& pixelData, bool hard)
   {
     combine(pixelData, 0, 0, hard);
@@ -391,6 +408,11 @@ namespace
     [](unsigned char* dst_ptr, const unsigned char* src_ptr, position_t, position_t) {
       color_detail::alphaBlend(dst_ptr, src_ptr);
     });
+  }
+
+  void PixelData::composite(const PixelData& pixelData, position_t x, position_t y)
+  {
+    composite(pixelData, x, y, [](auto*, auto*, auto, auto) { return true; });
   }
 
   PixelData PixelData::copy(position_t x, position_t y, dimension_t width, dimension_t height) const

@@ -19,6 +19,8 @@
  **********/
 #include "pixeldata.h"
 
+#include <functional>
+
 namespace pixpaint
 {
   template<class HardFunc, class Func>
@@ -35,12 +37,19 @@ namespace pixpaint
       if(hard) {
         std::make_signed_t<dimension_t> w = pixelData.getWidth();
         std::make_signed_t<dimension_t> h = pixelData.getHeight();
-        position_t srcXOff = 0, srcYOff = 0;
-        if(!pixeldata_detail::calculate_offset(x, y, srcXOff, srcYOff, w, h, layer_width, layer_height)) {
+        position_t src_x_off = 0, src_y_off = 0;
+        if(!pixeldata_detail::calculate_offset(x,
+                                               y,
+                                               src_x_off,
+                                               src_y_off,
+                                               w,
+                                               h,
+                                               layer_width,
+                                               layer_height)) {
           return;
         }
 
-        auto* src = pixelData.getData() + (srcYOff * 4 * pixelData.getWidth()) + (srcXOff * 4);
+        auto* src = pixelData.getData() + (src_y_off * 4 * pixelData.getWidth()) + (src_x_off * 4);
         auto* dst = getData() + (y * 4 * layer_width) + (x * 4);
         dimension_t src_width = pixelData.getWidth() * 4;
         dimension_t dst_width = layer_width * 4;
@@ -59,12 +68,19 @@ namespace pixpaint
       } else {
         std::make_signed_t<dimension_t> w = pixelData.getWidth();
         std::make_signed_t<dimension_t> h = pixelData.getHeight();
-        position_t srcXOff = 0, srcYOff = 0;
-        if(!pixeldata_detail::calculate_offset(x, y, srcXOff, srcYOff, w, h, layer_width, layer_height)) {
+        position_t src_x_off = 0, src_y_off = 0;
+        if(!pixeldata_detail::calculate_offset(x,
+                                               y,
+                                               src_x_off,
+                                               src_y_off,
+                                               w,
+                                               h,
+                                               layer_width,
+                                               layer_height)) {
           return;
         }
 
-        auto* src = pixelData.getData() + (srcYOff * 4 * pixelData.getWidth()) + (srcXOff * 4);
+        auto* src = pixelData.getData() + (src_y_off * 4 * pixelData.getWidth()) + (src_x_off * 4);
         auto* dst = getData() + (y * 4 * layer_width) + (x * 4);
         dimension_t src_width = pixelData.getWidth() * 4;
         dimension_t dst_width = layer_width * 4;
@@ -80,6 +96,77 @@ namespace pixpaint
           src += src_width;
           dst += dst_width;
         }
+      }
+    }
+  }
+
+  template<class Func>
+  void PixelData::composite(const PixelData& pixelData,
+                            position_t x,
+                            position_t y,
+                            Func condFunc)
+  {
+    auto layer_width = static_cast<std::make_signed_t<dimension_t>>(getWidth());
+    auto layer_height = static_cast<std::make_signed_t<dimension_t>>(getHeight());
+    if(x < layer_width && y < layer_height) {
+      std::function<void(color_channel_t*, color_channel_t*)> blend_func = &color_detail::alphaBlend;
+      switch(pixelData.getBlendMode()) {
+      case EBlendMode::MULTIPLY:
+        blend_func = &color_detail::multiplyBlend;
+        break;
+      case EBlendMode::SCREEN:
+        blend_func = &color_detail::screenBlend;
+        break;
+      case EBlendMode::OVERLAY:
+        blend_func = &color_detail::overlayBlend;
+        break;
+      case EBlendMode::ADDITION:
+        blend_func = &color_detail::additionBlend;
+        break;
+      case EBlendMode::DIFFERENCE:
+        blend_func = &color_detail::differenceBlend;
+        break;
+      default:
+        break;
+      }
+
+      std::make_signed_t<dimension_t> w = pixelData.getWidth();
+      std::make_signed_t<dimension_t> h = pixelData.getHeight();
+      position_t src_x_off = 0, src_y_off = 0;
+      if(!pixeldata_detail::calculate_offset(x,
+                                             y,
+                                             src_x_off,
+                                             src_y_off,
+                                             w,
+                                             h,
+                                             layer_width,
+                                             layer_height)) {
+        return;
+      }
+
+      auto* src = pixelData.getData() + (src_y_off * 4 * pixelData.getWidth()) + (src_x_off * 4);
+      auto* dst = getData() + (y * 4 * layer_width) + (x * 4);
+      dimension_t src_width = pixelData.getWidth() * 4;
+      dimension_t dst_width = layer_width * 4;
+      auto src_layer_opacity = pixelData.getOpacity();
+      for(std::size_t j = 0; j < h; ++j) {
+        auto* src_ptr = src;
+        auto* dst_ptr = dst;
+        for(std::size_t i = 0; i < w; ++i) {
+          Color src_color = *reinterpret_cast<const Color*>(src_ptr);
+          uint32_t src_color_a = uint32_t(src_color.a) * src_layer_opacity / 100;
+          src_color.a = src_color_a;
+
+          auto* src_color_ptr = reinterpret_cast<color_channel_t*>(&src_color);
+          if(condFunc(dst_ptr, src_color_ptr, i + x, j + y)) {
+            blend_func(dst_ptr, src_color_ptr);
+          }
+          src_ptr += 4;
+          dst_ptr += 4;
+        }
+
+        src += src_width;
+        dst += dst_width;
       }
     }
   }

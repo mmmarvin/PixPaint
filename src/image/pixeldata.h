@@ -66,6 +66,18 @@ namespace pixeldata_detail
       SMOOTH_SCALE
     };
 
+    enum class EBlendMode : unsigned char
+    {
+      NORMAL,
+      MULTIPLY,
+      SCREEN,
+      OVERLAY,
+      HARDLIGHT,
+      SOFTLIGHT,
+      ADDITION,
+      DIFFERENCE
+    };
+
     PixelData(dimension_t width, dimension_t height, const Color& color = Color::WHITE);
     PixelData(const PixelData& rhs);
     PixelData& operator=(const PixelData& rhs);
@@ -90,9 +102,15 @@ namespace pixeldata_detail
     void setOpacity(std::uint_least32_t opacity);
     std::uint_least32_t getOpacity() const noexcept;
 
+    void setBlendMode(EBlendMode mode);
+    EBlendMode getBlendMode() const noexcept;
+
     void combine(const PixelData& pixelData, bool hard = false);
     void combine(const PixelMap& pixelMap, bool hard = false);
     void combine(const PixelData& pixelData, position_t x, position_t y, bool hard = false);
+
+    void composite(const PixelData& pixelData, position_t x = 0, position_t y = 0);
+
     PixelData copy(position_t x, position_t y, dimension_t width, dimension_t height) const;
     PixelData cut(position_t x, position_t y, dimension_t width, dimension_t height);
 
@@ -124,12 +142,18 @@ namespace pixeldata_detail
                  bool hard,
                  HardFunc hardFunc,
                  Func func);
+    template<class Func>
+    void composite(const PixelData& pixelData,
+                   position_t x,
+                   position_t y,
+                   Func condFunc);
 
   private:
     Color*              m_data;
     std::uint_least32_t m_opacity;
     dimension_t         m_width;
     dimension_t         m_height;
+    EBlendMode          m_mode;
   };
 
   Point center(const PixelData& layer);

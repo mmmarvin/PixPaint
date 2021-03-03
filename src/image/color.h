@@ -27,6 +27,11 @@ namespace pixpaint
 namespace color_detail
 {
   void alphaBlend(color_channel_t* dst, const color_channel_t* src);
+  void multiplyBlend(color_channel_t* dst, const color_channel_t* src);
+  void screenBlend(color_channel_t* dst, const color_channel_t* src);
+  void overlayBlend(color_channel_t* dst, const color_channel_t* src);
+  void additionBlend(color_channel_t* dst, const color_channel_t* src);
+  void differenceBlend(color_channel_t* dst, const color_channel_t* src);
 }
 #pragma pack(push, 1)
   struct Color
