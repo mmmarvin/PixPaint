@@ -27,7 +27,10 @@ namespace pixpaint
 namespace settings_file_utils
 {
   void tryCreateSettingsFilename();
+
   std::string getSettingsFilename();
+  std::string getLogFilename();
+  std::string getSettingsLocation();
 }
 }
 
