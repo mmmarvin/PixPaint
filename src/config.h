@@ -20,6 +20,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <string>
+
 namespace pixpaint
 {
   static constexpr auto APP_TITLE = "PixPaint";
@@ -28,6 +30,10 @@ namespace pixpaint
   static constexpr auto APP_VERSION_PATCH = 3;
   static constexpr auto APP_VERSION_RELEASE = 0;
   static constexpr auto APP_RELEASE_TYPE = "a";
+
+  std::string getAppAndVersion();
+  std::string getApp();
+  std::string getVersion();
 }
 
 #endif // CONFIG_H
