@@ -37,8 +37,7 @@ namespace settings_file_utils
 {
   void tryCreateSettingsFilename()
   {
-    auto settings_filename = os_specific::filesystem::path(getSettingsFilename());
-    auto settings_dir = settings_filename.remove_filename();
+    auto settings_dir = getSettingsLocation();
     if(!os_specific::filesystem::exists(settings_dir)) {
       os_specific::filesystem::create_directory(settings_dir);
     }
@@ -46,8 +45,23 @@ namespace settings_file_utils
 
   std::string getSettingsFilename()
   {
-    static const std::string cfg_filename_location = ".pixpaint";
     static const std::string cfg_filename = "settings.cfg";
+
+    return (os_specific::filesystem::path(getSettingsLocation()) /
+            os_specific::filesystem::path(cfg_filename)).string();
+  }
+
+  std::string getLogFilename()
+  {
+    static const std::string log_filename = "log.txt";
+
+    return (os_specific::filesystem::path(getSettingsLocation()) /
+            os_specific::filesystem::path(log_filename)).string();
+  }
+
+  std::string getSettingsLocation()
+  {
+    static const std::string cfg_filename_location = ".pixpaint";
     std::string cfg_location;
 
 #if defined(LINUX_VERSION)
@@ -60,9 +74,9 @@ namespace settings_file_utils
       cfg_location = std::string(&wcfg_location_cstr[0], strnlen(&wcfg_location_cstr[0], MAX_PATH));
     }
 #endif // defined(LINUX_VERSION)
+
     return (os_specific::filesystem::path(cfg_location) /
-            os_specific::filesystem::path(cfg_filename_location) /
-            os_specific::filesystem::path(cfg_filename)).string();
+            os_specific::filesystem::path(cfg_filename_location)).string();
   }
 }
 }

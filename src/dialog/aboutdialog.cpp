@@ -47,9 +47,10 @@ namespace pixpaint
                          std::string(".") +
                          std::to_string(APP_VERSION_MINOR) +
                          std::to_string(APP_VERSION_PATCH) +
-                         std::string(" (") +
+                         std::string("-") +
                          std::string(APP_RELEASE_TYPE) +
-                         std::string(")")).c_str());
+                         std::string(".") +
+                         std::to_string(APP_VERSION_RELEASE)).c_str());
 
     title_layout->addWidget(title_icon);
     title_layout->addWidget(title_label);

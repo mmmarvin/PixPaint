@@ -22,6 +22,7 @@
 #include <QButtonGroup>
 #include <QGridLayout>
 #include "../env/guienvironment.h"
+#include "../env/imageenvironment.h"
 #include "../event/gui/tab_events.h"
 #include "../helper/selection_helpers.h"
 #include "../helper/tool_helpers.h"
@@ -35,6 +36,7 @@
 #include "../debug_log.h"
 #include "../gui_define.h"
 #include "imageeditorview.h"
+#include "selectionwidget.h"
 #include "statusbar.h"
 #include "zoomablescrollarea.h"
 
@@ -95,47 +97,49 @@ namespace pixpaint
 
   QWidget* LeftToolbox::createToolbox()
   {
-    auto& paintToolManager = getPaintToolManager();
-    auto& paintToolRegistrar = getPaintToolRegistrar();
+    auto& paint_tool_manager = getPaintToolManager();
+    auto& paint_tool_registrar = getPaintToolRegistrar();
 
     auto* widget = new QWidget(this);
-    auto* buttonGroup = new QButtonGroup(widget);
+    auto* button_group = new QButtonGroup(widget);
 
     m_toolLayout = new FlowLayout(widget);
     m_toolLayout->setSpacing(1);
     m_toolLayout->setAlignment(Qt::AlignTop);
 
-    for(auto it = paintToolRegistrar.begin(),  it_end = paintToolRegistrar.end(); it != it_end; ++it) {
-      auto& paintToolInformation = *it;
-      auto* toolBtn = new QPushButton(widget);
-      toolBtn->setToolTip((paintToolInformation.getName() +
+    for(auto it = paint_tool_registrar.begin(), it_end = paint_tool_registrar.end(); it != it_end; ++it) {
+      auto paint_tool_index = it - paint_tool_registrar.begin();
+      auto& paint_tool_information = *it;
+      auto* tool_btn = new QPushButton(widget);
+      tool_btn->setToolTip((paint_tool_information.getName() +
                            std::string(" (") +
-                           paintToolInformation.getShortcut() +
+                           paint_tool_information.getShortcut() +
                            std::string(")")).c_str());
 
-      QObject::connect(toolBtn, &QPushButton::clicked,
-      [it, &paintToolManager, &paintToolInformation, &paintToolRegistrar]() {
-        auto& paintTool = paintToolInformation.getTool();
-        if(paintToolManager.currentToolSet()) {
-          if(&paintToolManager.getCurrentTool() != &paintTool) {
-            paintToolManager.setCurrentTool(it - paintToolRegistrar.begin());
+      QObject::connect(tool_btn, &QPushButton::clicked,
+      [this, paint_tool_index, &paint_tool_manager, &paint_tool_information, &paint_tool_registrar]() {
+        auto& paintTool = paint_tool_information.getTool();
+        if(paint_tool_manager.currentToolSet()) {
+          if(&paint_tool_manager.getCurrentTool() != &paintTool) {
+            paint_tool_manager.setCurrentTool(paint_tool_index);
           }
         } else {
-          paintToolManager.setCurrentTool(it - paintToolRegistrar.begin());
+          paint_tool_manager.setCurrentTool(paint_tool_index);
         }
+        getImageEnvironment().getSelection().setMode(SelectionWidget::ESelectionMode::NORMAL);
       });
-      toolBtn->setMaximumSize(PAINTTOOLBOX_BUTTON_WIDTH, PAINTTOOLBOX_BUTTON_HEIGHT);
-      toolBtn->setIcon(QIcon(paintToolInformation.getIconFilename().c_str()));
-      toolBtn->setIconSize(QSize(PAINTTOOLBOX_BUTTON_WIDTH, PAINTTOOLBOX_BUTTON_HEIGHT));
-      toolBtn->setCheckable(true);
+      tool_btn->setMaximumSize(PAINTTOOLBOX_BUTTON_WIDTH, PAINTTOOLBOX_BUTTON_HEIGHT);
+      tool_btn->setIcon(QIcon(paint_tool_information.getIconFilename().c_str()));
+      tool_btn->setIconSize(QSize(PAINTTOOLBOX_BUTTON_WIDTH, PAINTTOOLBOX_BUTTON_HEIGHT));
+      tool_btn->setCheckable(true);
 
-      buttonGroup->addButton(toolBtn);
-      m_toolLayout->addWidget(toolBtn);
+      button_group->addButton(tool_btn);
+      m_toolLayout->addWidget(tool_btn);
 
       if(m_toolLayout->count() == 1) {
-        m_defaultSelectionToolIndex = it - paintToolRegistrar.begin();
+        m_defaultSelectionToolIndex = paint_tool_index;
       } else if(m_toolLayout->count() == 2) {
-        m_defaultToolIndex = it - paintToolRegistrar.begin();
+        m_defaultToolIndex = paint_tool_index;
       }
     }
     widget->setLayout(m_toolLayout);

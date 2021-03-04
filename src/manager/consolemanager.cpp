@@ -27,11 +27,18 @@ namespace pixpaint
 {
   void ConsoleManager::writeMessage(std::string msg)
   {
+    auto remove_newline_and_space = [](std::string s) {
+      while(s.size() &&
+            (isspace(s.back()) || s.back() == '\n')) {
+        s.pop_back();
+      }
+
+      return s;
+    };
+
     auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    auto ts = std::string(std::ctime(&t));
-    if(ts.back() == '\n')
-      ts.pop_back();
-    auto cmsg = std::move(ts) + std::string(": ") + std::move(msg);
+    auto current_time = std::string(std::ctime(&t));
+    auto cmsg = remove_newline_and_space(current_time) + std::string(": ") + std::move(msg);
 
     writeMessageImpl(std::move(cmsg));
   }

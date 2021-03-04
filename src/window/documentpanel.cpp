@@ -47,6 +47,7 @@ namespace pixpaint
   {
     this->tabBar()->setExpanding(false);
     this->tabBar()->setTabsClosable(true);
+    this->setMovable(false);
 
     m_rightClickEditMenu.menu = new QMenu(this);
     m_rightClickSelectionMenu.menu = m_rightClickEditMenu.menu;

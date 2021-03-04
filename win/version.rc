@@ -7,12 +7,12 @@ BEGIN
 		BLOCK "040904E4"
 		BEGIN
 			VALUE "FileDescription", "Pixel art editor"
-			VALUE "FileVersion", "1.02"
+			VALUE "FileVersion", "1.02-b.1"
 			VALUE "InternalName", "PixPaint"
 			VALUE "LegalCopyright", "2020-2021 Marvin Manese"
 			VALUE "OriginalFilename", "PixPaint.exe"
 			VALUE "ProductName", "PixPaint"
-			VALUE "ProductVersion", "1.02"
+			VALUE "ProductVersion", "1.02-b.1"
 		END
 	END
 	BLOCK "VarFileInfo"

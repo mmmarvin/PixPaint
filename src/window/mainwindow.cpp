@@ -63,6 +63,7 @@
 #include "../image_filetype_importer.h"
 #include "../project_filetype_importer.h"
 #include "../effect_importer.h"
+#include "../logger.h"
 #include "../os_specific_headers.h"
 #include "../tool_importer.h"
 #include "colortoolbox.h"
@@ -263,9 +264,10 @@ namespace
                      std::string(".") +
                      std::to_string(APP_VERSION_MINOR) +
                      std::to_string(APP_VERSION_PATCH) +
-                     std::string(" [") +
+                     std::string("-") +
                      APP_RELEASE_TYPE +
-                     std::string("]"));
+                     std::string(".") +
+                     std::to_string(APP_VERSION_RELEASE));
 
     this->setMinimumSize(800, 600);
     this->setWindowState(Qt::WindowState::WindowMaximized);
@@ -289,7 +291,9 @@ namespace
 
     if(runParam.usePython) {
       // register custom tools, effects, etc...
-      initPythonExports();
+      if(!initPythonExports()) {
+        getLogger().write("Failed to initialize the python environment.");
+      }
     }
 
     // load the config values

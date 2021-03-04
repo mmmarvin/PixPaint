@@ -20,6 +20,7 @@
 #include "image.h"
 
 #include <string>
+#include "../debug_log.h"
 
 namespace pixpaint
 {
@@ -182,7 +183,22 @@ namespace pixpaint
   {
     MaskablePixelData final_layer(m_width, m_height, Color::TRANSPARENT);
     for(auto& t : m_layers) {
-      final_layer.combine(std::get<0>(t), 0, 0, false);
+      const auto& layer = std::get<0>(t);
+      const auto layer_opacity = layer.getOpacity();
+
+      if(layer_opacity) {
+        auto* layer_data = reinterpret_cast<const Color*>(layer.getData());
+        auto* final_layer_data = final_layer.getData();
+        for(size_t i = 0, isize = layer.getWidth() * layer.getHeight();
+            i < isize;
+            ++i, ++layer_data, final_layer_data += 4) {
+          Color c = *layer_data;
+          uint32_t c_a = uint32_t(c.a) * layer_opacity / 100;
+          c.a = c_a;
+
+          color_detail::alphaBlend(final_layer_data, reinterpret_cast<color_channel_t*>(&c));
+        }
+      }
     }
 
     m_layers.clear();
