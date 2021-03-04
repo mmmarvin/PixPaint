@@ -1,5 +1,11 @@
 PixPaint Changelog:
 
+v.1.02-1:
+* Fixed bug where flattening image ignores opacity
+* Fixed bug where moving tabs causes a crash
+* Fixed erase tool not registering a history entry
+* Fixed bug where switching to a tool after using resize or move mode on selection widget prevents the tool to be used
+
 v.1.02:
 * Added ability to load / save color list 
 * Added ability to add / remove colors on the color list
