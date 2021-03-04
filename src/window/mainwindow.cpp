@@ -258,16 +258,7 @@ namespace
   MainWindow::MainWindow(const RunParam& runParam) :
     QMainWindow(nullptr)
   {
-    auto app_name = (APP_TITLE +
-                     std::string(" v.") +
-                     std::to_string(APP_VERSION_MAJOR) +
-                     std::string(".") +
-                     std::to_string(APP_VERSION_MINOR) +
-                     std::to_string(APP_VERSION_PATCH) +
-                     std::string("-") +
-                     APP_RELEASE_TYPE +
-                     std::string(".") +
-                     std::to_string(APP_VERSION_RELEASE));
+    auto app_name = getAppAndVersion();
 
     this->setMinimumSize(800, 600);
     this->setWindowState(Qt::WindowState::WindowMaximized);
