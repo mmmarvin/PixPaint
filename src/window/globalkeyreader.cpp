@@ -21,6 +21,7 @@
 
 #include <QKeyEvent>
 #include "../3rdparty/gengine/configuration.h"
+#include "../env/guienvironment.h"
 #include "../env/imageenvironment.h"
 #include "../helper/tool_helpers.h"
 #include "../manager/documentmanager.h"
@@ -30,6 +31,7 @@
 #include "../registrar/painttoolregistrar.h"
 #include "../utility/qt_utility.h"
 #include "../window/imageeditorview.h"
+#include "../window/lefttoolbox.h"
 #include "../define.h"
 #include "../document.h"
 
@@ -100,7 +102,7 @@ namespace
               event->accept();
               return true;
             }
-          } else {
+          } else if(getGUIEnvironment().getLeftToolbox().isEnabled()) {
             const auto& paint_tool_registrar = getPaintToolRegistrar();
             for(auto it = paint_tool_registrar.begin(), it_end = paint_tool_registrar.end(); it != it_end; ++it) {
               const auto& paint_tool_information = *it;

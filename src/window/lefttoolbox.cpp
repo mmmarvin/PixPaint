@@ -23,6 +23,7 @@
 #include <QGridLayout>
 #include "../env/guienvironment.h"
 #include "../env/imageenvironment.h"
+#include "../event/gui/animation_events.h"
 #include "../event/gui/tab_events.h"
 #include "../helper/selection_helpers.h"
 #include "../helper/tool_helpers.h"
@@ -83,6 +84,21 @@ namespace pixpaint
     if(!event.numberOfTabs) {
       this->setEnabled(false);
     }
+  }
+
+  void LeftToolbox::onEmit(const gui_events::AnimationPlayEvent&)
+  {
+    this->setEnabled(false);
+  }
+
+  void LeftToolbox::onEmit(const gui_events::AnimationPauseEvent&)
+  {
+    this->setEnabled(true);
+  }
+
+  void LeftToolbox::onEmit(const gui_events::AnimationStopEvent&)
+  {
+    this->setEnabled(true);
   }
 
   void LeftToolbox::updateObserver(int)
