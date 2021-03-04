@@ -37,6 +37,7 @@ namespace pixpaint
     void addFrame(std::size_t index, Image&& frame, int duration = 1000);
     void addFrame(std::size_t index, position_t width, position_t height, int duration = 1000);
     void removeFrame(std::size_t index);
+    void moveFrame(size_t srcIndex, size_t dstIndex);
 
     Image& getFrame(std::size_t index);
     const Image& getFrame(std::size_t index) const;
