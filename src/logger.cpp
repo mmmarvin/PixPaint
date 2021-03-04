@@ -17,6 +17,7 @@ namespace pixpaint
       if(m_out.is_open()) {
         m_out << APP_TITLE
               << " v." << APP_VERSION_MAJOR << "." << APP_VERSION_MINOR << APP_VERSION_PATCH
+              << "-" << APP_RELEASE_TYPE << "." << APP_VERSION_RELEASE
               << " Log File\n"
               << "=========================\n"
               << std::endl;

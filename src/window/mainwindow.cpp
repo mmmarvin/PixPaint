@@ -264,9 +264,10 @@ namespace
                      std::string(".") +
                      std::to_string(APP_VERSION_MINOR) +
                      std::to_string(APP_VERSION_PATCH) +
-                     std::string(" [") +
+                     std::string("-") +
                      APP_RELEASE_TYPE +
-                     std::string("]"));
+                     std::string(".") +
+                     std::to_string(APP_VERSION_RELEASE));
 
     this->setMinimumSize(800, 600);
     this->setWindowState(Qt::WindowState::WindowMaximized);
