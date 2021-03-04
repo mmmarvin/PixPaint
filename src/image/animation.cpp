@@ -64,6 +64,15 @@ namespace pixpaint
     m_frames.erase(m_frames.begin() + index);
   }
 
+  void Animation::moveFrame(size_t srcIndex, size_t dstIndex)
+  {
+    auto frame = std::move(m_frames[srcIndex]);
+    m_frames.erase(m_frames.begin() + srcIndex);
+    m_frames.insert(m_frames.begin() + dstIndex, std::move(frame));
+
+    m_frames[dstIndex].first->setModified(true);
+  }
+
   Image& Animation::getFrame(std::size_t index)
   {
     return *m_frames[index].first.get();

@@ -74,39 +74,40 @@ namespace pixpaint
     setModified(true);
   }
 
-  void Image::addLayer(std::size_t layerIndex, const Color& color)
+  void Image::addLayer(std::size_t index, const Color& color)
   {
-    m_layers.insert(m_layers.begin() + layerIndex,
+    m_layers.insert(m_layers.begin() + index,
                     std::make_tuple(MaskablePixelData(m_width, m_height),
                                     "Layer " + std::to_string(m_layers.size()),
                                     true));
-    std::get<0>(m_layers[layerIndex]).clear(color);
+    std::get<0>(m_layers[index]).clear(color);
     setModified(true);
   }
 
-  void Image::removeLayer(std::size_t layerIndex)
+  void Image::removeLayer(std::size_t index)
   {
-    m_layers.erase(m_layers.begin() + layerIndex);
+    m_layers.erase(m_layers.begin() + index);
     setModified(true);
   }
 
-  void Image::renameLayer(std::size_t layerIndex, std::string name)
+  void Image::renameLayer(std::size_t index, std::string name)
   {
-    std::get<1>(m_layers[layerIndex]) = std::move(name);
+    std::get<1>(m_layers[index]) = std::move(name);
     setModified(true);
   }
 
-  void Image::moveLayer(std::size_t layerSrcIndex, std::size_t layerDstIndex)
+  void Image::moveLayer(std::size_t srcIndex, std::size_t dstIndex)
   {
-    auto layer = std::move(m_layers[layerSrcIndex]);
-    m_layers.erase(m_layers.begin() + layerSrcIndex);
-    m_layers.insert(m_layers.begin() + layerDstIndex, std::move(layer));
+    auto layer = std::move(m_layers[srcIndex]);
+    m_layers.erase(m_layers.begin() + srcIndex);
+    m_layers.insert(m_layers.begin() + dstIndex, std::move(layer));
+
     setModified(true);
   }
 
-  void Image::setVisible(std::size_t layerIndex, bool visible)
+  void Image::setVisible(std::size_t index, bool visible)
   {
-    std::get<2>(m_layers[layerIndex]) = visible;
+    std::get<2>(m_layers[index]) = visible;
     setModified(true);
   }
 
@@ -124,19 +125,19 @@ namespace pixpaint
     setModified(true);
   }
 
-  const std::string& Image::getLayerName(std::size_t layerIndex) const noexcept
+  const std::string& Image::getLayerName(std::size_t index) const noexcept
   {
-    return std::get<1>(m_layers[layerIndex]);
+    return std::get<1>(m_layers[index]);
   }
 
-  MaskablePixelData& Image::getLayer(std::size_t layerIndex) noexcept
+  MaskablePixelData& Image::getLayer(std::size_t index) noexcept
   {
-    return std::get<0>(m_layers[layerIndex]);
+    return std::get<0>(m_layers[index]);
   }
 
-  const MaskablePixelData& Image::getLayer(std::size_t layerIndex) const noexcept
+  const MaskablePixelData& Image::getLayer(std::size_t index) const noexcept
   {
-    return std::get<0>(m_layers[layerIndex]);
+    return std::get<0>(m_layers[index]);
   }
 
   const std::string& Image::getCurrentLayerName() const noexcept
@@ -169,9 +170,9 @@ namespace pixpaint
     return m_layers.size();
   }
 
-  bool Image::isVisible(std::size_t layerIndex) const noexcept
+  bool Image::isVisible(std::size_t index) const noexcept
   {
-    return std::get<2>(m_layers[layerIndex]);
+    return std::get<2>(m_layers[index]);
   }
 
   bool Image::isCurrentLayerVisible() const noexcept

@@ -56,7 +56,8 @@ namespace pixpaint
     QWidget(parent),
     m_selectedLayerItem(nullptr),
     m_selectedLayerIndex(0),
-    m_moveDstLayer(nullptr)
+    m_moveDstLayer(nullptr),
+    m_moveDstLayerIndex(0)
   {
     auto* outerLayer = new QVBoxLayout(this);
     m_scrollArea = new QScrollArea(this);

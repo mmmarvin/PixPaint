@@ -31,8 +31,9 @@ namespace pixpaint
 {
   FrameToolboxItem::FrameToolboxItem(QWidget* parent, std::size_t frameIndex) :
     QWidget(parent),
+    m_frameIndex(frameIndex),
     m_selected(false),
-    m_frameIndex(frameIndex)
+    m_moveDestination(false)
   {
     auto* layout = new QHBoxLayout(this);
     m_view = new FrameView(this,
@@ -50,6 +51,16 @@ namespace pixpaint
   bool FrameToolboxItem::isSelected() const noexcept
   {
     return m_selected;
+  }
+
+  void FrameToolboxItem::setMoveDestination(bool destination) noexcept
+  {
+    m_moveDestination = destination;
+  }
+
+  bool FrameToolboxItem::isMoveDestination() const noexcept
+  {
+    return m_moveDestination;
   }
 
   void FrameToolboxItem::setItemIndex(std::size_t index) noexcept
@@ -73,6 +84,17 @@ namespace pixpaint
     if(m_selected) {
       painter.setPen(QPen(palette().color(QPalette::Highlight)));
       painter.setBrush(QBrush(palette().color(QPalette::Highlight)));
+      painter.drawRect(0,
+                       0,
+                       this->geometry().width() - 1,
+                       this->geometry().height() - 1);
+    }
+
+    if(m_moveDestination) {
+//      painter.setBrush(QBrush(QColor(0, 0, 0, 255)));
+//      painter.drawRect(0, 0, 5, this->geometry().height());
+      painter.setPen(QPen(palette().color(QPalette::LinkVisited)));
+      painter.setBrush(QBrush(palette().color(QPalette::LinkVisited)));
       painter.drawRect(0,
                        0,
                        this->geometry().width() - 1,
