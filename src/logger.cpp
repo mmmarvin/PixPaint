@@ -15,9 +15,7 @@ namespace pixpaint
     if(!os_specific::filesystem::exists(settings_file_utils::getLogFilename())) {
       m_out.open(settings_file_utils::getLogFilename(), std::ios_base::out);
       if(m_out.is_open()) {
-        m_out << APP_TITLE
-              << " v." << APP_VERSION_MAJOR << "." << APP_VERSION_MINOR << APP_VERSION_PATCH
-              << "-" << APP_RELEASE_TYPE << "." << APP_VERSION_RELEASE
+        m_out << getAppAndVersion()
               << " Log File\n"
               << "=========================\n"
               << std::endl;

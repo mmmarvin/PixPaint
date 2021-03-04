@@ -41,16 +41,7 @@ namespace pixpaint
     title_label_font.setPixelSize(16);
     title_label_font.setPointSize(16);
     title_label->setFont(title_label_font);
-    title_label->setText((std::string(APP_TITLE) +
-                         std::string(" v.") +
-                         std::to_string(APP_VERSION_MAJOR) +
-                         std::string(".") +
-                         std::to_string(APP_VERSION_MINOR) +
-                         std::to_string(APP_VERSION_PATCH) +
-                         std::string("-") +
-                         std::string(APP_RELEASE_TYPE) +
-                         std::string(".") +
-                         std::to_string(APP_VERSION_RELEASE)).c_str());
+    title_label->setText(getAppAndVersion().c_str());
 
     title_layout->addWidget(title_icon);
     title_layout->addWidget(title_label);
