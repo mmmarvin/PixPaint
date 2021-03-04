@@ -1,5 +1,8 @@
 PixPaint Changelog:
 
+v.1.02-1:
+* Fixed bug where keyboard shortcuts override the text values entered on text mode
+
 v.1.02:
 * Added ability to load / save color list 
 * Added ability to add / remove colors on the color list
