@@ -31,6 +31,7 @@
 #include "../event/gui/tab_events.h"
 #include "../helper/selection_helpers.h"
 #include "../history/addframeaction.h"
+#include "../history/moveframeaction.h"
 #include "../history/removeframeaction.h"
 #include "../manager/documentmanager.h"
 #include "../manager/drawermanager.h"
@@ -262,7 +263,7 @@ namespace pixpaint
         animation.moveFrame(m_selectedFrameIndex, m_moveDstFrameIndex);
 
         // TODO: Add move frame history
-//        emitHistoryAction(MoveLayerAction(m_selectedLayerIndex, m_moveDstLayerIndex));
+        emitHistoryAction(MoveFrameAction(m_selectedFrameIndex, m_moveDstFrameIndex));
 
         clearItems();
         createItems();
