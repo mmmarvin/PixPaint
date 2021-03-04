@@ -138,8 +138,14 @@ namespace pixpaint
     }
 
     if(m_moveDestination) {
-      painter.setBrush(QBrush(QColor(0, 0, 0, 255)));
-      painter.drawRect(0, 0, this->geometry().width(), 5);
+//      painter.setBrush(QBrush(QColor(0, 0, 0, 255)));
+//      painter.drawRect(0, 0, this->geometry().width(), 5);
+      painter.setPen(QPen(palette().color(QPalette::LinkVisited)));
+      painter.setBrush(QBrush(palette().color(QPalette::LinkVisited)));
+      painter.drawRect(0,
+                       0,
+                       this->geometry().width() - 1,
+                       this->geometry().height() - 1);
     }
   }
 

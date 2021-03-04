@@ -38,6 +38,9 @@ namespace pixpaint
     void setSelected(bool selected) noexcept;
     bool isSelected() const noexcept;
 
+    void setMoveDestination(bool destination) noexcept;
+    bool isMoveDestination() const noexcept;
+
     void setItemIndex(std::size_t index) noexcept;
     std::size_t getItemIndex() const noexcept;
 
@@ -52,9 +55,11 @@ namespace pixpaint
   private:
     friend class FrameToolbox;
 
-    bool          m_selected;
     std::size_t   m_frameIndex;
     FrameView*    m_view;
+
+    bool          m_selected;
+    bool          m_moveDestination;
   };
 }
 

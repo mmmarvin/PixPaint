@@ -52,7 +52,9 @@ namespace pixpaint
     QWidget(parent),
     m_playTimer(this),
     m_selectedFrameItem(nullptr),
-    m_selectedFrameIndex(0)
+    m_selectedFrameIndex(0),
+    m_moveDstFrame(nullptr),
+    m_moveDstFrameIndex(0)
   {
     static const QIcon playIcon("res/play_btn_icon.png");
     static const QIcon stopIcon("res/pause_btn_icon.png");
@@ -209,6 +211,69 @@ namespace pixpaint
     }
 
     event->ignore();
+  }
+
+  void FrameToolbox::mouseMoveEvent(QMouseEvent* event)
+  {
+    auto mx = event->globalPos().x();
+    auto my = event->globalPos().y();
+
+    if(event->buttons() == Qt::MouseButton::LeftButton) {
+      for(int i = 0; i < m_itemHolderLayout->count(); ++i) {
+        auto* widget = m_itemHolderLayout->itemAt(i)->widget();
+        auto widgetMousePosition = widget->mapFromGlobal(QPoint(mx, my));
+
+        if(widget->rect().contains(widgetMousePosition.x(), widgetMousePosition.y())) {
+          if(widget != m_moveDstFrame) {
+            if(widget != m_selectedFrameItem) {
+              if(m_moveDstFrame) {
+                m_moveDstFrame->setMoveDestination(false);
+                m_moveDstFrame->repaint();
+              }
+
+              m_moveDstFrame = static_cast<FrameToolboxItem*>(widget);
+              m_moveDstFrameIndex = i;
+
+              m_moveDstFrame->setMoveDestination(true);
+              m_moveDstFrame->repaint();
+            } else {
+              if(m_moveDstFrame) {
+                m_moveDstFrame->setMoveDestination(false);
+                m_moveDstFrame->repaint();
+              }
+
+              m_moveDstFrame = nullptr;
+              m_moveDstFrameIndex = 0;
+            }
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  void FrameToolbox::mouseReleaseEvent(QMouseEvent* event)
+  {
+    auto& animation = getDocumentManager().getDocument().getAnimation();
+    if(event->button() == Qt::MouseButton::LeftButton) {
+      if(m_selectedFrameItem && m_moveDstFrame) {
+        selection_helpers::tryFinalizeAllSelections(true);
+
+        animation.moveFrame(m_selectedFrameIndex, m_moveDstFrameIndex);
+
+        // TODO: Add move frame history
+//        emitHistoryAction(MoveLayerAction(m_selectedLayerIndex, m_moveDstLayerIndex));
+
+        clearItems();
+        createItems();
+
+        slotClicked(static_cast<FrameToolboxItem*>(m_itemHolderLayout->itemAt(m_moveDstFrameIndex)->widget()),
+                    m_moveDstFrameIndex);
+
+        m_moveDstFrame = nullptr;
+        m_moveDstFrameIndex = 0;
+      }
+    }
   }
 
   void FrameToolbox::resizeEvent(QResizeEvent*)

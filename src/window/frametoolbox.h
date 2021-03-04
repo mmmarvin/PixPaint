@@ -54,6 +54,8 @@ namespace gui_events
 
   protected:
     void keyPressEvent(QKeyEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
 
   private:
@@ -98,6 +100,9 @@ namespace gui_events
 
     FrameToolboxItem*               m_selectedFrameItem;
     std::size_t                     m_selectedFrameIndex;
+
+    FrameToolboxItem*               m_moveDstFrame;
+    std::size_t                     m_moveDstFrameIndex;
   };
 }
 

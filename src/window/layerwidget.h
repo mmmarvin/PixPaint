@@ -104,7 +104,6 @@ namespace gui_events
     LayerWidgetItem*              m_selectedLayerItem;
     std::size_t                   m_selectedLayerIndex;
 
-    QPoint                        m_movePosition;
     LayerWidgetItem*              m_moveDstLayer;
     std::size_t                   m_moveDstLayerIndex;
   };
