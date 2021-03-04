@@ -25,8 +25,8 @@ namespace pixpaint
   static constexpr auto APP_TITLE = "PixPaint";
   static constexpr auto APP_VERSION_MAJOR = 1;
   static constexpr auto APP_VERSION_MINOR = 0;
-  static constexpr auto APP_VERSION_PATCH = 2;
-  static constexpr auto APP_VERSION_RELEASE = 1;
+  static constexpr auto APP_VERSION_PATCH = 3;
+  static constexpr auto APP_VERSION_RELEASE = 0;
   static constexpr auto APP_RELEASE_TYPE = "a";
 }
 
