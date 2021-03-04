@@ -69,7 +69,7 @@ namespace pixpaint
     button_layout->setAlignment(Qt::AlignLeft);
     m_addButton = new QPushButton(outer_surface);
     m_addButton->setIcon(QIcon("res/add_btn_icon.png"));
-    m_addButton->setToolTip(tr("Add Frame"));
+    m_addButton->setToolTip(tr("Add Blank Frame"));
     m_addButton->setFixedSize(TOOLBOX_BUTTON_WIDTH, TOOLBOX_BUTTON_HEIGHT);
     connect(m_addButton, &QPushButton::clicked, [this]{ this->addFrame(); });
     m_addCpyButton = new QPushButton(outer_surface);
