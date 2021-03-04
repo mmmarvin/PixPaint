@@ -36,11 +36,17 @@ namespace gui_events
 {
   struct TabAddEvent;
   struct TabRemoveEvent;
+  struct AnimationPauseEvent;
+  struct AnimationPlayEvent;
+  struct AnimationStopEvent;
 }
   class LeftToolbox : public QWidget,
                       public patterns::Observer,
                       EventListener<gui_events::TabAddEvent>,
-                      EventListener<gui_events::TabRemoveEvent>
+                      EventListener<gui_events::TabRemoveEvent>,
+                      EventListener<gui_events::AnimationPlayEvent>,
+                      EventListener<gui_events::AnimationStopEvent>,
+                      EventListener<gui_events::AnimationPauseEvent>
   {
   public:
     LeftToolbox(QWidget* parent);
@@ -52,6 +58,9 @@ namespace gui_events
   private:
     void onEmit(const gui_events::TabAddEvent& event) override;
     void onEmit(const gui_events::TabRemoveEvent& event) override;
+    void onEmit(const gui_events::AnimationPlayEvent& event) override;
+    void onEmit(const gui_events::AnimationPauseEvent& event) override;
+    void onEmit(const gui_events::AnimationStopEvent& event) override;
 
     void updateObserver(int id) override;
 
