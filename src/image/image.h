@@ -39,17 +39,17 @@ namespace pixpaint
     position_t getHeight() const noexcept;
 
     void addLayer(const Color& color = Color::TRANSPARENT);
-    void addLayer(std::size_t layerIndex, const Color& color = Color::TRANSPARENT);
-    void removeLayer(std::size_t layerIndex);
-    void renameLayer(std::size_t layerIndex, std::string name);
-    void moveLayer(std::size_t layerSrcIndex, std::size_t layerDstIndex);
-    void setVisible(std::size_t layerIndex, bool visible);
+    void addLayer(std::size_t index, const Color& color = Color::TRANSPARENT);
+    void removeLayer(std::size_t index);
+    void renameLayer(std::size_t index, std::string name);
+    void moveLayer(std::size_t srcIndex, std::size_t dstIndex);
+    void setVisible(std::size_t index, bool visible);
 
     void rotate(float angle, ERotationDirection direction);
 
-    const std::string& getLayerName(std::size_t layerIndex) const noexcept;
-    MaskablePixelData& getLayer(std::size_t layerIndex) noexcept;
-    const MaskablePixelData& getLayer(std::size_t layerIndex) const noexcept;
+    const std::string& getLayerName(std::size_t index) const noexcept;
+    MaskablePixelData& getLayer(std::size_t index) noexcept;
+    const MaskablePixelData& getLayer(std::size_t index) const noexcept;
 
     const std::string& getCurrentLayerName() const noexcept;
     MaskablePixelData& getCurrentLayer() noexcept;
