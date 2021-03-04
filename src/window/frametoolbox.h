@@ -53,7 +53,8 @@ namespace gui_events
     explicit FrameToolbox(QWidget* parent);
 
   protected:
-    void resizeEvent(QResizeEvent* event);
+    void keyPressEvent(QKeyEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
   private:
     void onEmit(const gui_events::TabAddEvent& event) override;
@@ -74,6 +75,8 @@ namespace gui_events
     void resizeHolderWidget();
 
   private:
+    friend class MainWindow;
+
     void slotClicked(FrameToolboxItem* item, std::size_t index);
     void slotTimeOut();
 

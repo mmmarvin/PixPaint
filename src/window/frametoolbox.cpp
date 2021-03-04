@@ -20,6 +20,7 @@
 #include "frametoolbox.h"
 
 #include <QGroupBox>
+#include <QKeyEvent>
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include "../env/imageenvironment.h"
@@ -197,6 +198,17 @@ namespace pixpaint
 
     connect(&m_playTimer, &QTimer::timeout, this, &FrameToolbox::slotTimeOut);
     m_playTimer.setInterval(1000);
+  }
+
+  void FrameToolbox::keyPressEvent(QKeyEvent* event)
+  {
+    if(event->key() == Qt::Key_Delete) {
+      this->removeFrame();
+      event->accept();
+      return;
+    }
+
+    event->ignore();
   }
 
   void FrameToolbox::resizeEvent(QResizeEvent*)

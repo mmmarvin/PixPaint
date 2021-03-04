@@ -487,6 +487,15 @@ namespace
         default:
           break;
         }
+      } else if(getGUIEnvironment().getFrameToolbox().m_scrollArea->hasFocus()) {
+        auto key = keyEvent->key();
+        switch(key) {
+        case EKey::Key_Delete:
+          e->accept();
+          return true;
+        default:
+          break;
+        }
       }
     }
 
