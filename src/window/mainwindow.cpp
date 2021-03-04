@@ -63,6 +63,7 @@
 #include "../image_filetype_importer.h"
 #include "../project_filetype_importer.h"
 #include "../effect_importer.h"
+#include "../logger.h"
 #include "../os_specific_headers.h"
 #include "../tool_importer.h"
 #include "colortoolbox.h"
@@ -289,7 +290,9 @@ namespace
 
     if(runParam.usePython) {
       // register custom tools, effects, etc...
-      initPythonExports();
+      if(!initPythonExports()) {
+        getLogger().write("Failed to initialize the python environment.");
+      }
     }
 
     // load the config values
