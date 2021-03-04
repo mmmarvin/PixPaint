@@ -26,6 +26,7 @@
 #include "../manager/documentmanager.h"
 #include "../manager/imagemanager.h"
 #include "../manager/painttoolmanager.h"
+#include "../manager/textselectionmanager.h"
 #include "../registrar/painttoolregistrar.h"
 #include "../utility/qt_utility.h"
 #include "../window/imageeditorview.h"
@@ -57,81 +58,83 @@ namespace
 }
   bool GlobalKeyReader::eventFilter(QObject* watched, QEvent* event)
   {
-    auto eventType = event->type();
-    if(eventType == QEvent::KeyPress) {
-      auto* keyEvent = static_cast<QKeyEvent*>(event);
-      if(!keyEvent->isAutoRepeat()) {
-        auto& configurationManager = gengine2d::getConfigurationManager();
-        auto& imageManager = getImageManager();
-        auto& view = getImageEnvironment().getView();
+    if(!getTextSelectionManager().selectionExists()) {
+      auto eventType = event->type();
+      if(eventType == QEvent::KeyPress) {
+        auto* keyEvent = static_cast<QKeyEvent*>(event);
+        if(!keyEvent->isAutoRepeat()) {
+          auto& configurationManager = gengine2d::getConfigurationManager();
+          auto& imageManager = getImageManager();
+          auto& view = getImageEnvironment().getView();
 
-        auto previousFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "previousframe")->c_str());
-        auto nextFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "nextframe")->c_str());
-        auto keySequence = get_key_sequence(keyEvent);
+          auto previousFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "previousframe")->c_str());
+          auto nextFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "nextframe")->c_str());
+          auto keySequence = get_key_sequence(keyEvent);
 
-        if(previousFrameKeySequence == keySequence) {
-          auto& animation = getDocumentManager().getDocument().getAnimation();
-          auto currentIndex = animation.getCurrentFrameIndex();
-          if(currentIndex > 0) {
-            auto& previousFrame = animation.getFrame(currentIndex - 1);
-            view.setTemporaryImage(previousFrame);
+          if(previousFrameKeySequence == keySequence) {
+            auto& animation = getDocumentManager().getDocument().getAnimation();
+            auto currentIndex = animation.getCurrentFrameIndex();
+            if(currentIndex > 0) {
+              auto& previousFrame = animation.getFrame(currentIndex - 1);
+              view.setTemporaryImage(previousFrame);
 
-            auto width = imageManager.getImage().getWidth() * view.getPixelSize();
-            auto height = imageManager.getImage().getHeight() * view.getPixelSize();
-            view.repaint(qt_utils::convertToQTRect(castTo<position_t>(view.getSmallestDrawableRegion(DoubleRect(0, 0, width, height)))));
+              auto width = imageManager.getImage().getWidth() * view.getPixelSize();
+              auto height = imageManager.getImage().getHeight() * view.getPixelSize();
+              view.repaint(qt_utils::convertToQTRect(castTo<position_t>(view.getSmallestDrawableRegion(DoubleRect(0, 0, width, height)))));
 
-            event->accept();
-            return true;
-          }
-        } else if(nextFrameKeySequence == keySequence) {
-          auto& animation = getDocumentManager().getDocument().getAnimation();
-          auto currentIndex = animation.getCurrentFrameIndex();
-          if(animation.getFrameCount() > 0 &&
-             currentIndex < animation.getFrameCount() - 1) {
-            auto& nextFrame = animation.getFrame(currentIndex + 1);
-            view.setTemporaryImage(nextFrame);
+              event->accept();
+              return true;
+            }
+          } else if(nextFrameKeySequence == keySequence) {
+            auto& animation = getDocumentManager().getDocument().getAnimation();
+            auto currentIndex = animation.getCurrentFrameIndex();
+            if(animation.getFrameCount() > 0 &&
+               currentIndex < animation.getFrameCount() - 1) {
+              auto& nextFrame = animation.getFrame(currentIndex + 1);
+              view.setTemporaryImage(nextFrame);
 
-            auto width = imageManager.getImage().getWidth() * view.getPixelSize();
-            auto height = imageManager.getImage().getHeight() * view.getPixelSize();
-            view.repaint(qt_utils::convertToQTRect(castTo<position_t>(view.getSmallestDrawableRegion(DoubleRect(0, 0, width, height)))));
+              auto width = imageManager.getImage().getWidth() * view.getPixelSize();
+              auto height = imageManager.getImage().getHeight() * view.getPixelSize();
+              view.repaint(qt_utils::convertToQTRect(castTo<position_t>(view.getSmallestDrawableRegion(DoubleRect(0, 0, width, height)))));
 
-            event->accept();
-            return true;
-          }
-        } else {
-          const auto& paint_tool_registrar = getPaintToolRegistrar();
-          for(auto it = paint_tool_registrar.begin(), it_end = paint_tool_registrar.end(); it != it_end; ++it) {
-            const auto& paint_tool_information = *it;
-            if(!paint_tool_information.getShortcut().empty()) {
-              auto tool_key_sequence = QKeySequence(paint_tool_information.getShortcut().c_str());
-              if(keySequence == tool_key_sequence) {
-                getPaintToolManager().setCurrentTool(it - paint_tool_registrar.begin());
-                break;
+              event->accept();
+              return true;
+            }
+          } else {
+            const auto& paint_tool_registrar = getPaintToolRegistrar();
+            for(auto it = paint_tool_registrar.begin(), it_end = paint_tool_registrar.end(); it != it_end; ++it) {
+              const auto& paint_tool_information = *it;
+              if(!paint_tool_information.getShortcut().empty()) {
+                auto tool_key_sequence = QKeySequence(paint_tool_information.getShortcut().c_str());
+                if(keySequence == tool_key_sequence) {
+                  getPaintToolManager().setCurrentTool(it - paint_tool_registrar.begin());
+                  break;
+                }
               }
             }
           }
         }
-      }
-    } else if(eventType == QEvent::KeyRelease) {
-      auto* keyEvent = static_cast<QKeyEvent*>(event);
-      if(!keyEvent->isAutoRepeat()) {
-        auto& configurationManager = gengine2d::getConfigurationManager();
-        auto& imageManager = getImageManager();
-        auto& view = getImageEnvironment().getView();
+      } else if(eventType == QEvent::KeyRelease) {
+        auto* keyEvent = static_cast<QKeyEvent*>(event);
+        if(!keyEvent->isAutoRepeat()) {
+          auto& configurationManager = gengine2d::getConfigurationManager();
+          auto& imageManager = getImageManager();
+          auto& view = getImageEnvironment().getView();
 
-        const auto previousFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "previousframe")->c_str());
-        const auto nextFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "nextframe")->c_str());
-        auto keySequence = get_key_sequence(keyEvent);
+          const auto previousFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "previousframe")->c_str());
+          const auto nextFrameKeySequence = QKeySequence(configurationManager.getString(CONFIG_SECTION_KEYBOARD_SHORTCUT, "nextframe")->c_str());
+          auto keySequence = get_key_sequence(keyEvent);
 
-        if(previousFrameKeySequence == keySequence ||
-           nextFrameKeySequence == keySequence) {
-          view.clearTemporaryImage();
-          auto width = imageManager.getImage().getWidth() * view.getPixelSize();
-          auto height = imageManager.getImage().getHeight() * view.getPixelSize();
-          view.repaint(qt_utils::convertToQTRect(castTo<position_t>(view.getSmallestDrawableRegion(DoubleRect(0, 0, width, height)))));
+          if(previousFrameKeySequence == keySequence ||
+             nextFrameKeySequence == keySequence) {
+            view.clearTemporaryImage();
+            auto width = imageManager.getImage().getWidth() * view.getPixelSize();
+            auto height = imageManager.getImage().getHeight() * view.getPixelSize();
+            view.repaint(qt_utils::convertToQTRect(castTo<position_t>(view.getSmallestDrawableRegion(DoubleRect(0, 0, width, height)))));
 
-          event->accept();
-          return true;
+            event->accept();
+            return true;
+          }
         }
       }
     }
