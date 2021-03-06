@@ -22,10 +22,11 @@
 
 namespace pixpaint
 {
-  static constexpr auto PAINTTOOLBOX_BUTTON_WIDTH = 32;
-  static constexpr auto PAINTTOOLBOX_BUTTON_HEIGHT = 32;
+  static constexpr auto PAINTTOOLBOX_BUTTON_WIDTH = 28;
+  static constexpr auto PAINTTOOLBOX_BUTTON_HEIGHT = 28;
   static constexpr auto TOOLBOX_BUTTON_WIDTH = 24;
   static constexpr auto TOOLBOX_BUTTON_HEIGHT = 24;
+  static constexpr auto TOOLBOX_WIDGET_HEIGHT = 24;
   static constexpr auto COLOR_BUTTON_WIDTH = 24;
   static constexpr auto COLOR_BUTTON_HEIGHT = 24;
 }

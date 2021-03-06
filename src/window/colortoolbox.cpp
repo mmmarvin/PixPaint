@@ -159,8 +159,10 @@ namespace
     this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     auto* layout = new QHBoxLayout(this);
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignLeft);
-    layout->addSpacerItem(new QSpacerItem(25, 1));
+//    layout->addSpacerItem(new QSpacerItem(25, 1));
 
     m_colorSelectionWidget = static_cast<ColorSelectionWidget*>(createColorSelectionWidget());
     layout->addWidget(m_colorSelectionWidget);

@@ -30,6 +30,8 @@ namespace pixpaint
     QWidget(parent)
   {
     auto* layout = new QHBoxLayout(this);
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignHCenter);
 
     m_preview = new PreviewView(this, image);

@@ -21,6 +21,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include "../gui_define.h"
 
 namespace pixpaint
 {
@@ -39,6 +40,7 @@ namespace pixpaint
     auto* label = new QLabel((name + ":").c_str(), this);
 
     m_lineEdit = new QLineEdit(this);
+    m_lineEdit->setMaximumHeight(TOOLBOX_WIDGET_HEIGHT);
     m_lineEdit->setText(initialValue.c_str());
     QObject::connect(m_lineEdit, &QLineEdit::textChanged, this, &OptionTextbox::textChanged);
     layout->addWidget(label);

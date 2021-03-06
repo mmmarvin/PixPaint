@@ -21,6 +21,7 @@
 
 #include <QPainter>
 #include <QGridLayout>
+#include "../gui_define.h"
 
 namespace pixpaint
 {
@@ -40,13 +41,14 @@ namespace pixpaint
     auto* label = new QLabel((name + ":").c_str(), this);
 
     m_text = new QSpinBox(this);
-    m_text->setFixedSize(55, 35);
+    m_text->setFixedSize(55, TOOLBOX_WIDGET_HEIGHT);
     m_text->setMinimum(minValue);
     m_text->setMaximum(maxValue);
     m_text->setValue(initialValue);
     QObject::connect(m_text, QOverload<int>::of(&QSpinBox::valueChanged), this, &OptionSlider::valueChanged);
 
     m_slider = new QSlider(this);
+    m_slider->setMaximumHeight(TOOLBOX_WIDGET_HEIGHT);
     m_slider->setOrientation(Qt::Horizontal);
     m_slider->setTickInterval(1);
     m_slider->setTickPosition(QSlider::NoTicks);

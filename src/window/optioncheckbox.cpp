@@ -21,6 +21,7 @@
 
 #include <QGridLayout>
 #include <QLabel>
+#include "../gui_define.h"
 
 namespace pixpaint
 {
@@ -39,6 +40,7 @@ namespace pixpaint
     auto* label = new QLabel((name + ":").c_str(), this);
 
     m_checkbox = new QCheckBox(this);
+    m_checkbox->setMaximumHeight(TOOLBOX_WIDGET_HEIGHT);
     m_checkbox->setChecked(initialValue);
     QObject::connect(m_checkbox, &QCheckBox::stateChanged, this, &OptionCheckbox::stateChanged);
     layout->addWidget(label);

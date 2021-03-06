@@ -69,6 +69,8 @@ namespace pixpaint
     m_scrollArea->setWidget(m_itemHolderWidget);
 
     auto* btnLayout = new QHBoxLayout;
+    btnLayout->setSpacing(0);
+    btnLayout->setContentsMargins(0, 0, 0, 0);
     btnLayout->setAlignment(Qt::AlignLeft);
 
     m_addButton = new QPushButton(this);
@@ -85,6 +87,7 @@ namespace pixpaint
     QObject::connect(m_removeButton, &QPushButton::clicked, this, &LayerWidget::removeLayer);
 
     m_opacitySlider = new QSlider(Qt::Orientation::Horizontal, this);
+    m_opacitySlider->setMaximumHeight(TOOLBOX_WIDGET_HEIGHT);
     m_opacitySlider->setTickPosition(QSlider::TicksRight);
     m_opacitySlider->setMinimum(0);
     m_opacitySlider->setMaximum(100);

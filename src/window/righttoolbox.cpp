@@ -30,6 +30,7 @@
 #include "../image/pixeldata.h"
 #include "../manager/imagemanager.h"
 #include "../manager/previewmanager.h"
+#include "../gui_define.h"
 #include "layerwidget.h"
 #include "previewview.h"
 #include "previewwidget.h"
@@ -164,12 +165,14 @@ namespace
   QGroupBox* RightToolbox::createLayerGroup()
   {
     auto* layer_group = new QGroupBox(this);
+    layer_group->setContentsMargins(0, 0, 0, 0);
     layer_group->setTitle(tr("Layers"));
     layer_group->setFlat(true);
 
     auto* blend_layout = new QHBoxLayout;
     auto* blend_mode_label = new QLabel("Mode:", layer_group);
     m_blendCombo = new QComboBox(layer_group);
+    m_blendCombo->setMaximumHeight(TOOLBOX_WIDGET_HEIGHT);
 
     for(const auto& p : STRING_TO_BLENDMODE) {
       m_blendCombo->addItem(p.first.c_str());
@@ -186,6 +189,8 @@ namespace
     m_layer = new LayerWidget(layer_group);
 
     auto* layer_layout = new QVBoxLayout(layer_group);
+    layer_layout->setSpacing(0);
+    layer_layout->setContentsMargins(0, 0, 0, 0);
     layer_layout->addLayout(blend_layout);
     layer_layout->addWidget(m_layer);
 

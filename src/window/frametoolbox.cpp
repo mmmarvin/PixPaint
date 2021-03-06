@@ -61,6 +61,9 @@ namespace pixpaint
     static const QIcon stopIcon("res/pause_btn_icon.png");
 
     auto* outer_layer = new QVBoxLayout(this);
+    outer_layer->setSpacing(0);
+    outer_layer->setContentsMargins(0, 0, 0, 0);
+
     auto* outer_surface = new QWidget(this);
 
     auto* layout = new QVBoxLayout(outer_surface);
@@ -69,6 +72,8 @@ namespace pixpaint
     layout->addWidget(m_scrollArea);
 
     auto* button_layout = new QHBoxLayout;
+    button_layout->setSpacing(0);
+    button_layout->setContentsMargins(0, 0, 0, 0);
     button_layout->setAlignment(Qt::AlignLeft);
     m_addButton = new QPushButton(outer_surface);
     m_addButton->setIcon(QIcon("res/add_btn_icon.png"));
@@ -87,6 +92,7 @@ namespace pixpaint
     m_removeButton->setEnabled(false);
     connect(m_removeButton, &QPushButton::clicked, this, &FrameToolbox::removeFrame);
     m_timerText = new QSpinBox(outer_surface);
+    m_timerText->setMaximumWidth(150);
     m_timerText->setToolTip(tr("Frame Duration"));
     m_timerText->setMinimum(1);
     m_timerText->setMaximum(1000000);
@@ -180,7 +186,7 @@ namespace pixpaint
     button_layout->addWidget(m_addButton);
     button_layout->addWidget(m_addCpyButton);
     button_layout->addWidget(m_removeButton);
-    button_layout->addSpacerItem(new QSpacerItem(100, TOOLBOX_BUTTON_HEIGHT));
+    button_layout->addSpacerItem(new QSpacerItem(50, TOOLBOX_BUTTON_HEIGHT));
     button_layout->addWidget(m_timerText);
 
     button_layout->addWidget(m_backBeginButton);

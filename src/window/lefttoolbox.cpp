@@ -120,7 +120,8 @@ namespace pixpaint
     auto* button_group = new QButtonGroup(widget);
 
     m_toolLayout = new FlowLayout(widget);
-    m_toolLayout->setSpacing(1);
+    m_toolLayout->setSpacing(0);
+    m_toolLayout->setContentsMargins(0, 0, 0, 0);
     m_toolLayout->setAlignment(Qt::AlignTop);
 
     for(auto it = paint_tool_registrar.begin(), it_end = paint_tool_registrar.end(); it != it_end; ++it) {

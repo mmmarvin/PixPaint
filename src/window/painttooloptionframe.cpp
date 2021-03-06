@@ -41,9 +41,13 @@ namespace pixpaint
     QScrollArea(parent)
   {
     auto* layout = new QVBoxLayout(this);
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     m_mainWidget = new QWidget(this);
     m_mainLayout = new QVBoxLayout(m_mainWidget);
+    m_mainLayout->setSpacing(0);
+    m_mainLayout->setContentsMargins(0, 0, 0, 0);
     m_mainWidget->setLayout(m_mainLayout);
     layout->addWidget(m_mainWidget);
     layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);

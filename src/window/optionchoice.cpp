@@ -21,6 +21,7 @@
 
 #include <QLabel>
 #include <QVBoxLayout>
+#include "../gui_define.h"
 
 namespace pixpaint
 {
@@ -38,6 +39,7 @@ namespace pixpaint
     auto* label = new QLabel((name + ":").c_str(), this);
 
     m_comboBox = new QComboBox(this);
+    m_comboBox->setMaximumHeight(TOOLBOX_WIDGET_HEIGHT);
     for(const auto& choice : choices) {
       m_comboBox->addItem(choice.c_str());
     }
