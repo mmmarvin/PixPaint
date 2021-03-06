@@ -45,8 +45,6 @@ namespace pixeldata_detail
                         std::make_signed_t<dimension_t> layer_width,
                         std::make_signed_t<dimension_t> layer_height);
 }
-  class PixelMap;
-
   enum class ERotationDirection : unsigned char
   {
     CLOCKWISE = 0,
@@ -64,6 +62,27 @@ namespace pixeldata_detail
       RESIZE = 0,
       SCALE,
       SMOOTH_SCALE
+    };
+
+    enum class EBlendMode : unsigned char
+    {
+      NORMAL,
+      MULTIPLY,
+      SCREEN,
+      OVERLAY,
+      HARDLIGHT,
+      SOFTLIGHT,
+      ADDITION,
+      DIFFERENCE,
+      DARKEN,
+      LIGHTEN,
+      COLOR_DODGE,
+      COLOR_BURN,
+
+      SRC_IN,
+      DST_IN,
+      SRC_OUT,
+      DST_OUT
     };
 
     PixelData(dimension_t width, dimension_t height, const Color& color = Color::WHITE);
@@ -90,9 +109,14 @@ namespace pixeldata_detail
     void setOpacity(std::uint_least32_t opacity);
     std::uint_least32_t getOpacity() const noexcept;
 
+    void setBlendMode(EBlendMode mode);
+    EBlendMode getBlendMode() const noexcept;
+
     void combine(const PixelData& pixelData, bool hard = false);
-    void combine(const PixelMap& pixelMap, bool hard = false);
     void combine(const PixelData& pixelData, position_t x, position_t y, bool hard = false);
+
+    void composite(const PixelData& pixelData, position_t x = 0, position_t y = 0);
+
     PixelData copy(position_t x, position_t y, dimension_t width, dimension_t height) const;
     PixelData cut(position_t x, position_t y, dimension_t width, dimension_t height);
 
@@ -118,13 +142,24 @@ namespace pixeldata_detail
 
   protected:
     template<class HardFunc, class Func>
-    void combine(const PixelData& pixelData, position_t x, position_t y, bool hard, HardFunc hardFunc, Func func);
+    void combine(const PixelData& pixelData,
+                 position_t x,
+                 position_t y,
+                 bool hard,
+                 HardFunc hardFunc,
+                 Func func);
+    template<class Func>
+    void composite(const PixelData& pixelData,
+                   position_t x,
+                   position_t y,
+                   Func condFunc);
 
   private:
     Color*              m_data;
     std::uint_least32_t m_opacity;
     dimension_t         m_width;
     dimension_t         m_height;
+    EBlendMode          m_mode;
   };
 
   Point center(const PixelData& layer);

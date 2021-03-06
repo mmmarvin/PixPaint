@@ -26,7 +26,26 @@ namespace pixpaint
 {
 namespace color_detail
 {
+  // TODO: Implement missing blend modes
   void alphaBlend(color_channel_t* dst, const color_channel_t* src);
+  void multiplyBlend(color_channel_t* dst, const color_channel_t* src);
+  void screenBlend(color_channel_t* dst, const color_channel_t* src);
+  void overlayBlend(color_channel_t* dst, const color_channel_t* src);
+//  void hardLightBlend(color_channel_t* dst, const color_channel_t* src);
+//  void softLightBlend(color_channel_t* dst, const color_channel_t* src);
+  void additionBlend(color_channel_t* dst, const color_channel_t* src);
+  void differenceBlend(color_channel_t* dst, const color_channel_t* src);
+  void darkenBlend(color_channel_t* dst, const color_channel_t* src);
+  void lightenBlend(color_channel_t* dst, const color_channel_t* src);
+  void colorDodgeBlend(color_channel_t* dst, const color_channel_t* src);
+  void colorBurnBlend(color_channel_t* dst, const color_channel_t* src);
+
+//  void srcInBlend(color_channel_t* dst, const color_channel_t* src);
+//  void dstInBlend(color_channel_t* dst, const color_channel_t* src);
+//  void srcOutBlend(color_channel_t* dst, const color_channel_t* src);
+//  void dstOutBlend(color_channel_t* dst, const color_channel_t* src);
+
+  void invert(color_channel_t* color);
 }
 #pragma pack(push, 1)
   struct Color
@@ -60,6 +79,7 @@ namespace color_detail
   Color operator*(const Color& lhs, const Color& rhs);
 
   Color alphaBlend(const Color& background, const Color& foreground);
+  Color invert(const Color& color);
 }
 
 #endif // COLOR_H

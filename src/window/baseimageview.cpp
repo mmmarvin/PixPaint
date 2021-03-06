@@ -109,9 +109,47 @@ namespace pixpaint
   {
     painter.setOpacity(static_cast<float>(layer.getOpacity()) / 100.f);
 
+    // TO DO: Find FIX: Qt applies blend modes even on alpha channels on the source image
+    // Find alternative ways to draw blend modes
+    switch(layer.getBlendMode()) {
+    case PixelData::EBlendMode::NORMAL:
+      painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+      break;
+    case PixelData::EBlendMode::MULTIPLY:
+      painter.setCompositionMode(QPainter::CompositionMode_Multiply);
+      break;
+    case PixelData::EBlendMode::SCREEN:
+      painter.setCompositionMode(QPainter::CompositionMode_Screen);
+      break;
+    case PixelData::EBlendMode::OVERLAY:
+      painter.setCompositionMode(QPainter::CompositionMode_Overlay);
+      break;
+    case PixelData::EBlendMode::ADDITION:
+      painter.setCompositionMode(QPainter::CompositionMode_Plus);
+      break;
+    case PixelData::EBlendMode::DIFFERENCE:
+      painter.setCompositionMode(QPainter::CompositionMode_Difference);
+      break;
+    case PixelData::EBlendMode::DARKEN:
+      painter.setCompositionMode(QPainter::CompositionMode_Darken);
+      break;
+    case PixelData::EBlendMode::LIGHTEN:
+      painter.setCompositionMode(QPainter::CompositionMode_Lighten);
+      break;
+    case PixelData::EBlendMode::COLOR_DODGE:
+      painter.setCompositionMode(QPainter::CompositionMode_ColorDodge);
+      break;
+    case PixelData::EBlendMode::COLOR_BURN:
+      painter.setCompositionMode(QPainter::CompositionMode_ColorBurn);
+      break;
+    default:
+      break;
+    }
+
     auto qimage = qt_utils::createQImage(layer);
     painter.drawImage(x, y, qimage);
 
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
     painter.setOpacity(1.f);
   }
 }

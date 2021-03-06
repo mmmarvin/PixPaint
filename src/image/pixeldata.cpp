@@ -27,7 +27,6 @@
 #include "../utility/math_utility.h"
 #include "../utility/qt_utility.h"
 #include "../debug_log.h"
-#include "pixelmap.h"
 
 namespace pixpaint
 {
@@ -168,20 +167,20 @@ namespace
     PixelData ret(layer_width, layer_height);
 
     auto c = center(layer);
-    auto rad = math_utils::toRadian(degree);
-    double x0 = c.x;
-    double y0 = c.y;
-    auto cos_r = std::cos(rad);
-    auto sin_r = std::sin(rad);
+    float rad = math_utils::toRadian(degree);
+    float x0 = c.x;
+    float y0 = c.y;
+    float cos_r = std::cos(rad);
+    float sin_r = std::sin(rad);
 
     auto* dst = ret.getData();
     auto* src = layer.getData();
     auto line_width = layer_width * 4;
-    for(std::size_t j = 0, jsize = layer_height; j < jsize; ++j) {
+    for(float j = 0, jsize = layer_height; j < jsize; j += 1.f) {
       auto* src_ptr = src;
-      for(std::size_t i = 0, isize = layer_width; i < isize; ++i) {
-        double dx = i - x0;
-        double dy = j - y0;
+      for(float i = 0, isize = layer_width; i < isize; i += 1.f) {
+        float dx = i - x0;
+        float dy = j - y0;
         position_t dst_x = std::round((cos_r * dx) - (sin_r * dy) + x0);
         position_t dst_y = std::round((sin_r * dx) + (cos_r * dy) + y0);
         if(dst_x < 0 || dst_x > layer_width ||
@@ -204,7 +203,8 @@ namespace
     m_data(nullptr),
     m_opacity(100),
     m_width(0),
-    m_height(0)
+    m_height(0),
+    m_mode(EBlendMode::NORMAL)
   {
     auto size = width * height;
     if(size) {
@@ -221,7 +221,8 @@ namespace
     m_data(nullptr),
     m_opacity(100),
     m_width(0),
-    m_height(0)
+    m_height(0),
+    m_mode(EBlendMode::NORMAL)
   {
     auto size = rhs.m_width * rhs.m_height;
     if(size) {
@@ -231,6 +232,7 @@ namespace
       m_width = rhs.m_width;
       m_height = rhs.m_height;
       m_opacity = rhs.m_opacity;
+      m_mode = rhs.m_mode;
       m_data = temp.release();
     }
   }
@@ -241,6 +243,7 @@ namespace
     std::swap(temp.m_width, m_width);
     std::swap(temp.m_height, m_height);
     std::swap(temp.m_opacity, m_opacity);
+    std::swap(temp.m_mode, m_mode);
     std::swap(temp.m_data, m_data);
 
     return *this;
@@ -250,11 +253,13 @@ namespace
     m_data(nullptr),
     m_opacity(100),
     m_width(0),
-    m_height(0)
+    m_height(0),
+    m_mode(EBlendMode::NORMAL)
   {
     std::swap(rhs.m_width, m_width);
     std::swap(rhs.m_height, m_height);
     std::swap(rhs.m_opacity, m_opacity);
+    std::swap(rhs.m_mode, m_mode);
     std::swap(rhs.m_data, m_data);
   }
 
@@ -263,6 +268,7 @@ namespace
     std::swap(rhs.m_width, m_width);
     std::swap(rhs.m_height, m_height);
     std::swap(rhs.m_opacity, m_opacity);
+    std::swap(rhs.m_mode, m_mode);
     std::swap(rhs.m_data, m_data);
 
     return *this;
@@ -363,23 +369,19 @@ namespace
     return m_opacity;
   }
 
+  void PixelData::setBlendMode(EBlendMode mode)
+  {
+    m_mode = mode;
+  }
+
+  PixelData::EBlendMode PixelData::getBlendMode() const noexcept
+  {
+    return m_mode;
+  }
+
   void PixelData::combine(const PixelData& pixelData, bool hard)
   {
     combine(pixelData, 0, 0, hard);
-  }
-
-  void PixelData::combine(const PixelMap& pixelMap, bool hard)
-  {
-    using setter_func_t = std::function<void(position_t, position_t, const Color&)>;
-    const auto pixelSetter = hard ?
-      setter_func_t([this](position_t x, position_t y, const Color& color) { setPixel(x, y, color); }) :
-      setter_func_t([this](position_t x, position_t y, const Color& color) { setPixelSoft(x, y, color); });
-
-    for(const auto& t : pixelMap.m_pixels) {
-      const auto& point = std::get<0>(t);
-      const auto& color = std::get<1>(t);
-      pixelSetter(point.first, point.second, color);
-    }
   }
 
   void PixelData::combine(const PixelData& pixelData, position_t x, position_t y, bool hard)
@@ -391,6 +393,11 @@ namespace
     [](unsigned char* dst_ptr, const unsigned char* src_ptr, position_t, position_t) {
       color_detail::alphaBlend(dst_ptr, src_ptr);
     });
+  }
+
+  void PixelData::composite(const PixelData& pixelData, position_t x, position_t y)
+  {
+    composite(pixelData, x, y, [](auto*, auto*, auto, auto) { return true; });
   }
 
   PixelData PixelData::copy(position_t x, position_t y, dimension_t width, dimension_t height) const
@@ -600,9 +607,7 @@ namespace
     auto* data = getData();
 
     for(std::size_t i = 0; i < size; ++i) {
-      data[0] = general_utils::max<int>(255 - data[0], 0);
-      data[1] = general_utils::max<int>(255 - data[1], 0);
-      data[2] = general_utils::max<int>(255 - data[2], 0);
+      color_detail::invert(data);
       data += 4;
     }
   }
