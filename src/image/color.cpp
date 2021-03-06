@@ -55,9 +55,11 @@ namespace color_detail
     unsigned int s_r = src[0], s_g = src[1], s_b = src[2];
     unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2];
 
-    dst[0] = d_r * s_r / 255;
-    dst[1] = d_g * s_g / 255;
-    dst[2] = d_b * s_b / 255;
+    if(src[3]) {
+      dst[0] = d_r * s_r / 255;
+      dst[1] = d_g * s_g / 255;
+      dst[2] = d_b * s_b / 255;
+    }
   }
 
   void screenBlend(color_channel_t* dst, const color_channel_t* src)
@@ -67,9 +69,11 @@ namespace color_detail
     unsigned int s_r = src[0], s_g = src[1], s_b = src[2];
     unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2];
 
-    dst[0] = 255 - (((255 - d_r) * (255 - s_r)) / 255);
-    dst[1] = 255 - (((255 - d_g) * (255 - s_g)) / 255);
-    dst[2] = 255 - (((255 - d_b) * (255 - s_b)) / 255);
+    if(src[3]) {
+      dst[0] = 255 - (((255 - d_r) * (255 - s_r)) / 255);
+      dst[1] = 255 - (((255 - d_g) * (255 - s_g)) / 255);
+      dst[2] = 255 - (((255 - d_b) * (255 - s_b)) / 255);
+    }
   }
 
   void overlayBlend(color_channel_t* dst, const color_channel_t* src)
@@ -80,14 +84,16 @@ namespace color_detail
     unsigned int s_r = src[0], s_g = src[1], s_b = src[2];
     unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2];
 
-    if(dst[3] < 128) {
-      dst[0] = 2 * d_r * s_r / 255;
-      dst[1] = 2 * d_g * s_g / 255;
-      dst[2] = 2 * d_b * s_b / 255;
-    } else {
-      dst[0] = 255 - ((2 * (255 - d_r) * (255 - s_r)) / 255);
-      dst[1] = 255 - ((2 * (255 - d_g) * (255 - s_g)) / 255);
-      dst[2] = 255 - ((2 * (255 - d_b) * (255 - s_b)) / 255);
+    if(src[3]) {
+      if(dst[3] < 128) {
+        dst[0] = 2 * d_r * s_r / 255;
+        dst[1] = 2 * d_g * s_g / 255;
+        dst[2] = 2 * d_b * s_b / 255;
+      } else {
+        dst[0] = 255 - ((2 * (255 - d_r) * (255 - s_r)) / 255);
+        dst[1] = 255 - ((2 * (255 - d_g) * (255 - s_g)) / 255);
+        dst[2] = 255 - ((2 * (255 - d_b) * (255 - s_b)) / 255);
+      }
     }
   }
 
@@ -122,45 +128,55 @@ namespace color_detail
     unsigned int s_r = src[0], s_g = src[1], s_b = src[2];
     unsigned int d_r = dst[0], d_g = dst[1], d_b = dst[2];
 
-    dst[0] = s_r >= d_r ? s_r - d_r : d_r - s_r;
-    dst[1] = s_g >= d_g ? s_g - d_g : d_g - s_g;
-    dst[2] = s_b >= d_b ? s_b - d_b : d_b - s_b;
+    if(src[3]) {
+      dst[0] = s_r >= d_r ? s_r - d_r : d_r - s_r;
+      dst[1] = s_g >= d_g ? s_g - d_g : d_g - s_g;
+      dst[2] = s_b >= d_b ? s_b - d_b : d_b - s_b;
+    }
   }
 
   void darkenBlend(color_channel_t* dst, const color_channel_t* src)
   {
     // formula:
     // min(s, d)
-    dst[0] = general_utils::min(dst[0], src[0]);
-    dst[1] = general_utils::min(dst[1], src[1]);
-    dst[2] = general_utils::min(dst[2], src[2]);
+    if(src[3]) {
+      dst[0] = general_utils::min(dst[0], src[0]);
+      dst[1] = general_utils::min(dst[1], src[1]);
+      dst[2] = general_utils::min(dst[2], src[2]);
+    }
   }
 
   void lightenBlend(color_channel_t* dst, const color_channel_t* src)
   {
     // formula:
     // max(s, d)
-    dst[0] = general_utils::max(dst[0], src[0]);
-    dst[1] = general_utils::max(dst[1], src[1]);
-    dst[2] = general_utils::max(dst[2], src[2]);
+    if(src[3]) {
+      dst[0] = general_utils::max(dst[0], src[0]);
+      dst[1] = general_utils::max(dst[1], src[1]);
+      dst[2] = general_utils::max(dst[2], src[2]);
+    }
   }
 
   void colorDodgeBlend(color_channel_t* dst, const color_channel_t* src)
   {
     // formula:
     // d / (1 - s)
-    dst[0] /= (255 - src[0]);
-    dst[1] /= (255 - src[1]);
-    dst[2] /= (255 - src[2]);
+    if(src[3]) {
+      dst[0] /= (255 - src[0]);
+      dst[1] /= (255 - src[1]);
+      dst[2] /= (255 - src[2]);
+    }
   }
 
   void colorBurnBlend(color_channel_t* dst, const color_channel_t* src)
   {
     // formula:
     // (1 - d) / s
-    dst[0] = (255 - dst[0]) / src[0];
-    dst[1] = (255 - dst[1]) / src[1];
-    dst[2] = (255 - dst[2]) / src[2];
+    if(src[3]) {
+      dst[0] = (255 - dst[0]) / src[0];
+      dst[1] = (255 - dst[1]) / src[1];
+      dst[2] = (255 - dst[2]) / src[2];
+    }
   }
 
 //  void srcInBlend(color_channel_t* dst, const color_channel_t* src)

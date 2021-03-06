@@ -109,6 +109,8 @@ namespace pixpaint
   {
     painter.setOpacity(static_cast<float>(layer.getOpacity()) / 100.f);
 
+    // TO DO: Find FIX: Qt applies blend modes even on alpha channels on the source image
+    // Find alternative ways to draw blend modes
     switch(layer.getBlendMode()) {
     case PixelData::EBlendMode::NORMAL:
       painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
