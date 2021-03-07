@@ -1,6 +1,7 @@
 PixPaint Changelog:
 
-v.1.02-1:
+v.1.02-b.1:
+* Python initialization error now logs the error on a log file
 * Fixed bug where flattening image ignores opacity
 * Fixed bug where moving tabs causes a crash
 * Fixed erase tool not registering a history entry
