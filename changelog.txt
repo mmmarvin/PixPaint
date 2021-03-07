@@ -1,5 +1,10 @@
 PixPaint Changelog:
 
+v.1.1:
+* Added blend modes
+* Added ability to move frames around
+* Made GUI more compact
+
 v.1.02-b.1:
 * Python initialization error now logs the error on a log file
 * Fixed bug where flattening image ignores opacity
