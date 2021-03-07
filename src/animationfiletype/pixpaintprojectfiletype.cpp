@@ -22,6 +22,7 @@
 #include <fstream>
 #include "../embed/headerstream.h"
 #include "../image/animation.h"
+#include "../utility/general_utility.h"
 #include "../assert.h"
 #include "../debug_log.h"
 
@@ -32,6 +33,35 @@
 
 namespace pixpaint
 {
+namespace
+{
+  std::string safe_buffer_to_string(const std::array<char, 255>& buff)
+  {
+    std::string ret;
+    for(size_t i = 0; i < 255; ++i) {
+      if(buff[i] == '\0')
+        return ret;
+
+      ret += buff[i];
+    }
+
+    return ret;
+  }
+}
+// PPF Data Structure:
+// Header (6 bytes)
+// Animation Table
+//  Frame 1:
+//    Number of Layers  (4 bytes)
+//    Frame Duration    (4 bytes)
+//  Frame 2:
+//    Number of Layers  (4 bytes)
+//    Frame Duration    (4 bytes)
+//  ...
+// Frame Data
+//  Layer Name        (255 bytes)
+//  Layer Opacity     (4 bytes)
+//  Pixel Data...
   const unsigned char PixPaintProjectFileType::HEADER_VALUE[PixPaintProjectFileType::NUMBER_OF_HEADER_BITS] =
   {
     'P', 'P', 'F',
@@ -60,8 +90,8 @@ namespace pixpaint
         out.write(reinterpret_cast<char*>(&project_header), sizeof(project_header));
 
         for(std::size_t i = 0, isize = project_header.num_frames; i < isize; ++i) {
-          std::int32_t num_layers = animation.getFrame(i).getLayerCount();
-          std::int32_t frame_duration = animation.getFrameDuration(i);
+          boost::endian::little_uint32_t num_layers = animation.getFrame(i).getLayerCount();
+          boost::endian::little_uint32_t frame_duration = animation.getFrameDuration(i);
 
           out.write(reinterpret_cast<char*>(&num_layers), sizeof(num_layers));
           out.write(reinterpret_cast<char*>(&frame_duration), sizeof(frame_duration));
@@ -75,7 +105,22 @@ namespace pixpaint
         for(std::size_t i = 0, isize = project_header.num_frames; i < isize; ++i) {
           const auto& frame = animation.getFrame(i);
           for(std::size_t j = 0, jsize = frame.getLayerCount(); j < jsize; ++j) {
+            // write the layer name
+            const auto& layer_name = frame.getLayerName(j);
+            std::array<char, 255> layer_name_buff;
+            layer_name_buff.fill('\0');
+            std::memcpy(layer_name_buff.data(),
+                        layer_name.data(),
+                        general_utils::min<size_t>(layer_name.size(), 255));
+            out.write(layer_name_buff.data(), layer_name_buff.size());
+
             const auto& layer = frame.getLayer(j);
+
+            // write the layer opacity
+            boost::endian::little_uint32_t layer_opacity = layer.getOpacity();
+            out.write(reinterpret_cast<char*>(&layer_opacity), sizeof(layer_opacity));
+
+            // write the layer data
             out.write(reinterpret_cast<const char*>(layer.getData()),
                       frame_header.width * frame_header.height * 4 * sizeof(unsigned char));
           }
@@ -105,8 +150,8 @@ namespace pixpaint
       std::vector<std::pair<std::size_t, int>> layer_duration_pair;
       layer_duration_pair.resize(project_header.num_frames);
       for(std::size_t i = 0, isize = project_header.num_frames; i < isize; ++i) {
-        std::int32_t number_layers;
-        std::int32_t frame_duration;
+        boost::endian::little_uint32_t number_layers;
+        boost::endian::little_uint32_t frame_duration;
 
         in.read(reinterpret_cast<char*>(&number_layers), sizeof(number_layers));
         CHECK_READ_COUNT(in, sizeof(number_layers))
@@ -133,11 +178,31 @@ namespace pixpaint
         auto number_layers = std::get<0>(t);
         auto frame_duration = std::get<1>(t);
 
+        if(!number_layers) {
+          return EOpenResult::EOR_ERROR;
+        }
+
         Image frame(frame_header.width, frame_header.height);
+        frame.removeLayer(0);
+
         for(std::size_t j = 0; j < number_layers; ++j) {
           frame.addLayer();
+
+          // read the layer name
+          std::array<char, 255> buff;
+          in.read(buff.data(), buff.size());
+          CHECK_READ_COUNT(in, buff.size())
+          frame.renameLayer(j, safe_buffer_to_string(buff));
+
           auto& layer = frame.getLayer(j);
 
+          // read the layer opacity
+          boost::endian::little_uint32_t layer_opacity;
+          in.read(reinterpret_cast<char*>(&layer_opacity), sizeof(layer_opacity));
+          CHECK_READ_COUNT(in, sizeof(layer_opacity))
+          layer.setOpacity(layer_opacity);
+
+          // read the layer data
           in.read(reinterpret_cast<char*>(layer.getData()), image_size);
           CHECK_READ_COUNT(in, image_size)
         }
