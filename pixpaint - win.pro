@@ -226,6 +226,7 @@ HEADERS += \
     src/image_filetype_importer.h \
     src/keys.h \
     src/linestyle.h \
+    src/logger.h \
     src/macro.h \
     src/os_specific_headers.h \
     src/project_filetype_importer.h \
@@ -417,6 +418,7 @@ SOURCES += \
     src/window/zoomablescrollarea.cpp \
     src/animation_filetype_importer.cpp \
     src/colorlist.cpp \
+    src/config.cpp \
     src/cursor.cpp \
     src/debug_log.cpp \
     src/debug_log.inl \
@@ -425,6 +427,7 @@ SOURCES += \
     src/effect_importer.cpp \
     src/idgenerator.cpp \
     src/image_filetype_importer.cpp \
+    src/logger.cpp \
     src/os_specific_headers.cpp \
     src/pixpaint.cpp \
     src/project_filetype_importer.cpp \
@@ -435,7 +438,7 @@ QMAKE_CXXFLAGS += \
     -Wl,-subsystem,windows
 
 QMAKE_LFLAGS += \
-    -mwindows {PWD}/win/icon.res {PWD}/win/version.res
+    -mwindows $${PWD}/win/icon.res $${PWD}/win/version.res
 
 INCLUDEPATH += \
     $${INCLUDE_PATH_PYTHON} \
