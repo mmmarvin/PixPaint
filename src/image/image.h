@@ -28,6 +28,8 @@ namespace pixpaint
   class Image
   {
   public:
+    static constexpr uint32_t MAX_LAYER_NAME_LENGTH = 255;
+
     Image(position_t width, position_t height, const Color& color = Color::WHITE);
     void clear(const Color& color);
 

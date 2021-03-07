@@ -92,8 +92,10 @@ namespace pixpaint
 
   void Image::renameLayer(std::size_t index, std::string name)
   {
-    std::get<1>(m_layers[index]) = std::move(name);
-    setModified(true);
+    if(name.size() <= MAX_LAYER_NAME_LENGTH) {
+      std::get<1>(m_layers[index]) = std::move(name);
+      setModified(true);
+    }
   }
 
   void Image::moveLayer(std::size_t srcIndex, std::size_t dstIndex)
