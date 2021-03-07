@@ -31,6 +31,10 @@ USE_MULTI_THREADING {
 }
 
 HEADERS += \
+    src/3rdparty/catch2/catch.hpp \
+    src/3rdparty/catch2/catch_reporter_automake.hpp \
+    src/3rdparty/catch2/catch_reporter_tap.hpp \
+    src/3rdparty/catch2/catch_reporter_teamcity.hpp \
     src/3rdparty/gengine/base.h \
     src/3rdparty/gengine/configuration.h \
     src/3rdparty/gengine/converter_utility.h \
@@ -100,6 +104,7 @@ HEADERS += \
     src/history/history.h \
     src/history/historyaction.h \
     src/history/imagerestoreaction.h \
+    src/history/moveframeaction.h \
     src/history/movelayeraction.h \
     src/history/regionrestoreaction.h \
     src/history/removeframeaction.h \
@@ -121,7 +126,6 @@ HEADERS += \
     src/image/maskablepixeldata.h \
     src/image/modifyablepixeldata.h \
     src/image/pixeldata.h \
-    src/image/pixelmap.h \
     src/image/point.h \
     src/image/rect.h \
     src/image/size.h \
@@ -226,6 +230,7 @@ HEADERS += \
     src/image_filetype_importer.h \
     src/keys.h \
     src/linestyle.h \
+    src/logger.h \
     src/macro.h \
     src/os_specific_headers.h \
     src/project_filetype_importer.h \
@@ -294,6 +299,7 @@ SOURCES += \
     src/history/history.inl \
     src/history/historyaction.cpp \
     src/history/imagerestoreaction.cpp \
+    src/history/moveframeaction.cpp \
     src/history/movelayeraction.cpp \
     src/history/regionrestoreaction.cpp \
     src/history/removeframeaction.cpp \
@@ -315,7 +321,6 @@ SOURCES += \
     src/image/modifyablepixeldata.cpp \
     src/image/pixeldata.cpp \
     src/image/pixeldata.inl \
-    src/image/pixelmap.cpp \
     src/image/point.cpp \
     src/image/rect.inl \
     src/image/size.cpp \
@@ -417,6 +422,7 @@ SOURCES += \
     src/window/zoomablescrollarea.cpp \
     src/animation_filetype_importer.cpp \
     src/colorlist.cpp \
+    src/config.cpp \
     src/cursor.cpp \
     src/debug_log.cpp \
     src/debug_log.inl \
@@ -425,6 +431,7 @@ SOURCES += \
     src/effect_importer.cpp \
     src/idgenerator.cpp \
     src/image_filetype_importer.cpp \
+    src/logger.cpp \
     src/os_specific_headers.cpp \
     src/pixpaint.cpp \
     src/project_filetype_importer.cpp \
@@ -435,7 +442,7 @@ QMAKE_CXXFLAGS += \
     -Wl,-subsystem,windows
 
 QMAKE_LFLAGS += \
-    -mwindows {PWD}/win/icon.res {PWD}/win/version.res
+    -mwindows $${PWD}/win/icon.res $${PWD}/win/version.res
 
 INCLUDEPATH += \
     $${INCLUDE_PATH_PYTHON} \
