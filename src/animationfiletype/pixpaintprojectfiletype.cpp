@@ -35,10 +35,10 @@ namespace pixpaint
 {
 namespace
 {
-  std::string safe_buffer_to_string(const std::array<char, 255>& buff)
+  std::string safe_buffer_to_string(const std::array<char, Image::MAX_LAYER_NAME_LENGTH>& buff)
   {
     std::string ret;
-    for(size_t i = 0; i < 255; ++i) {
+    for(size_t i = 0; i < Image::MAX_LAYER_NAME_LENGTH; ++i) {
       if(buff[i] == '\0')
         return ret;
 
@@ -107,11 +107,11 @@ namespace
           for(std::size_t j = 0, jsize = frame.getLayerCount(); j < jsize; ++j) {
             // write the layer name
             const auto& layer_name = frame.getLayerName(j);
-            std::array<char, 255> layer_name_buff;
+            std::array<char, Image::MAX_LAYER_NAME_LENGTH> layer_name_buff;
             layer_name_buff.fill('\0');
             std::memcpy(layer_name_buff.data(),
                         layer_name.data(),
-                        general_utils::min<size_t>(layer_name.size(), 255));
+                        general_utils::min<size_t>(layer_name.size(), Image::MAX_LAYER_NAME_LENGTH));
             out.write(layer_name_buff.data(), layer_name_buff.size());
 
             const auto& layer = frame.getLayer(j);
@@ -189,7 +189,7 @@ namespace
           frame.addLayer();
 
           // read the layer name
-          std::array<char, 255> buff;
+          std::array<char, Image::MAX_LAYER_NAME_LENGTH> buff;
           in.read(buff.data(), buff.size());
           CHECK_READ_COUNT(in, buff.size())
           frame.renameLayer(j, safe_buffer_to_string(buff));
