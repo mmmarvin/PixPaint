@@ -13,6 +13,7 @@ Compression=lzma2
 SolidCompression=yes
 PrivilegesRequiredOverridesAllowed = commandline dialog
 PrivilegesRequired=lowest
+ChangesAssociations=yes
 
 [Files]
 Source: "changelog.txt"; Destdir: "{app}"
@@ -81,6 +82,12 @@ Source: "res\rem_btn_icon.png"; Destdir: "{app}\res"
 Source: "thirdpartylicense.txt"; Destdir: "{app}"
 Source: "uninst.ico"; Destdir: "{app}"
 Source: "zlib1.dll"; Destdir: "{app}"
+
+[Registry]
+Root: HKCR; Subkey: ".ppf";                             ValueData: "{#MyAppName}";             Flags: uninsdeletevalue; ValueType: string;  ValueName: ""
+Root: HKCR; Subkey: "{#MyAppName}";                     ValueData: "Program {#MyAppName}";     Flags: uninsdeletekey;   ValueType: string;  ValueName: ""
+Root: HKCR; Subkey: "{#MyAppName}\DefaultIcon";         ValueData: "{app}\{#MyAppExeName},0";                           ValueType: string;  ValueName: ""
+Root: HKCR; Subkey: "{#MyAppName}\shell\open\command";  ValueData: """{app}\{#MyAppExeName}""  ""%1""";                 ValueType: string;  ValueName: ""
 
 [Dirs]
 Name: "{app}\scripts"
