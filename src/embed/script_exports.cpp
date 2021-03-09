@@ -72,6 +72,7 @@ BOOST_PYTHON_MODULE(pixpaint)
 
   bp::class_<Color>("Color", bp::init<>())
     .def(bp::init<color_channel_t, color_channel_t, color_channel_t>())
+    .def(bp::init<color_channel_t, color_channel_t, color_channel_t, color_channel_t>())
     .def_readwrite("r", &Color::r)
     .def_readwrite("g", &Color::g)
     .def_readwrite("b", &Color::b)
