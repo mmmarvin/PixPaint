@@ -34,6 +34,7 @@ namespace pixpaint
   std::string getAppAndVersion();
   std::string getApp();
   std::string getVersion();
+  int getVersionID();
 }
 
 #endif // CONFIG_H
