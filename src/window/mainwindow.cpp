@@ -262,7 +262,7 @@ namespace
 
     this->setMinimumSize(800, 600);
     this->setWindowState(Qt::WindowState::WindowMaximized);
-    this->setWindowTitle(app_name.c_str());
+    this->setWindowTitle((app_name + "[" + std::to_string(getVersionID()) + "]").c_str());
     this->setWindowIcon(QIcon("res/pixpaint.png"));
     this->setAcceptDrops(true);
 
