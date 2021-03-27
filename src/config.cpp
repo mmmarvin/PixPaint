@@ -33,15 +33,12 @@ namespace pixpaint
   int getVersionID()
   {
     auto get_release_type_id = [] {
-      switch(APP_RELEASE_TYPE) {
-      case 'a':
+      if(APP_RELEASE_TYPE == "a") {
         return 0;
-      case 'b':
+      } else if(APP_RELEASE_TYPE == "b") {
         return 1;
-      case 'rc':
+      } else if(APP_RELEASE_TYPE == "rc") {
         return 2;
-      default:
-        break;
       }
 
       return 3;
@@ -50,7 +47,7 @@ namespace pixpaint
     return (APP_VERSION_MAJOR * 10000) +
            (APP_VERSION_MINOR * 1000) +
            (APP_VERSION_PATCH * 100) +
-           (get_release_type_id * 10) +
+           (get_release_type_id() * 10) +
            APP_VERSION_RELEASE;
   }
 }
