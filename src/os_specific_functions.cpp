@@ -53,6 +53,8 @@ namespace pixpaint
         char home_location_cstr[MAX_PATH];
         snprintf(&home_location_cstr[0], MAX_PATH, "%ls", &home_location[0]);
         ret = std::string(&home_location_cstr[0], strnlen(&home_location_cstr[0], MAX_PATH));
+      } else {
+        ret = ".";
       }
 #endif // defined(LINUX_VERSION)
       return ret;
