@@ -14,7 +14,8 @@ namespace requests
       return ec;
     }
 
-    while(!p.is_done()) {
+    bool done = false;
+    while(!p.is_done() && !done) {
       std::array<char, Size> buff;
       p.get().body().data = buff.data();
       p.get().body().size = buff.size();
@@ -28,7 +29,7 @@ namespace requests
         return ec;
       }
 
-      func(buff);
+      done = !func(buff);
     }
 
     return boost::beast::error_code();
