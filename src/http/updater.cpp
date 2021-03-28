@@ -2,7 +2,7 @@
 
 #include <boost/beast/version.hpp>
 #include "../3rdparty/jsonxx/jsonxx.h"
-#include "../config.h"
+#include "../version.h"
 #include "../macro.h"
 #include "sslrequest.h"
 

@@ -22,7 +22,7 @@
 #include <chrono>
 #include <ctime>
 #include "utility/settings_file_utility.h"
-#include "config.h"
+#include "version.h"
 #include "debug_log.h"
 #include "os_specific_headers.h"
 

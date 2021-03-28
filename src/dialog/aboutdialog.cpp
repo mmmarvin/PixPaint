@@ -21,7 +21,7 @@
 
 #include <QLabel>
 #include <QVBoxLayout>
-#include "../config.h"
+#include "../version.h"
 
 namespace pixpaint
 {

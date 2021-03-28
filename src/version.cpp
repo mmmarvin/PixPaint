@@ -1,4 +1,4 @@
-#include "config.h"
+#include "version.h"
 
 namespace pixpaint
 {
@@ -33,11 +33,11 @@ namespace pixpaint
   int getVersionID()
   {
     auto get_release_type_id = [] {
-      if(APP_RELEASE_TYPE == "a") {
+      if(std::string(APP_RELEASE_TYPE) == "a") {
         return 0;
-      } else if(APP_RELEASE_TYPE == "b") {
+      } else if(std::string(APP_RELEASE_TYPE) == "b") {
         return 1;
-      } else if(APP_RELEASE_TYPE == "rc") {
+      } else if(std::string(APP_RELEASE_TYPE) == "rc") {
         return 2;
       }
 

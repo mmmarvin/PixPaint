@@ -55,7 +55,7 @@
 #include "../utility/filetype_utility.h"
 #include "../utility/qt_utility.h"
 #include "../utility/settings_file_utility.h"
-#include "../config.h"
+#include "../version.h"
 #include "../debug_log.h"
 #include "../define.h"
 #include "../default_color_template.h"
