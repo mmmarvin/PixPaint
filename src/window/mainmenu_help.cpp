@@ -28,7 +28,8 @@ namespace pixpaint
   void popHelpMenu(MainMenu::HelpMenu* helpMenu, QWidget* parent, bool)
   {
     helpMenu->checkForUpdatesAction = helpMenu->menu->addAction(QObject::tr("Check for updates..."));
-    helpMenu->aboutHelpAction = helpMenu->menu->addAction(QObject::tr("About..."));
+    helpMenu->menu->addSeparator();
+    helpMenu->aboutHelpAction = helpMenu->menu->addAction(QObject::tr("About"));
 
     QObject::connect(helpMenu->checkForUpdatesAction, &QAction::triggered, [parent](bool) {
       auto res = getUpdater().updateAvailable();
