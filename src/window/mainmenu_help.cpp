@@ -19,13 +19,48 @@
  **********/
 #include "mainmenu.h"
 
+#include <QMessageBox>
 #include "../dialog/aboutdialog.h"
+#include "../http/updater.h"
 
 namespace pixpaint
 {
   void popHelpMenu(MainMenu::HelpMenu* helpMenu, QWidget* parent, bool)
   {
+    helpMenu->checkForUpdatesAction = helpMenu->menu->addAction(QObject::tr("Check for updates..."));
     helpMenu->aboutHelpAction = helpMenu->menu->addAction(QObject::tr("About..."));
+
+    QObject::connect(helpMenu->checkForUpdatesAction, &QAction::triggered, [parent](bool) {
+      auto res = getUpdater().updateAvailable();
+      switch(res) {
+      case 0:
+        QMessageBox::information(parent,
+                                 "Update",
+                                 "PixPaint is up-to-date!");
+        break;
+      case 1:
+      {
+        auto res = QMessageBox::information(parent,
+                                            "Update",
+                                            "There is a new version available! Do you want to update?",
+                                            QMessageBox::StandardButton::Yes |
+                                            QMessageBox::StandardButton::No,
+                                            QMessageBox::StandardButton::No);
+        if(res == QMessageBox::StandardButton::Yes) {
+          parent->close();
+        }
+        break;
+      }
+      case -1:
+        QMessageBox::critical(parent,
+                              "Update",
+                              "Cannot check for a new version!");
+        break;
+      default:
+        break;
+      }
+    });
+
     QObject::connect(helpMenu->aboutHelpAction, &QAction::triggered, [parent](bool) {
       AboutDialog dialog(parent);
       dialog.exec();

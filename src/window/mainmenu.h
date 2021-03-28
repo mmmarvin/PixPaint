@@ -120,6 +120,7 @@ namespace pixpaint
     {
       QMenu*                menu;
 
+      QAction*              checkForUpdatesAction;
       QAction*              aboutHelpAction;
     };
 
