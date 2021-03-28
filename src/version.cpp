@@ -33,11 +33,12 @@ namespace pixpaint
   int getVersionID()
   {
     auto get_release_type_id = [] {
-      if(std::string(APP_RELEASE_TYPE) == "a") {
+      auto release_type = std::string(APP_RELEASE_TYPE);
+      if(release_type == "a") {
         return 0;
-      } else if(std::string(APP_RELEASE_TYPE) == "b") {
+      } else if(release_type == "b") {
         return 1;
-      } else if(std::string(APP_RELEASE_TYPE) == "rc") {
+      } else if(release_type == "rc") {
         return 2;
       }
 
