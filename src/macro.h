@@ -24,6 +24,8 @@
   #define LINUX_VERSION
 #elif defined(_WIN32)
   #define WINDOWS_VERSION
+#else
+#error Not supported operating system
 #endif // defined
 
 #endif // MACRO_H

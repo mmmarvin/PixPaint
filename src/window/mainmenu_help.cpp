@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include "../dialog/aboutdialog.h"
 #include "../http/updater.h"
+#include "../os_specific_functions.h"
 
 namespace pixpaint
 {
@@ -48,7 +49,17 @@ namespace pixpaint
                                             QMessageBox::StandardButton::No,
                                             QMessageBox::StandardButton::No);
         if(res == QMessageBox::StandardButton::Yes) {
-          parent->close();
+          auto updater_filename = "Updater";
+#if defined(WINDOWS_VERSION)
+          updater_filename += ".exe";
+#endif // defined(WINDOWS_VERSION)
+          if(os_specific::call_process(updater_filename, "")) {
+            parent->close();
+          } else {
+            QMessageBox::critical(parent,
+                                  "Update",
+                                  "Cannot run updater!");
+          }
         }
         break;
       }
