@@ -53,7 +53,7 @@ namespace pixpaint
 #if defined(WINDOWS_VERSION)
           updater_filename += ".exe";
 #endif // defined(WINDOWS_VERSION)
-          if(os_specific::call_process(updater_filename, "")) {
+          if(os_specific::callProcess(updater_filename, "")) {
             parent->close();
           } else {
             QMessageBox::critical(parent,

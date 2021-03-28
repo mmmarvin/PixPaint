@@ -7,8 +7,9 @@ namespace pixpaint
 {
 namespace os_specific
 {
-  bool call_process(const std::string& process_name,
-                    const std::string& process_parameters);
+  bool callProcess(const std::string& process_name,
+                   const std::string& process_parameters);
+  std::string getHomePath();
 }
 }
 

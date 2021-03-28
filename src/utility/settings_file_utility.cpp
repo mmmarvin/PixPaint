@@ -22,14 +22,8 @@
 #include <filesystem>
 #include <string.h>
 #include "../macro.h"
+#include "../os_specific_functions.h"
 #include "../version_specific_headers.h"
-#if defined(LINUX_VERSION)
-#include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
-#elif defined(WINDOWS_VERSION)
-#include <Shlobj.h>
-#endif // defined(LINUX_VERSION)
 
 namespace pixpaint
 {
@@ -62,18 +56,7 @@ namespace settings_file_utils
   std::string getSettingsLocation()
   {
     static const std::string cfg_filename_location = ".pixpaint";
-    std::string cfg_location;
-
-#if defined(LINUX_VERSION)
-    cfg_location = getpwuid(getuid())->pw_dir;
-#elif defined(WINDOWS_VERSION)
-    WCHAR wcfg_location[MAX_PATH];
-    if(SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_LOCAL_APPDATA, nullptr, 0, wcfg_location))) {
-      char wcfg_location_cstr[MAX_PATH];
-      snprintf(&wcfg_location_cstr[0], MAX_PATH, "%ls", &wcfg_location[0]);
-      cfg_location = std::string(&wcfg_location_cstr[0], strnlen(&wcfg_location_cstr[0], MAX_PATH));
-    }
-#endif // defined(LINUX_VERSION)
+    std::string cfg_location = os_specific::getHomePath();
 
     return (version_specific::filesystem::path(cfg_location) /
             version_specific::filesystem::path(cfg_filename_location)).string();
