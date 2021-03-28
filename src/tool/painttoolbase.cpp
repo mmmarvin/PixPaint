@@ -130,17 +130,17 @@ namespace pixpaint
   {
     // getOldRect is only useful for tools that incorporate moving (ex. selection tool) so that
     // it can repaint an old rect (previous rect position)
-    return os_specific::nullopt;
+    return version_specific::nullopt;
   }
 
   optional<IntRect> PaintToolBase::getHistoryRect() const
   {
-    return os_specific::nullopt;
+    return version_specific::nullopt;
   }
 
   optional<const Cursor&> PaintToolBase::getCursor() const
   {
-    return os_specific::nullopt;
+    return version_specific::nullopt;
   }
 
   int PaintToolHandlerBase::onKeyPress(EKey key,

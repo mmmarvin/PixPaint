@@ -17,10 +17,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>. 
  *
  **********/
-#include "os_specific_headers.h"
+#include "version_specific_headers.h"
 
 #if defined(USE_CXX14)
-namespace os_specific
+namespace version_specific
 {
 namespace filesystem
 {
@@ -41,7 +41,7 @@ namespace filesystem
 }
 }
 #elif defined(USE_CXX17)
-namespace os_specific
+namespace version_specific
 {
 namespace filesystem
 {

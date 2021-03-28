@@ -183,7 +183,7 @@ namespace
                                                    "PixPaint Colors(*.ppc)");
       if(filename.size()) {
         auto filename_s = std::string(filename.toUtf8().constData());
-        auto filename_p = os_specific::filesystem::path(filename_s);
+        auto filename_p = version_specific::filesystem::path(filename_s);
         if(filename_p.extension().string().empty() ||
            filename_p.extension().string() != "ppa") {
           filename_s += ".ppa";

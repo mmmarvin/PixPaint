@@ -24,14 +24,14 @@
 #include "utility/settings_file_utility.h"
 #include "version.h"
 #include "debug_log.h"
-#include "os_specific_headers.h"
+#include "version_specific_headers.h"
 
 namespace pixpaint
 {
   Logger::Logger()
   {
     settings_file_utils::tryCreateSettingsFilename();
-    if(!os_specific::filesystem::exists(settings_file_utils::getLogFilename())) {
+    if(!version_specific::filesystem::exists(settings_file_utils::getLogFilename())) {
       m_out.open(settings_file_utils::getLogFilename(), std::ios_base::out);
       if(m_out.is_open()) {
         m_out << getAppAndVersion()

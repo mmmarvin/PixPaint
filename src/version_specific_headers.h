@@ -17,8 +17,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>. 
  *
  **********/
-#ifndef OS_SPECIFIC_HEADERS_H
-#define OS_SPECIFIC_HEADERS_H
+#ifndef VERSION_SPECIFIC_HEADERS_H
+#define VERSION_SPECIFIC_HEADERS_H
 
 #if __cplusplus < 201703L || (defined(_MSC_VER) && (_MSC_VER < 1914))
 #define USE_CXX14
@@ -31,7 +31,7 @@
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
-namespace os_specific
+namespace version_specific
 {
 namespace filesystem
 {
@@ -94,7 +94,7 @@ namespace filesystem
 #include <optional>
 #include <variant>
 
-namespace os_specific
+namespace version_specific
 {
 namespace filesystem
 {
@@ -153,4 +153,4 @@ namespace filesystem
   }
 }
 #endif // __cplusplus < 201703L || (defined(_MSC_VER) && (_MSC_VER < 1914))
-#endif // OS_SPECIFIC_HEADERS_H
+#endif // VERSION_SPECIFIC_HEADERS_H

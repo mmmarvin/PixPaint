@@ -22,7 +22,7 @@
 
 #include <string>
 #include <vector>
-#include "../os_specific_headers.h"
+#include "../version_specific_headers.h"
 
 namespace pixpaint
 {
@@ -70,7 +70,7 @@ namespace pixpaint
   private:
     std::string                                           m_name;
     void*                                                 m_value;
-    os_specific::variant<IntegerValue, StringChoiceValue> m_extraValue;
+    version_specific::variant<IntegerValue, StringChoiceValue> m_extraValue;
     EValueOptionType                                      m_type;
   };
 }

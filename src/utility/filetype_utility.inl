@@ -19,7 +19,7 @@
  **********/
 #include "filetype_utility.h"
 
-#include "../os_specific_headers.h"
+#include "../version_specific_headers.h"
 
 namespace pixpaint
 {
@@ -29,11 +29,11 @@ namespace filetype_utils
            class>
   std::string addExtension(const std::string& filename, const FileInformationT& fileTypeInformation)
   {
-    if(os_specific::filesystem::path(filename).extension() == fileTypeInformation.getExtension()) {
+    if(version_specific::filesystem::path(filename).extension() == fileTypeInformation.getExtension()) {
       return filename;
     }
 
-    auto new_filename = os_specific::filesystem::path(filename).replace_extension(fileTypeInformation.getExtension());
+    auto new_filename = version_specific::filesystem::path(filename).replace_extension(fileTypeInformation.getExtension());
     return new_filename.string();
   }
 }

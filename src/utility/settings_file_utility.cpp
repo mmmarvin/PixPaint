@@ -22,7 +22,7 @@
 #include <filesystem>
 #include <string.h>
 #include "../macro.h"
-#include "../os_specific_headers.h"
+#include "../version_specific_headers.h"
 #if defined(LINUX_VERSION)
 #include <unistd.h>
 #include <sys/types.h>
@@ -38,8 +38,8 @@ namespace settings_file_utils
   void tryCreateSettingsFilename()
   {
     auto settings_dir = getSettingsLocation();
-    if(!os_specific::filesystem::exists(settings_dir)) {
-      os_specific::filesystem::create_directory(settings_dir);
+    if(!version_specific::filesystem::exists(settings_dir)) {
+      version_specific::filesystem::create_directory(settings_dir);
     }
   }
 
@@ -47,16 +47,16 @@ namespace settings_file_utils
   {
     static const std::string cfg_filename = "settings.cfg";
 
-    return (os_specific::filesystem::path(getSettingsLocation()) /
-            os_specific::filesystem::path(cfg_filename)).string();
+    return (version_specific::filesystem::path(getSettingsLocation()) /
+            version_specific::filesystem::path(cfg_filename)).string();
   }
 
   std::string getLogFilename()
   {
     static const std::string log_filename = "log.txt";
 
-    return (os_specific::filesystem::path(getSettingsLocation()) /
-            os_specific::filesystem::path(log_filename)).string();
+    return (version_specific::filesystem::path(getSettingsLocation()) /
+            version_specific::filesystem::path(log_filename)).string();
   }
 
   std::string getSettingsLocation()
@@ -75,8 +75,8 @@ namespace settings_file_utils
     }
 #endif // defined(LINUX_VERSION)
 
-    return (os_specific::filesystem::path(cfg_location) /
-            os_specific::filesystem::path(cfg_filename_location)).string();
+    return (version_specific::filesystem::path(cfg_location) /
+            version_specific::filesystem::path(cfg_filename_location)).string();
   }
 }
 }

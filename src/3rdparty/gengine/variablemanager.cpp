@@ -181,14 +181,14 @@ namespace gengine2d
     return "";
   }
 
-  os_specific::optional<EVariableType> VariableManager::getType(const std::string& name) const
+  version_specific::optional<EVariableType> VariableManager::getType(const std::string& name) const
   {
     auto findIt = m_variables.find(name);
     if(findIt != m_variables.end()) {
       return std::get<1>(findIt->second);
     }
 
-    return os_specific::nullopt;
+    return version_specific::nullopt;
   }
 
   std::vector<std::string> VariableManager::getVariableList() const

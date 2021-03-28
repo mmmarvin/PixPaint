@@ -20,7 +20,7 @@
 #ifndef OPTIONAL_H
 #define OPTIONAL_H
 
-#include "../os_specific_headers.h"
+#include "../version_specific_headers.h"
 
 namespace pixpaint
 {
@@ -28,10 +28,10 @@ namespace pixpaint
   class optional
   {
   public:
-    using value_type = typename os_specific::optional<T>::value_type;
+    using value_type = typename version_specific::optional<T>::value_type;
 
     optional() noexcept {}
-    optional(os_specific::nullopt_t) noexcept : m_value(os_specific::nullopt) {}
+    optional(version_specific::nullopt_t) noexcept : m_value(version_specific::nullopt) {}
     optional(const optional<T>&) = default;
     optional(optional<T>&&) noexcept = default;
     optional& operator=(const optional<T>&) = default;
@@ -47,7 +47,7 @@ namespace pixpaint
     void reset() noexcept { m_value.reset(); }
 
   private:
-    os_specific::optional<T> m_value;
+    version_specific::optional<T> m_value;
   };
 
   template<class T>
@@ -57,7 +57,7 @@ namespace pixpaint
     using value_type = T;
 
     optional() noexcept {}
-    optional(os_specific::nullopt_t) noexcept : m_value(os_specific::nullopt) {}
+    optional(version_specific::nullopt_t) noexcept : m_value(version_specific::nullopt) {}
     optional(const optional<value_type&>&) = default;
     optional(optional<value_type&>&&) noexcept = default;
     optional& operator=(const optional<value_type&>&) = default;
@@ -73,7 +73,7 @@ namespace pixpaint
     void reset() noexcept { m_value.reset(); }
 
   private:
-    os_specific::optional<value_type*> m_value;
+    version_specific::optional<value_type*> m_value;
   };
 
   template<class T>
@@ -83,7 +83,7 @@ namespace pixpaint
     using value_type = const T;
 
     optional() noexcept {}
-    optional(os_specific::nullopt_t) noexcept : m_value(os_specific::nullopt) {}
+    optional(version_specific::nullopt_t) noexcept : m_value(version_specific::nullopt) {}
     optional(const optional<value_type&>&) = default;
     optional(optional<value_type&>&&) noexcept = default;
     optional& operator=(const optional<value_type&>&) = default;
@@ -99,7 +99,7 @@ namespace pixpaint
     void reset() noexcept { m_value.reset(); }
 
   private:
-    os_specific::optional<value_type*> m_value;
+    version_specific::optional<value_type*> m_value;
   };
 }
 

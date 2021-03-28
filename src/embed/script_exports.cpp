@@ -45,7 +45,7 @@
 #include "../tool/painttoolbase.h"
 #include "../utility/geometry_utility.h"
 #include "../document.h"
-#include "../os_specific_headers.h"
+#include "../version_specific_headers.h"
 #include "animationfiletypewrapper.h"
 #include "effectwrapper.h"
 #include "headerstream.h"
@@ -309,10 +309,10 @@ namespace pixpaint
 {
 namespace
 {
-  void load_scripts_impl(const os_specific::filesystem::path& location, bp::object& mainNamespace)
+  void load_scripts_impl(const version_specific::filesystem::path& location, bp::object& mainNamespace)
   {
-    if(os_specific::filesystem::exists(location)) {
-      for(const auto& tool_script_file : os_specific::filesystem::directory_iterator(location)) {
+    if(version_specific::filesystem::exists(location)) {
+      for(const auto& tool_script_file : version_specific::filesystem::directory_iterator(location)) {
         if(tool_script_file.path().filename().extension().string() == ".py") {
           bp::exec_file(tool_script_file.path().string().c_str(), mainNamespace, mainNamespace);
         }
@@ -322,33 +322,33 @@ namespace
 
   void load_tool_scripts(bp::object& mainNamespace)
   {
-    auto location = os_specific::filesystem::current_path() /
-                    os_specific::filesystem::path("scripts") /
-                    os_specific::filesystem::path("tools");
+    auto location = version_specific::filesystem::current_path() /
+                    version_specific::filesystem::path("scripts") /
+                    version_specific::filesystem::path("tools");
     load_scripts_impl(location, mainNamespace);
   }
 
   void load_image_file_type_scripts(bp::object& mainNamespace)
   {
-    auto location = os_specific::filesystem::current_path() /
-                    os_specific::filesystem::path("scripts") /
-                    os_specific::filesystem::path("image_filetypes");
+    auto location = version_specific::filesystem::current_path() /
+                    version_specific::filesystem::path("scripts") /
+                    version_specific::filesystem::path("image_filetypes");
     load_scripts_impl(location, mainNamespace);
   }
 
   void load_animation_file_type_scripts(bp::object& mainNamespace)
   {
-    auto location = os_specific::filesystem::current_path() /
-                    os_specific::filesystem::path("scripts") /
-                    os_specific::filesystem::path("animation_filetypes");
+    auto location = version_specific::filesystem::current_path() /
+                    version_specific::filesystem::path("scripts") /
+                    version_specific::filesystem::path("animation_filetypes");
     load_scripts_impl(location, mainNamespace);
   }
 
   void load_effect_scripts(bp::object& mainNamespace)
   {
-    auto location = os_specific::filesystem::current_path() /
-        os_specific::filesystem::path("scripts") /
-        os_specific::filesystem::path("effects");
+    auto location = version_specific::filesystem::current_path() /
+        version_specific::filesystem::path("scripts") /
+        version_specific::filesystem::path("effects");
     load_scripts_impl(location, mainNamespace);
   }
 }

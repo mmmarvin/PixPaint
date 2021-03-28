@@ -23,7 +23,7 @@
 #include <cassert>
 #include <unordered_map>
 #include <vector>
-#include "../../os_specific_headers.h"
+#include "../../version_specific_headers.h"
 
 namespace gengine2d
 {
@@ -39,7 +39,7 @@ namespace gengine2d
   {
     struct Variable
     {
-      using value_type = os_specific::variant<bool, std::int64_t, double, std::string>;
+      using value_type = version_specific::variant<bool, std::int64_t, double, std::string>;
 
       Variable(value_type&& v);
 
@@ -69,7 +69,7 @@ namespace gengine2d
     const double* getFloat(const std::string& name) const { return getVariable<double>(name); }
     const std::string* getString(const std::string& name) const { return getVariable<std::string>(name); }
     std::string getValueString(const std::string& name) const;
-    os_specific::optional<EVariableType> getType(const std::string& name) const;
+    version_specific::optional<EVariableType> getType(const std::string& name) const;
 
     std::vector<std::string> getVariableList() const;
 
@@ -90,7 +90,7 @@ namespace gengine2d
     assert(findIt != m_variables.end());
 
     if(findIt != m_variables.end()) {
-      const T* ret = os_specific::variant_get_if<T>(&std::get<0>(findIt->second).value);
+      const T* ret = version_specific::variant_get_if<T>(&std::get<0>(findIt->second).value);
       assert(ret);
 
       return ret;

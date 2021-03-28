@@ -70,11 +70,11 @@ namespace filetype_utils
 
   std::string addExtension(const std::string& filename, const std::string& extension)
   {
-    if(os_specific::filesystem::path(filename).extension() == extension) {
+    if(version_specific::filesystem::path(filename).extension() == extension) {
       return filename;
     }
 
-    auto new_filename = os_specific::filesystem::path(filename).replace_extension(os_specific::filesystem::path(extension));
+    auto new_filename = version_specific::filesystem::path(filename).replace_extension(version_specific::filesystem::path(extension));
     return new_filename.string();
   }
 }

@@ -38,7 +38,7 @@ namespace pixpaint
                             bool shouldAddToRecent,
                             bool showError)
   {
-    auto extension = std::string(os_specific::to_string(os_specific::filesystem::path(filename).extension()));
+    auto extension = std::string(version_specific::to_string(version_specific::filesystem::path(filename).extension()));
     if(!extension.empty() && extension[0] == '.') {
       extension = extension.substr(1, extension.size() - 1);
     }
@@ -69,7 +69,7 @@ namespace pixpaint
         if(res == ImageFileTypeBase::EOR_SUCCESS) {
           gengine2d::getConfigurationManager().setVariable(CONFIG_SECTION_SETTINGS,
                                                            "last_location",
-                                                           os_specific::filesystem::path(filename).parent_path().string());
+                                                           version_specific::filesystem::path(filename).parent_path().string());
 
           m_documentPanel->addPage(std::move(animationDocument));
           FileTypeSetterT()(document_manager, file_type_obj);
@@ -174,7 +174,7 @@ namespace pixpaint
 
             gengine2d::getConfigurationManager().setVariable(CONFIG_SECTION_SETTINGS,
                                                              "last_location",
-                                                             os_specific::filesystem::path(filename).parent_path().string());
+                                                             version_specific::filesystem::path(filename).parent_path().string());
 
             FileTypeSetterT()(document_manager, file_type_obj);
             if(shouldSetFilename) {
@@ -203,7 +203,7 @@ namespace pixpaint
 
           gengine2d::getConfigurationManager().setVariable(CONFIG_SECTION_SETTINGS,
                                                            "last_location",
-                                                           os_specific::filesystem::path(filename).parent_path().string());
+                                                           version_specific::filesystem::path(filename).parent_path().string());
 
           FileTypeSetterT()(document_manager, file_type_obj);
           if(shouldSetFilename) {

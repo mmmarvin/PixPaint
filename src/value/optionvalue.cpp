@@ -77,16 +77,16 @@ namespace pixpaint
 
   int OptionValue::getFloor() const
   {
-    return os_specific::variant_get<IntegerValue>(m_extraValue).floor;
+    return version_specific::variant_get<IntegerValue>(m_extraValue).floor;
   }
 
   int OptionValue::getCeil() const
   {
-    return os_specific::variant_get<IntegerValue>(m_extraValue).ceil;
+    return version_specific::variant_get<IntegerValue>(m_extraValue).ceil;
   }
 
   const std::vector<std::string>& OptionValue::getChoices() const
   {
-    return os_specific::variant_get<StringChoiceValue>(m_extraValue).values;
+    return version_specific::variant_get<StringChoiceValue>(m_extraValue).values;
   }
 }

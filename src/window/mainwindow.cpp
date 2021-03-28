@@ -64,7 +64,7 @@
 #include "../project_filetype_importer.h"
 #include "../effect_importer.h"
 #include "../logger.h"
-#include "../os_specific_headers.h"
+#include "../version_specific_headers.h"
 #include "../tool_importer.h"
 #include "colortoolbox.h"
 #include "consoletoolbox.h"
@@ -671,7 +671,7 @@ namespace
   {
     std::vector<std::string> new_recent_files;
     for(const auto& filename : m_recentFiles) {
-      if(os_specific::filesystem::exists(filename)) {
+      if(version_specific::filesystem::exists(filename)) {
         new_recent_files.push_back(filename);
       }
     }
@@ -919,7 +919,7 @@ namespace
         auto sargv = std::string(argv[i]);
         if(sargv == "--nopython") {
           param.usePython = false;
-        } else if(os_specific::filesystem::exists(os_specific::filesystem::path(sargv))) {
+        } else if(version_specific::filesystem::exists(version_specific::filesystem::path(sargv))) {
           param.filename = sargv;
         }
       }
