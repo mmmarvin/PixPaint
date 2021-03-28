@@ -32,7 +32,7 @@ namespace pixpaint
 
     QObject::connect(helpMenu->checkForUpdatesAction, &QAction::triggered, [parent](bool) {
       auto res = getUpdater().updateAvailable();
-      switch(res) {
+      switch(std::get<0>(res)) {
       case 0:
         QMessageBox::information(parent,
                                  "Update",

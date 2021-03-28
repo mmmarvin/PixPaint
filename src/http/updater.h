@@ -1,6 +1,8 @@
 #ifndef UPDATER_H
 #define UPDATER_H
 
+#include <string>
+#include <tuple>
 #include "../pattern/singleton.h"
 
 namespace pixpaint
@@ -14,7 +16,7 @@ namespace pixpaint
     Updater() {}
 
   public:
-    int updateAvailable() const;
+    std::tuple<int, std::string, std::string> updateAvailable() const;
 
   private:
     PIXPAINT_SINGLETON_FUNC_FRIEND(Updater)

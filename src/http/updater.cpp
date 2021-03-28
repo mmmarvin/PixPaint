@@ -14,7 +14,7 @@ using btcp = basio::ip::tcp;
 
 namespace pixpaint
 {
-  int Updater::updateAvailable() const
+  std::tuple<int, std::string, std::string> Updater::updateAvailable() const
   {
     try {
       requests::SSLRequest r(HOST, PORT);
@@ -31,15 +31,33 @@ namespace pixpaint
         if(o.parse(requests::to_string(res.body()))) {
           auto latest_version_id = o.get<jsonxx::Object>("latest").get<jsonxx::Number>("version");
           if(latest_version_id > getVersionID()) {
-            return 1;
+#if defined(LINUX_VERSION)
+            const auto& linux_object = o.get<jsonxx::Object>("latest").get<jsonxx::Object>("bin").get<jsonxx::Object>("linux");
+#elif defined(WINDOWS_VERSION)
+            const auto& win_object = o.get<jsonxx::Object>("latest").get<jsonxx::Object>("bin").get<jsonxx::Object>("win");
+#endif // defined(LINUX_VERSION)
+
+            std::string url =
+#if defined(LINUX_VERSION)
+                linux_object.get<jsonxx::String>("url");
+#elif defined(WINDOWS_VERSION)
+                win_object.get<jsonxx::String>("url");
+#endif // defined(LINUX_VERSION)
+            std::string checksum =
+#if defined(LINUX_VERSION)
+                    linux_object.get<jsonxx::String>("checksum");
+#elif defined(WINDOWS_VERSION)
+                    win_object.get<jsonxx::String>("checksum");
+#endif // defined(LINUX_VERSION)
+            return { 1, url, checksum };
           }
 
-          return 0;
+          return { 0, "", "" };
         }
       }
     } catch(...) {}
 
-    return -1;
+    return { -1, "", "" };
   }
 
   PIXPAINT_SINGLETON_FUNC_DEF(Updater)
