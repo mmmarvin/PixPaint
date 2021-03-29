@@ -20,7 +20,7 @@ namespace requests
       p.get().body().data = buff.data();
       p.get().body().size = buff.size();
 
-      auto read_size = boost::beast::http::read(m_stream, buffer, p, ec);
+      boost::beast::http::read(m_stream, buffer, p, ec);
       if(ec == boost::beast::http::error::need_buffer) {
         ec = {};
       }
@@ -29,7 +29,7 @@ namespace requests
         return ec;
       }
 
-      done = !func(buff, read_size);
+      done = !func(buff, buff.size() - p.get().body().size);
     }
 
     return boost::beast::error_code();
