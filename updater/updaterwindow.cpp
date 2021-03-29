@@ -207,7 +207,7 @@ namespace
       }
 
       // run the extractor
-      pixpaint::os_specific::callProcess("extract", out_filename + " ./out/");
+      pixpaint::os_specific::callProcess("minizip", "-x -d . " + out_filename);
       QApplication::exit(0);
     }
 
