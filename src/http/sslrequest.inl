@@ -16,7 +16,7 @@ namespace requests
 
     bool done = false;
     while(!p.is_done() && !done) {
-      std::array<char, Size> buff;
+      std::array<unsigned char, Size> buff;
       p.get().body().data = buff.data();
       p.get().body().size = buff.size();
 
