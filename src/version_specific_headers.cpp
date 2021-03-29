@@ -38,6 +38,11 @@ namespace filesystem
   {
     return boost::filesystem::current_path();
   }
+
+  path temporary_path()
+  {
+    return boost::filesystem::temp_directory_path();
+  }
 }
 }
 #elif defined(USE_CXX17)
@@ -58,6 +63,11 @@ namespace filesystem
   path current_path()
   {
     return std::filesystem::current_path();
+  }
+
+  path temporary_path()
+  {
+    return std::filesystem::temp_directory_path();
   }
 }
 }

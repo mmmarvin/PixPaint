@@ -41,6 +41,7 @@ namespace filesystem
   bool exists(const path& filename);
   bool create_directory(const path& p);
   path current_path();
+  path temporary_path();
 }
   template<class... Args> using variant = boost::variant<Args...>;
   template<class T> using optional = boost::optional<T>;
@@ -104,6 +105,7 @@ namespace filesystem
   bool exists(const path& filename);
   bool create_directory(const path& p);
   path current_path();
+  path temporary_path();
 }
   template<class... Args> using variant = std::variant<Args...>;
   template<class T> using optional = std::optional<T>;
