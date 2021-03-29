@@ -35,6 +35,7 @@
 #include "../src/http/http_helper.h"
 #include "../src/http/sslrequest.h"
 #include "../src/debug_log.h"
+#include "../src/macro.h"
 #include "../src/os_specific_functions.h"
 #include "../src/version_specific_headers.h"
 #include "updater_version.h"
@@ -207,7 +208,12 @@ namespace
       }
 
       // run the extractor
-      pixpaint::os_specific::callProcess("minizip", "-x -d . " + out_filename);
+      std::string extractor_filename = "minizip";
+#if defined(WINDOWS_VERSION)
+      extractor_filename += ".exe";
+#endif // defined(WINDOWS_VERSION)
+
+      pixpaint::os_specific::callProcess(extractor_filename, "-x -d . " + out_filename);
       QApplication::exit(0);
     }
 
