@@ -31,8 +31,10 @@
 #include <QStyle>
 #include <QPainter>
 #include <QVBoxLayout>
+#include "../src/crypto/hash_utility.h"
 #include "../src/http/http_helper.h"
 #include "../src/http/sslrequest.h"
+#include "../src/debug_log.h"
 #include "../src/os_specific_functions.h"
 #include "../src/version_specific_headers.h"
 #include "updater_version.h"
@@ -42,6 +44,17 @@ namespace bhttp = bbeast::http;
 
 namespace pixpaint_updater
 {
+namespace
+{
+  bool checkChecksum(const std::string& filename,
+                     const std::string& checksum)
+  {
+    auto calc_checksum = pixpaint::crypto_hash_utils::sha256_file(filename);
+//    PIXPAINT_DEBUG_LOG("Checksum:", checksum, "\n",
+//                       "Calculated checksum", c);
+    return calc_checksum == checksum;
+  }
+}
   UpdaterWindow::UpdaterWindow(std::string url, std::string checksum) :
     QDialog(nullptr),
     m_ready(false),
@@ -53,8 +66,6 @@ namespace pixpaint_updater
     m_downloaderThread = std::thread(&UpdaterWindow::dowloaderThread, this, url, checksum);
 
     try {
-//      auto* central_widget = new QWidget(this);
-
       auto* layout = new QVBoxLayout(this);
 
       m_label = new QLabel("Downloading update...", this);
@@ -69,8 +80,6 @@ namespace pixpaint_updater
       layout->addWidget(m_label);
       layout->addWidget(m_progressBar);
       layout->addSpacerItem(new QSpacerItem(0, 20));
-
-//      this->setCentralWidget(central_widget);
     } catch(...) {
       m_done.store(true);
       if(m_downloaderThread.joinable()) {
@@ -126,9 +135,9 @@ namespace pixpaint_updater
       QApplication::exit(1);
     }
 
-//    std::cout << url_structure.protocol << "\n"
-//              << url_structure.hostname << "\n"
-//              << url_structure.pathname << std::endl;
+//    PIXPAINT_DEBUG_LOG(url_structure.protocol, "\n",
+//                       url_structure.hostname, "\n",
+//                       url_structure.pathname);
 
     // open the file to write to
     auto out_path = (version_specific::filesystem::temporary_path() /
@@ -152,15 +161,17 @@ namespace pixpaint_updater
 
     std::ofstream out_file(out_filename, std::ios_base::binary | std::ios_base::app);
 
-//    std::cout << "Saving file to " << (version_specific::filesystem::temporary_path() /
-//                                       version_specific::filesystem::path("pixpaint") /
-//                                       version_specific::filesystem::path("update.zip")).string() << std::endl;
+//    PIXPAINT_DEBUG_LOG("Saving file to ",
+//                       (version_specific::filesystem::temporary_path() /
+//                        version_specific::filesystem::path("pixpaint") /
+//                        version_specific::filesystem::path("update.zip")).string());
 
     if(!out_file.is_open()) {
       QMessageBox::critical(this, "Updater", "Cannot write to hard disk!");
       QApplication::exit(1);
     }
 
+    // send request
     requests::SSLRequest r(url_structure.hostname.c_str(),
                            url_structure.protocol.c_str());
 
@@ -170,6 +181,7 @@ namespace pixpaint_updater
 
     r.write(req);
 
+    // read response
     auto res = r.read_response_chunks<512>([this, &out_file]
     (const std::array<unsigned char, 512>& buff, size_t read_size) {
       if(m_done.load()) {
@@ -181,12 +193,21 @@ namespace pixpaint_updater
     });
 
     if(!m_done.load()) {
+      out_file.close();
+
       if(res) {
         throw bbeast::system_error(res);
       }
 
+      // check the checksum
+      m_label->setText("Verifying file...");
+      if(!checkChecksum(out_filename, checksum)) {
+        QMessageBox::critical(this, "Updater", "File checksum does not match! Exiting...");
+        QApplication::exit(1);
+      }
+
       // run the extractor
-      pixpaint::os_specific::callProcess("extract", out_filename + " .");
+      pixpaint::os_specific::callProcess("extract", out_filename + " ./out/");
       QApplication::exit(0);
     }
 

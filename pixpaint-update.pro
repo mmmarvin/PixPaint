@@ -28,6 +28,7 @@ HEADERS += \
     updater/updater_version.h \
     updater/updaterwindow.h \
     src/3rdparty/jsonxx/jsonxx.h \
+    src/crypto/hash_utility.h \
     src/http/http_helper.h \
     src/http/sslrequest.h \
     src/http/updater.h \
@@ -40,16 +41,18 @@ SOURCES += \
     updater/pixpaint_updater.cpp \
     updater/updater_version.cpp \
     updater/updaterwindow.cpp \
+    src/3rdparty/jsonxx/jsonxx.cc \
+    src/crypto/hash_utility.cpp \
     src/http/http_helper.cpp \
     src/http/sslrequest.cpp \
     src/http/sslrequest.inl \
     src/http/updater.cpp \
-    src/3rdparty/jsonxx/jsonxx.cc \
     src/debug_log.cpp \
     src/debug_log.inl \
     src/os_specific_functions.cpp \
     src/version.cpp \
     src/version_specific_headers.cpp
+
 
 QMAKE_CXXFLAGS += \
     -Wpedantic -Werror=return-type -Werror=uninitialized -Werror=strict-overflow=5 #-Wswitch-default
