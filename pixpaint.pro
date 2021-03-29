@@ -447,6 +447,9 @@ SOURCES += \
     src/singleton.inl \
     src/tool_importer.cpp
 
+QMAKE_CXXFLAGS += \
+    -Wpedantic -Werror=return-type -Werror=uninitialized -Werror=strict-overflow=5 #-Wswitch-default
+
 INCLUDEPATH += \
     $${INCLUDE_PATH_PYTHON} \
     $${INCLUDE_PATH_CLIP}

@@ -441,6 +441,9 @@ SOURCES += \
 QMAKE_CXXFLAGS += \
     -Wl,-subsystem,windows
 
+QMAKE_CXXFLAGS += \
+    -Wpedantic -Werror=return-type -Werror=uninitialized -Werror=strict-overflow=5 #-Wswitch-default
+
 QMAKE_LFLAGS += \
     -mwindows $${PWD}/win/icon.res $${PWD}/win/version.res
 
