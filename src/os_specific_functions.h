@@ -26,10 +26,14 @@ namespace pixpaint
 {
 namespace os_specific
 {
-  bool callProcess(const std::string& process_name,
-                   const std::string& process_parameters);
+  bool callProcess(const std::string& process_name, const std::string& process_parameters);
+  template<class... Args>
+  bool callProcessArgs(const std::string& process_name,
+                       Args&&... args);
   std::string getHomePath();
 }
 }
+
+#include "os_specific_functions.inl"
 
 #endif // OS_SPECIFIC_FUNCTIONS_H

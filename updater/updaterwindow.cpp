@@ -73,7 +73,7 @@ namespace
       m_progressBar = new QProgressBar(this);
       m_progressBar->setMinimum(0);
       m_progressBar->setMaximum(100);
-      m_progressBar->setValue(50);
+      m_progressBar->setValue(0);
       m_progressBar->setFormat("");
       m_progressBar->setStyleSheet("QProgressBar::chunk { background: #0000FF; width: 5px; }");
 
@@ -134,6 +134,7 @@ namespace
        url_structure.pathname.empty()) {
       QMessageBox::critical(this, "Updater", "There was a problem parsing the update URL!");
       QApplication::exit(1);
+      return;
     }
 
 //    PIXPAINT_DEBUG_LOG(url_structure.protocol, "\n",
@@ -150,17 +151,19 @@ namespace
       if(!version_specific::filesystem::create_directory(out_path)) {
         QMessageBox::critical(this, "Updater", "Cannot write to hard disk!");
         QApplication::exit(1);
+        return;
       }
     }
 
-    if(version_specific::filesystem::exists(out_filename)) {
-      if(std::remove(out_filename.c_str())) {
-        QMessageBox::critical(this, "Updater", "Cannot write to hard disk!");
-        QApplication::exit(1);
-      }
-    }
+//    if(version_specific::filesystem::exists(out_filename)) {
+//      if(std::remove(out_filename.c_str())) {
+//        QMessageBox::critical(this, "Updater", "Cannot write to hard disk!");
+//        QApplication::exit(1);
+//        return;
+//      }
+//    }
 
-    std::ofstream out_file(out_filename, std::ios_base::binary | std::ios_base::app);
+    std::ofstream out_file(out_filename, std::ios_base::binary);
 
 //    PIXPAINT_DEBUG_LOG("Saving file to ",
 //                       (version_specific::filesystem::temporary_path() /
@@ -170,6 +173,7 @@ namespace
     if(!out_file.is_open()) {
       QMessageBox::critical(this, "Updater", "Cannot write to hard disk!");
       QApplication::exit(1);
+      return;
     }
 
     // send request
@@ -183,11 +187,19 @@ namespace
     r.write(req);
 
     // read response
-    auto res = r.read_response_chunks<512>([this, &out_file]
-    (const std::array<unsigned char, 512>& buff, size_t read_size) {
+    size_t total_read_size = 0;
+
+    auto res = r.read_response_chunks<512>([this, &out_file, &total_read_size]
+    (const std::array<unsigned char, 512>& buff, size_t body_size, size_t read_size) {
       if(m_done.load()) {
         return false;
       }
+
+      total_read_size += read_size;
+
+      // update progress bar
+      float read_percentage = (total_read_size / static_cast<float>(body_size)) * 100.f;
+      this->m_progressBar->setValue(read_percentage);
 
       out_file.write(reinterpret_cast<const char*>(buff.data()), read_size);
       return true;
@@ -205,6 +217,7 @@ namespace
       if(!checkChecksum(out_filename, checksum)) {
         QMessageBox::critical(this, "Updater", "File checksum does not match! Exiting...");
         QApplication::exit(1);
+        return;
       }
 
       // run the extractor
@@ -213,10 +226,12 @@ namespace
       extractor_filename += ".exe";
 #endif // defined(WINDOWS_VERSION)
 
-      pixpaint::os_specific::callProcess(extractor_filename, "-x -d . " + out_filename);
+      pixpaint::os_specific::callProcessArgs(extractor_filename, "-x", "-d", ".", "-o", out_filename);
       QApplication::exit(0);
+      return;
     }
 
     QApplication::exit(1);
+    return;
   }
 }
